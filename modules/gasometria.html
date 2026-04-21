@@ -621,8 +621,8 @@ function renderFinalDiag(){
     </div>
     <div style="background:var(--bg3);border-radius:var(--rs);padding:1rem;margin-top:1rem">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Tu desempeño</div>
-      <div style="font-family:var(--fh);font-size:2rem;color:${pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)'}">${pct}%</div>
-      <div style="font-size:13px;color:var(--text2)">${correct} de ${total} pasos correctos</div>
+      ${(()=>{const nota=+(correct/total*20).toFixed(1);const nc=nota>=17?'var(--green)':nota>=14?'var(--blue)':nota>=11?'var(--amber)':'var(--red)';return `<div style="font-family:var(--fh);font-size:2.5rem;color:${nc};line-height:1">${nota}</div><div style="font-size:.85rem;color:var(--text3);margin-bottom:.25rem">nota / 20</div>`;})()}
+      <div style="font-size:13px;color:var(--text2)">${correct} de ${total} pasos correctos (${pct}%)</div>
       <div style="margin-top:.75rem;font-size:13px;color:var(--text2)">${pct>=80?'Excelente interpretación. Dominas el algoritmo GSA.':pct>=60?'Buen avance. Repasa los pasos donde fallaste.':'Repasa el algoritmo de 5 pasos en la sección Referencia Rápida.'}</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">

@@ -1435,6 +1435,7 @@ function renderReeval(){
       ${session.score.total>=60?'Sesión exitosa. Continuar con progresión de carga en próxima sesión.':
         session.score.total>=40?'Sesión aceptable. Revisar el orden de técnicas y la prescripción de ejercicio.':
         'Revisar el plan de tratamiento. Consultar bibliografía sobre el caso antes de la próxima sesión.'}
+      <span style="font-size:11px;color:var(--text3)"> · Nota: ${+(session.score.total/100*20).toFixed(1)}/20</span>
     </div>
   </div>`;
 }
@@ -1447,7 +1448,8 @@ function renderResult(){
   const sc=session.score;
   const sm=c.scoreMap;
   const total=Math.min(100,sc.total);
-  const grade=total>=85?{l:'Excelente',c:'var(--green)'}:total>=70?{l:'Bueno',c:'var(--blue)'}:total>=55?{l:'Aceptable',c:'var(--amber)'}:{l:'Insuficiente',c:'var(--red)'};
+  const nota=+(total/100*20).toFixed(1);
+  const grade=nota>=17?{l:'Excelente',c:'var(--green)'}:nota>=14?{l:'Bueno',c:'var(--blue)'}:nota>=11?{l:'Aceptable',c:'var(--amber)'}:{l:'Insuficiente',c:'var(--red)'};
 
   clearInterval(session.timerInterval);
   const elapsed=Math.round((Date.now()-session.startTime)/1000);
@@ -1464,9 +1466,10 @@ function renderResult(){
 
   return `<div class="card">
     <div style="text-align:center;padding:1.5rem 0">
-      <div style="font-family:var(--fh);font-size:3.5rem;color:${grade.c};line-height:1">${total}</div>
-      <div style="font-size:.9rem;color:var(--text3);margin:.2rem 0">puntos / 100</div>
+      <div style="font-family:var(--fh);font-size:3.5rem;color:${grade.c};line-height:1">${nota}</div>
+      <div style="font-size:.9rem;color:var(--text3);margin:.2rem 0">nota / 20</div>
       <div style="font-family:var(--fh);font-size:1.4rem;color:${grade.c}">${grade.l}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">${total} / 100 pts</div>
       <div style="font-size:12px;color:var(--text3);margin-top:.5rem">Tiempo: ${em}:${es.toString().padStart(2,'0')} min &nbsp;·&nbsp; Caso: ${c.name}</div>
     </div>
 
