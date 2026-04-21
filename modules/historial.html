@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historial Longitudinal — FisioResp</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="../data/cases-historial.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+.logo span{color:var(--teal)}
+.hero h1{font-family:var(--fh);font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.1;margin-bottom:.5rem}
+.hero h1 em{color:var(--purple);font-style:normal}
+.hero p{color:var(--text2);max-width:520px;margin:0 auto}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media(max-width:800px){.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+/* CASE SELECTOR */
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.case-card{border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;background:var(--card)}
+.case-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.case-card.active{border-color:var(--purple);background:rgba(167,139,250,.06)}
+.case-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.75rem}
+.case-name{font-weight:700;font-size:13.5px;margin-bottom:2px}
+.case-diag{font-size:11.5px;color:var(--text2)}
+/* TIMELINE */
+.timeline-wrap{position:relative;margin:1.5rem 0}
+.timeline-track{display:flex;align-items:flex-start;gap:0;position:relative}
+.timeline-track::before{content:'';position:absolute;top:24px;left:24px;right:24px;height:2px;background:var(--border);z-index:0}
+.tl-node{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;cursor:pointer}
+.tl-dot{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--card);transition:all .3s;flex-shrink:0}
+.tl-dot.unlocked{border-color:var(--purple)}
+.tl-dot.active{border-color:var(--purple);background:rgba(167,139,250,.15);box-shadow:0 0 16px rgba(167,139,250,.3)}
+.tl-dot.locked{opacity:.4;cursor:default}
+.tl-label{font-size:11.5px;font-weight:600;color:var(--text2);margin-top:.5rem;text-align:center}
+.tl-date{font-size:10.5px;color:var(--text3);text-align:center}
+/* SNAPSHOT PANEL */
+.snapshot{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-top:1rem}
+.snapshot.animate{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* VITALS GRID */
+.vital-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.875rem;text-align:center}
+.vital-val{font-family:var(--fh);font-size:1.6rem;line-height:1;margin:.25rem 0}
+.vital-name{font-size:10.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--text2)}
+.vital-unit{font-size:10.5px;color:var(--text3)}
+.vital-delta{font-size:11px;margin-top:4px;font-weight:600}
+/* CHART AREAS */
+.chart-area{height:200px;position:relative}
+.chart-area-sm{height:160px;position:relative}
+/* BADGE */
+.badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.3px}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--fb)}
+/* DECISION POINT */
+.decision-box{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:var(--r);padding:1.25rem;margin:.75rem 0}
+.decision-title{font-family:var(--fh);color:var(--amber);font-size:1rem;margin-bottom:.5rem}
+.decision-opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem}
+.decision-opt{border:1px solid var(--border);border-radius:var(--rs);padding:.75rem;cursor:pointer;transition:all .2s;font-size:12.5px;background:var(--card)}
+.decision-opt:hover{border-color:rgba(251,191,36,.4)}
+.decision-opt.chosen-right{border-color:var(--green);background:rgba(74,222,128,.06);color:var(--green)}
+.decision-opt.chosen-wrong{border-color:var(--red);background:rgba(248,113,113,.06);color:var(--red)}
+.decision-fb{margin-top:.75rem;font-size:12.5px;padding:.75rem;border-radius:var(--rs);background:var(--bg3)}
+/* PREDICTION */
+.predict-wrap{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:var(--r);padding:1.25rem;margin:.75rem 0}
+.predict-title{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:.75rem}
+.predict-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.predict-label{font-size:12px;color:var(--text2);width:130px;flex-shrink:0}
+.predict-input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;color:var(--text);font-family:var(--fm);font-size:13px;width:80px;text-align:center}
+.predict-unit{font-size:11px;color:var(--text3);width:40px}
+/* EVOLUTION CHART */
+.evo-chart-wrap{height:240px;position:relative;margin-top:.75rem}
+/* INFO / WARN */
+.info{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--text2)}
+.success{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--text2)}
+tr:last-child td{border-bottom:none}
+/* MODE TABS */
+.mode-tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.mode-tab{padding:7px 16px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:all .2s}
+.mode-tab:hover{border-color:var(--border2);color:var(--text)}
+.mode-tab.active{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.4);color:var(--purple)}
+/* PRESENTER MODE */
+.presenter-btn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:300;padding:10px 20px;border-radius:var(--r);background:var(--purple);color:#fff;font-weight:700;font-size:13px;cursor:pointer;border:none;font-family:var(--fb);box-shadow:0 4px 20px rgba(167,139,250,.3);transition:all .2s}
+.presenter-btn:hover{background:#b89ef8;transform:translateY(-2px)}
+/* LOCK OVERLAY */
+.locked-msg{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+/* SCORE SUMMARY */
+.score-card{border:1px solid var(--border);border-radius:var(--rs);padding:.875rem;text-align:center;background:var(--bg3)}
+.score-num{font-family:var(--fh);font-size:2rem;line-height:1}
+.score-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--text2)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FisioResp <span>·</span> Historial</div>
+  <div class="ntab active" onclick="switchMode('learn',this)">📚 Aprendizaje</div>
+  <div class="ntab" onclick="switchMode('eval',this)">📝 Evaluación</div>
+  <div class="ntab" onclick="switchMode('present',this)">🖥️ Presentación</div>
+  <div class="ntab" onclick="switchMode('ref',this)">📊 Comparar</div>
+  <div class="phase-badge">Fase 5</div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>Historial <em>Longitudinal</em> del Paciente</h1>
+    <p>Sigue la evolución de 4 pacientes durante 12 semanas de rehabilitación respiratoria — con puntos de decisión clínica en tiempo real</p>
+  </div>
+
+  <!-- ══ MODO APRENDIZAJE ══ -->
+  <div class="panel active" id="mode-learn">
+
+    <!-- Case selector -->
+    <div class="case-grid" id="case-grid-learn"></div>
+
+    <!-- Timeline -->
+    <div id="learn-content" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <div id="learn-case-title" style="font-family:var(--fh);font-size:1.1rem"></div>
+            <div id="learn-case-sub" style="font-size:12px;color:var(--text2)"></div>
+          </div>
+          <div id="learn-case-badges" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+        </div>
+
+        <!-- Timeline nodes -->
+        <div class="timeline-track" id="learn-timeline"></div>
+      </div>
+
+      <!-- Snapshot content -->
+      <div id="learn-snapshot"></div>
+    </div>
+  </div>
+
+  <!-- ══ MODO EVALUACIÓN ══ -->
+  <div class="panel" id="mode-eval">
+    <div class="info" style="margin-bottom:1.25rem">
+      <b style="color:var(--text)">Modo Evaluación</b> — Los datos aparecen progresivamente. Predice los valores antes de verlos y toma decisiones clínicas en los puntos de inflexión. Al finalizar recibes tu puntuación.
+    </div>
+
+    <div class="case-grid" id="case-grid-eval"></div>
+
+    <div id="eval-content" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <div id="eval-case-title" style="font-family:var(--fh);font-size:1.1rem"></div>
+            <div id="eval-case-sub" style="font-size:12px;color:var(--text2)"></div>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="score-card" style="padding:.5rem .875rem">
+              <div class="score-num" id="eval-score" style="font-size:1.4rem;color:var(--purple)">0</div>
+              <div class="score-lbl">puntos</div>
+            </div>
+            <button class="btn btn-s btn-sm" onclick="resetEval()" style="font-size:11px;padding:5px 10px">↺ Reiniciar</button>
+          </div>
+        </div>
+        <div class="timeline-track" id="eval-timeline"></div>
+      </div>
+
+      <div id="eval-snapshot"></div>
+    </div>
+  </div>
+
+  <!-- ══ MODO PRESENTACIÓN ══ -->
+  <div class="panel" id="mode-present">
+    <div class="warn" style="margin-bottom:1.25rem">
+      <b style="color:var(--amber)">Modo Presentación</b> — Para docentes en clase. Los datos se revelan gradualmente con un clic. Sin puntuación ni predicciones — solo la evolución clínica progresiva.
+    </div>
+
+    <div class="case-grid" id="case-grid-present"></div>
+
+    <div id="present-content" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <div id="present-case-title" style="font-family:var(--fh);font-size:1.1rem"></div>
+            <div id="present-case-sub" style="font-size:12px;color:var(--text2)"></div>
+          </div>
+          <div style="display:flex;gap:.5rem">
+            <button class="btn btn-s" id="present-prev" onclick="presentNav(-1)">← Anterior</button>
+            <button class="btn btn-p" id="present-next" onclick="presentNav(1)">Siguiente →</button>
+          </div>
+        </div>
+        <div class="timeline-track" id="present-timeline"></div>
+      </div>
+
+      <div id="present-snapshot"></div>
+    </div>
+  </div>
+
+  <!-- ══ MODO COMPARAR ══ -->
+  <div class="panel" id="mode-ref">
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-family:var(--fh);font-size:1rem;margin-bottom:1rem">Comparar evolución de parámetros — todos los pacientes</div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--text2);display:block;margin-bottom:4px">Parámetro</label>
+          <select id="ref-param" onchange="drawRefChart()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;color:var(--text);font-family:var(--fb);font-size:13px">
+            <option value="smwt">6MWT (metros)</option>
+            <option value="fev1">VEF₁ % predicho</option>
+            <option value="spo2">SpO₂ en reposo (%)</option>
+            <option value="bode">Índice BODE</option>
+            <option value="borg">Borg en ejercicio</option>
+            <option value="mrc">Escala MRC</option>
+          </select>
+        </div>
+      </div>
+      <div class="evo-chart-wrap">
+        <canvas id="refChart"></canvas>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:.95rem;margin-bottom:.75rem">Resumen de mejoras a 12 semanas</div>
+        <table>
+          <tr><th>Paciente</th><th>Marcha 6' Δ</th><th>VEF₁ Δ</th><th>BODE Δ</th></tr>
+          <tbody id="ref-summary"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:.95rem;margin-bottom:.75rem">Evidencia de rehabilitación pulmonar</div>
+        <div style="font-size:12.5px;color:var(--text2)">
+          <b style="color:var(--text)">Diferencia Mínima Clínicamente Significativa:</b><br>
+          • Test de marcha 6 min: ≥ 30 m (EPOC), ≥ 25 m (fibrosis quística)<br>
+          • VEF₁: > 200 ml y > 12% del basal (broncodilatación)<br>
+          • Índice BODE: reducción ≥ 1 punto = beneficio pronóstico<br>
+          • Escala de Borg: reducción ≥ 1 punto con misma carga<br><br>
+          <b style="color:var(--text)">Metaanálisis Cochrane 2015 (Lacasse et al.):</b><br>
+          La rehabilitación pulmonar mejora la disnea (DM -0.78 en escala MRC), calidad de vida y capacidad de ejercicio en EPOC. Efectos mantenidos 12-24 meses si se mantiene la actividad.<br><br>
+          <b style="color:var(--text)">Post-COVID (Greenhalgh et al. BMJ 2021):</b><br>
+          La rehabilitación respiratoria adaptada mejora la fatiga y la disnea en COVID persistente — con precaución ante el malestar post-esfuerzo.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — 4 pacientes × 4 momentos + puntos de decisión
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let learnCase = null, learnSnap = 0;
+let evalCase = null, evalSnap = 0, evalScore = 0, evalDecisions = {};
+let presentCase = null, presentSnap = 0;
+let activeMode = 'learn';
+let refChart = null;
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+function init(){
+  buildCaseGrids();
+  drawRefChart();
+  buildRefSummary();
+}
+
+function buildCaseGrids(){
+  ['learn','eval','present'].forEach(mode=>{
+    const el = document.getElementById(`case-grid-${mode}`);
+    el.innerHTML = PATIENTS.map(p=>`
+      <div class="case-card" id="${mode}-case-${p.id}" onclick="selectCase('${mode}',${p.id})">
+        <div class="case-avatar" style="background:rgba(${colorToRgb(p.color)},.15);color:${p.color}">${p.emoji}</div>
+        <div class="case-name">${p.name}</div>
+        <div class="case-diag" style="margin-bottom:.5rem">${p.diag}</div>
+        <div><span class="badge ${p.badgeClass}" style="font-size:10px">${p.age} años · ${p.sex==='M'?'Masculino':'Femenino'}</span></div>
+      </div>
+    `).join('');
+  });
+}
+
+function colorToRgb(cssVar){
+  const map={'var(--orange)':'251,146,60','var(--teal)':'45,212,191','var(--red)':'248,113,113','var(--blue)':'56,189,248','var(--purple)':'167,139,250','var(--amber)':'251,191,36','var(--green)':'74,222,128'};
+  return map[cssVar]||'56,189,248';
+}
+
+function switchMode(mode, el){
+  activeMode = mode;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`mode-${mode}`).classList.add('active');
+  el.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// LEARN MODE
+// ═══════════════════════════════════════════════════════════
+function selectCase(mode, pid){
+  const p = PATIENTS[pid];
+  document.querySelectorAll(`[id^="${mode}-case-"]`).forEach(el=>el.classList.remove('active'));
+  document.getElementById(`${mode}-case-${pid}`).classList.add('active');
+
+  if(mode==='learn'){ learnCase=p; learnSnap=0; renderLearn(); }
+  else if(mode==='eval'){ evalCase=p; evalSnap=0; evalScore=0; evalDecisions={}; document.getElementById('eval-score').textContent='0'; renderEval(); }
+  else if(mode==='present'){ presentCase=p; presentSnap=0; renderPresent(); }
+}
+
+function renderLearn(){
+  const p = learnCase;
+  document.getElementById('learn-content').style.display='block';
+  document.getElementById('learn-case-title').textContent = p.name + ' — ' + p.diag;
+  document.getElementById('learn-case-sub').textContent = p.bg;
+  document.getElementById('learn-case-badges').innerHTML = `<span class="badge ${p.badgeClass}">${p.age} años</span><span class="badge badge-blue">${p.sex==='M'?'Masculino':'Femenino'}</span>`;
+
+  // Timeline
+  renderTimeline('learn-timeline', p, learnSnap, p.snapshots.length-1, 'learn');
+  renderSnapshot('learn-snapshot', p, learnSnap, 'learn');
+}
+
+function renderTimeline(containerId, p, activeIdx, unlockUpTo, modeKey){
+  const el = document.getElementById(containerId);
+  el.innerHTML = p.snapshots.map((s,i)=>{
+    const locked = i > unlockUpTo;
+    const cls = locked ? 'locked' : i===activeIdx ? 'active unlocked' : 'unlocked';
+    const clickHandler = locked ? '' : `tlNav('${modeKey}',${i})`;
+    return `<div class="tl-node" onclick="${clickHandler}">
+      <div class="tl-dot ${cls}">${s.icon}</div>
+      <div class="tl-label" style="${i===activeIdx?`color:${p.color}`:''}">${s.label}</div>
+      <div class="tl-date">Semana ${s.week}</div>
+    </div>`;
+  }).join('');
+}
+
+function tlNav(mode, idx){
+  if(mode==='learn'){ learnSnap=idx; renderLearn(); }
+  else if(mode==='present'){ presentSnap=idx; renderPresent(); }
+}
+
+function renderSnapshot(containerId, p, snapIdx, mode){
+  const s = p.snapshots[snapIdx];
+  const prev = snapIdx > 0 ? p.snapshots[snapIdx-1] : null;
+
+  const delta = (cur,prv,higher=true)=>{
+    if(!prv) return '';
+    const d = cur-prv;
+    const good = higher ? d>0 : d<0;
+    const color = d===0?'var(--text3)':good?'var(--green)':'var(--red)';
+    return `<div class="vital-delta" style="color:${color}">${d>0?'+':''}${d.toFixed ? d.toFixed(1) : d}</div>`;
+  };
+
+  const vitals = [
+    {name:'SpO₂',val:s.vitals.spo2,unit:'%',key:'spo2',higher:true},
+    {name:'FC',val:s.vitals.fc,unit:'lpm',key:'fc',higher:false},
+    {name:'FR',val:s.vitals.fr,unit:'rpm',key:'fr',higher:false},
+    {name:'TAS',val:s.vitals.tas,unit:'mmHg',key:'tas',higher:false},
+    {name:'IMC',val:s.vitals.imc,unit:'kg/m²',key:'imc',higher:true},
+    {name:'Borg Ejerc.',val:s.vitals.borg,unit:'/10',key:'borg',higher:false},
+  ];
+
+  const spiro = [
+    {name:'VEF₁',val:s.spiro.fev1,unit:'%pred',key:'fev1',higher:true},
+    {name:'CVF',val:s.spiro.fvc,unit:'%pred',key:'fvc',higher:true},
+    {name:'VEF₁/CVF',val:s.spiro.ratio,unit:'%',key:'ratio',higher:true},
+  ];
+
+  // Decision block (learn = always show; eval = manage separately)
+  const hasDec = s.decision && mode==='learn';
+  const hasDecEval = s.decision && mode==='eval';
+
+  const prevDecHTML = hasDec ? `
+    <div class="decision-box">
+      <div class="decision-title">⚡ Punto de Decisión Clínica — Semana ${s.week}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:.5rem">${s.decision.q}</div>
+      <div class="decision-opts">
+        ${s.decision.opts.map((o,oi)=>`
+          <div class="decision-opt ${o.right?'chosen-right':'chosen-wrong'}">
+            ${o.right?'✓':'✗'} ${o.txt}
+            <div style="margin-top:.5rem;font-size:11.5px;font-style:italic;opacity:.85">${o.fb}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  let evalDecHTML = '';
+  if(hasDecEval){
+    const alreadyChosen = evalDecisions[snapIdx];
+    if(!alreadyChosen){
+      evalDecHTML = `
+        <div class="decision-box">
+          <div class="decision-title">⚡ Punto de Decisión — Semana ${s.week}</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem">${s.decision.q}</div>
+          <div class="decision-opts" id="eval-dec-${snapIdx}">
+            ${s.decision.opts.map((o,oi)=>`
+              <div class="decision-opt" id="eval-opt-${snapIdx}-${oi}" onclick="chooseEvalDec(${snapIdx},${oi})">
+                ${o.txt}
+              </div>`).join('')}
+          </div>
+        </div>`;
+    } else {
+      const chosen = s.decision.opts[alreadyChosen.idx];
+      evalDecHTML = `
+        <div class="decision-box">
+          <div class="decision-title">⚡ Decisión registrada — Semana ${s.week}</div>
+          <div class="decision-opts">
+            ${s.decision.opts.map((o,oi)=>`
+              <div class="decision-opt ${o.right?'chosen-right':'chosen-wrong'}" style="opacity:${oi===alreadyChosen.idx?1:.5}">
+                ${o.right?'✓':'✗'} ${o.txt}
+                ${oi===alreadyChosen.idx?`<div style="margin-top:.5rem;font-size:11.5px;font-style:italic">${o.fb}</div>`:''}
+              </div>`).join('')}
+          </div>
+          <div style="margin-top:.5rem;font-size:12px;color:${alreadyChosen.right?'var(--green)':'var(--red)'}">
+            ${alreadyChosen.right?'+20 puntos':'Sin puntos'} — ${alreadyChosen.right?'Decisión correcta':'Decisión incorrecta'}
+          </div>
+        </div>`;
+    }
+  }
+
+  document.getElementById(containerId).innerHTML = `
+    <div class="snapshot animate">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+        <span style="font-family:var(--fh);font-size:1rem">${s.label}</span>
+        <span class="badge badge-purple">Semana ${s.week}</span>
+        ${mode==='learn'&&s.notes?`<span style="font-size:12px;color:var(--text2);margin-left:.25rem">${s.notes}</span>`:''}
+      </div>
+
+      ${mode==='eval'&&s.notes?`<div class="info" style="margin-bottom:1rem">${s.notes}</div>`:''}
+
+      <!-- Vitals -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:.5rem">Signos vitales</div>
+      <div class="grid4" style="margin-bottom:1rem">
+        ${vitals.map(v=>`
+          <div class="vital-card">
+            <div class="vital-name">${v.name}</div>
+            <div class="vital-val" style="color:${p.color}">${v.val}</div>
+            <div class="vital-unit">${v.unit}</div>
+            ${delta(v.val, prev?prev.vitals[v.key]:null, v.higher)}
+          </div>`).join('')}
+      </div>
+
+      <!-- Spiro + 6MWT + BODE -->
+      <div class="grid3" style="margin-bottom:1rem;align-items:start">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:.5rem">Espirometría</div>
+          ${spiro.map(sp=>`
+            <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:12.5px">
+              <span style="color:var(--text2)">${sp.name}</span>
+              <span style="font-family:var(--fm)">${sp.val}${sp.unit}
+                ${prev?`<span style="font-size:10px;color:${sp.val-prev.spiro[sp.key]>=0?'var(--green)':'var(--red)'};margin-left:4px">${sp.val-prev.spiro[sp.key]>=0?'+':''}${sp.val-prev.spiro[sp.key]}</span>`:''}
+              </span>
+            </div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:.5rem">Capacidad funcional</div>
+          <div class="vital-card" style="margin-bottom:.5rem">
+            <div class="vital-name">Test 6 min marcha</div>
+            <div class="vital-val" style="color:${p.color};font-size:1.4rem">${s.smwt} m</div>
+            ${delta(s.smwt, prev?prev.smwt:null, true)}
+          </div>
+          ${s.bode!==null?`
+          <div class="vital-card">
+            <div class="vital-name">Índice BODE</div>
+            <div class="vital-val" style="color:${p.color};font-size:1.4rem">${s.bode}</div>
+            ${delta(s.bode, prev&&prev.bode!==null?prev.bode:null, false)}
+          </div>`:''}
+        </div>
+        <div style="min-width:0">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:.5rem">Gasometría arterial</div>
+          ${[['pH',s.gsa.ph,7.35,7.45],['PaCO₂',s.gsa.pco2,35,45],['HCO₃⁻',s.gsa.hco3,22,26],['PaO₂',s.gsa.pao2,80,100]].map(([name,val,lo,hi])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:12.5px">
+              <span style="color:var(--text2);white-space:nowrap">${name}</span>
+              <span style="font-family:var(--fm);color:${val>=lo&&val<=hi?'var(--green)':val<lo?'var(--red)':'var(--orange)'};flex-shrink:0">${val}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Decision point -->
+      ${prevDecHTML}
+      ${evalDecHTML}
+
+      <!-- Plan -->
+      ${(s.plan && mode==='learn')?`
+        <div class="success" style="margin-top:.75rem">
+          <b style="color:var(--text)">Plan de tratamiento (Semana ${s.week}):</b><br>${s.plan}
+        </div>`:''}
+
+      <!-- Navigation -->
+      <div style="display:flex;gap:.5rem;margin-top:1rem;justify-content:${mode==='learn'?'flex-start':'flex-end'}">
+        ${mode==='learn'?`
+          <button class="btn btn-s" onclick="learnNav(-1)" ${snapIdx===0?'disabled style="opacity:.4"':''}>← Anterior</button>
+          <button class="btn btn-p" onclick="learnNav(1)" ${snapIdx===p.snapshots.length-1?'disabled style="opacity:.4"':''}>Siguiente →</button>
+        `:mode==='eval'?`
+          <button class="btn btn-s" onclick="evalNav(-1)" ${snapIdx===0?'disabled style="opacity:.4"':''}>← Anterior</button>
+          ${(!s.decision || evalDecisions[snapIdx]) ? `<button class="btn btn-p" onclick="evalNav(1)" ${snapIdx===p.snapshots.length-1?'disabled style="opacity:.4"':''}>Siguiente →</button>` : `<span style="font-size:12px;color:var(--text2);align-self:center">⬆ Toma una decisión para continuar</span>`}
+        `:''}
+      </div>
+    </div>`;
+}
+
+function learnNav(dir){
+  learnSnap = Math.max(0, Math.min(learnCase.snapshots.length-1, learnSnap+dir));
+  renderLearn();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVAL MODE
+// ═══════════════════════════════════════════════════════════
+function renderEval(){
+  const p = evalCase;
+  document.getElementById('eval-content').style.display='block';
+  document.getElementById('eval-case-title').textContent = p.name + ' — ' + p.diag;
+  document.getElementById('eval-case-sub').textContent = p.bg;
+  renderTimeline('eval-timeline', p, evalSnap, evalSnap, 'eval');
+  renderSnapshot('eval-snapshot', p, evalSnap, 'eval');
+}
+
+function evalNav(dir){
+  evalSnap = Math.max(0, Math.min(evalCase.snapshots.length-1, evalSnap+dir));
+  renderEval();
+  // Show final result if last
+  if(evalSnap === evalCase.snapshots.length-1 && dir===1){
+    setTimeout(showEvalResult, 400);
+  }
+}
+
+function chooseEvalDec(snapIdx, optIdx){
+  const s = evalCase.snapshots[snapIdx];
+  const opt = s.decision.opts[optIdx];
+  const isRight = opt.right;
+  evalDecisions[snapIdx] = {idx:optIdx, right:isRight};
+  if(isRight){ evalScore+=20; document.getElementById('eval-score').textContent=evalScore; }
+  renderEval();
+}
+
+function showEvalResult(){
+  const total = evalCase.snapshots.filter(s=>s.decision).length * 20;
+  const pct = Math.round((evalScore/total)*100);
+  const result = document.getElementById('eval-snapshot');
+  result.innerHTML += `
+    <div class="success" style="margin-top:1rem;padding:1.25rem">
+      <div style="font-family:var(--fh);font-size:1.2rem;color:var(--green);margin-bottom:.5rem">🏁 Evaluación completada</div>
+      <div style="font-size:2rem;font-family:var(--fh);color:var(--text)">${evalScore} / ${total} puntos (${pct}%)</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:.5rem">
+        ${pct>=80?'Excelente manejo clínico. Tomaste las decisiones óptimas para el paciente.':
+          pct>=50?'Buen desempeño. Revisa los puntos donde fallaste para consolidar el aprendizaje.':
+          'Revisa los fundamentos de rehabilitación pulmonar y los criterios de progresión de carga.'}
+      </div>
+      <button class="btn btn-s" style="margin-top:.75rem" onclick="resetEval()">↺ Intentar de nuevo</button>
+    </div>`;
+}
+
+function resetEval(){
+  evalSnap=0; evalScore=0; evalDecisions={};
+  document.getElementById('eval-score').textContent='0';
+  renderEval();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRESENT MODE
+// ═══════════════════════════════════════════════════════════
+function renderPresent(){
+  const p = presentCase;
+  document.getElementById('present-content').style.display='block';
+  document.getElementById('present-case-title').textContent = p.name + ' — ' + p.diag;
+  document.getElementById('present-case-sub').textContent = p.bg;
+  renderTimeline('present-timeline', p, presentSnap, presentSnap, 'present');
+  renderPresentSnap(p, presentSnap);
+  document.getElementById('present-prev').disabled = presentSnap===0;
+  document.getElementById('present-next').disabled = presentSnap===p.snapshots.length-1;
+}
+
+function renderPresentSnap(p, idx){
+  const s = p.snapshots[idx];
+  const prev = idx>0 ? p.snapshots[idx-1] : null;
+  // Simplified presenter view — just vitals + key numbers
+  const container = document.getElementById('present-snapshot');
+  container.innerHTML = `
+    <div class="snapshot">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem">
+        <span style="font-family:var(--fh);font-size:1.3rem">${s.label}</span>
+        <span class="badge badge-purple">Semana ${s.week}</span>
+      </div>
+
+      <div style="margin-bottom:1rem">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:.5rem">Signos vitales y función</div>
+        <div class="grid4">
+          ${[{n:'SpO₂',v:s.vitals.spo2,u:'%',pk:'spo2',h:true},{n:'VEF₁',v:s.spiro.fev1,u:'%p',pk:'fev1',h:true},{n:'6MWT',v:s.smwt,u:'m',pk:'smwt',h:true},{n:'Borg',v:s.vitals.borg,u:'/10',pk:'borg',h:false},{n:'FC',v:s.vitals.fc,u:'lpm',pk:'fc',h:false},{n:'MRC',v:s.mrc,u:'',pk:'mrc',h:false},
+          ...(s.bode!==null?[{n:'BODE',v:s.bode,u:'/10',pk:'bode',h:false}]:[])
+          ].map(v=>{
+            const prevVal = prev ? (v.pk==='smwt'?prev.smwt:v.pk==='fev1'?prev.spiro.fev1:v.pk==='bode'?prev.bode:v.pk==='mrc'?prev.mrc:prev.vitals[v.pk]) : null;
+            const d = prevVal!==null&&prevVal!==undefined ? v.v - prevVal : null;
+            const good = d!==null ? (v.h?d>=0:d<=0) : null;
+            return `<div class="vital-card">
+              <div class="vital-name">${v.n}</div>
+              <div class="vital-val" style="color:${p.color}">${v.v}</div>
+              <div class="vital-unit">${v.u}</div>
+              ${d!==null?`<div class="vital-delta" style="color:${good?'var(--green)':'var(--red)'}">${d>0?'+':''}${d}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      ${s.decision?`
+        <div class="decision-box">
+          <div class="decision-title">⚡ Punto de Discusión — Semana ${s.week}</div>
+          <div style="font-size:13px;color:var(--text)">${s.decision.q}</div>
+          <div style="margin-top:.75rem;font-size:12px;color:var(--text2)"><i>Discute con el grupo antes de revelar la respuesta.</i></div>
+        </div>` : ''}
+
+      <div class="info">
+        <b style="color:var(--text)">Notas clínicas:</b> ${s.notes}
+        ${s.plan?`<br><br><b style="color:var(--text)">Plan:</b> ${s.plan}`:''}
+      </div>
+    </div>`;
+}
+
+function presentNav(dir){
+  presentSnap = Math.max(0, Math.min(presentCase.snapshots.length-1, presentSnap+dir));
+  renderPresent();
+}
+
+// ═══════════════════════════════════════════════════════════
+// REFERENCE CHART
+// ═══════════════════════════════════════════════════════════
+function getParamData(p, param){
+  return p.snapshots.map(s=>{
+    if(param==='smwt') return s.smwt;
+    if(param==='fev1') return s.spiro.fev1;
+    if(param==='spo2') return s.vitals.spo2;
+    if(param==='bode') return s.bode;
+    if(param==='borg') return s.vitals.borg;
+    if(param==='mrc') return s.mrc;
+    return null;
+  });
+}
+
+function drawRefChart(){
+  const param = document.getElementById('ref-param').value;
+  const ctx = document.getElementById('refChart').getContext('2d');
+  if(refChart) refChart.destroy();
+
+  const colors = ['rgba(251,146,60,1)','rgba(45,212,191,1)','rgba(248,113,113,1)','rgba(56,189,248,1)'];
+
+  refChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['Basal','Semana 4','Semana 8','Semana 12'],
+      datasets: PATIENTS.map((p,i)=>({
+        label: p.name,
+        data: getParamData(p, param),
+        borderColor: colors[i],
+        backgroundColor: colors[i].replace('1)','0.1)'),
+        borderWidth:2.5,
+        pointRadius:5,
+        pointHoverRadius:7,
+        tension:.35,
+        spanGaps:true,
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11},boxWidth:14}}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,.06)'}},
+      }
+    }
+  });
+}
+
+function buildRefSummary(){
+  const tbody = document.getElementById('ref-summary');
+  tbody.innerHTML = PATIENTS.map(p=>{
+    const s0 = p.snapshots[0], sF = p.snapshots[p.snapshots.length-1];
+    const d6mwt = sF.smwt - s0.smwt;
+    const dfev1 = sF.spiro.fev1 - s0.spiro.fev1;
+    const dbode = sF.bode!==null && s0.bode!==null ? sF.bode - s0.bode : null;
+    const color6 = d6mwt>=30?'var(--green)':d6mwt>=0?'var(--amber)':'var(--red)';
+    return `<tr>
+      <td><span style="color:${p.color}">${p.emoji}</span> ${p.name}</td>
+      <td style="color:${color6};font-family:var(--fm)">+${d6mwt} m</td>
+      <td style="color:${dfev1>=0?'var(--green)':'var(--red)'};font-family:var(--fm)">${dfev1>=0?'+':''}${dfev1}%</td>
+      <td style="font-family:var(--fm)">${dbode!==null ? (dbode<=0?`<span style="color:var(--green)">${dbode}</span>`:`<span style="color:var(--red)">+${dbode}</span>`) : '<span style="color:var(--text3)">N/A</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════
+init();
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>

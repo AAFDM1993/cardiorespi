@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FisioResp — Gasometría Arterial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+.logo em{color:var(--teal);font-style:normal}
+/* MODE SELECTOR */
+.mode-bar{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+/* SECTION VISIBILITY */
+.mode-section{display:none}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+.card2{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+/* STEP ENGINE */
+.step-engine{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.step-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.step-title{font-family:var(--fh);font-size:1rem;color:var(--blue)}
+.step-body{padding:1.25rem}
+.step-track{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:.75rem 1.25rem;background:var(--bg3);border-bottom:1px solid var(--border)}
+.step-track::-webkit-scrollbar{display:none}
+.snode{display:flex;align-items:center;gap:0;flex-shrink:0}
+.snode-circle{width:28px;height:28px;border-radius:50%;background:var(--card2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);transition:all .3s;cursor:default}
+.snode.done .snode-circle{background:var(--teal);border-color:var(--teal);color:#07090f}
+.snode.active .snode-circle{background:var(--blue);border-color:var(--blue);color:#07090f;box-shadow:0 0 0 3px rgba(56,189,248,.25)}
+.snode-label{font-size:10px;color:var(--text3);margin-left:6px;white-space:nowrap}
+.snode.done .snode-label,.snode.active .snode-label{color:var(--text2)}
+.sconnector{width:20px;height:2px;background:var(--border);margin:0 4px;flex-shrink:0;transition:background .3s}
+.sconnector.done{background:var(--teal)}
+/* QUESTION BLOCK */
+.q-block{margin-bottom:1.25rem}
+.opt.correct .opt-letter{background:var(--green);color:#07090f}
+.opt.wrong .opt-letter{background:var(--red);color:#07090f}
+.feedback.info{border-left-color:var(--blue)}
+/* VALUE DISPLAY */
+.val-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:var(--rs);background:var(--bg3);margin-bottom:5px;font-size:13px}
+.val-name{color:var(--text2)}
+.val-num{font-family:var(--fm);font-size:1rem;font-weight:500}
+.val-ref{font-size:11px;color:var(--text3);margin-left:8px}
+.hi{color:var(--red)}
+.lo{color:var(--amber)}
+.ok{color:var(--green)}
+.n{color:var(--text)}
+/* RESULT BOX */
+.result-box{border-radius:var(--r);padding:1.1rem 1.25rem;margin-top:1rem;border:1px solid}
+.result-box.acid-resp{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.06)}
+.result-box.acid-met{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.06)}
+.result-box.alc-resp{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.06)}
+.result-box.alc-met{border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.06)}
+.result-box.mixed{border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.06)}
+.result-box.normal{border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.06)}
+.diag-title{font-family:var(--fh);font-size:1.3rem;margin-bottom:.3rem}
+/* DAVENPORT */
+.davenport-wrap{position:relative;width:100%;height:260px}
+canvas.davenport{width:100%;height:100%}
+/* SIMULATOR DIALS */
+.dial-group{margin-bottom:1rem}
+.dial-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:12.5px;color:var(--text2)}
+.dial-val{font-family:var(--fm);font-size:.95rem;font-weight:500;color:var(--blue)}
+.dial-range{display:flex;align-items:center;gap:8px}
+.dial-range input[type=range]{flex:1;accent-color:var(--blue)}
+.dial-ref{font-size:10.5px;color:var(--text3)}
+/* CASE CARDS */
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:1.5rem}
+.case-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s}
+.case-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.case-card.active{border-color:var(--blue);background:rgba(56,189,248,.06)}
+.case-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:.5rem}
+.tag-acid-resp{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+.tag-acid-met{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+.tag-alc-resp{background:rgba(56,189,248,.12);color:var(--blue);border:1px solid rgba(56,189,248,.25)}
+.tag-alc-met{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.25)}
+.tag-mixed{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.25)}
+.tag-normal{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.25)}
+.case-name{font-weight:600;font-size:.9rem;margin-bottom:.2rem;color:var(--text)}
+.case-meta{font-size:11.5px;color:var(--text3)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--fb)}
+.infobox strong{color:var(--blue)}
+.mt-3{margin-top:1.5rem}
+/* FORMULA BOX */
+.formula{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;font-family:var(--fm);font-size:12.5px;color:var(--teal);margin:.5rem 0;line-height:1.8}
+/* PROGRESS */
+.progbar{height:3px;background:var(--card2);border-radius:100px;margin-bottom:1.5rem;overflow:hidden}
+.progfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:100px;transition:width .5s ease}
+/* SCORE BADGE */
+.score-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.08);color:var(--green)}
+/* COMPENSATION ARROW */
+.comp-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rs);background:var(--bg3);margin-bottom:6px;font-size:13px}
+.comp-arrow{font-size:16px;flex-shrink:0}
+.comp-text{color:var(--text2)}
+.comp-formula{font-family:var(--fm);font-size:12px;color:var(--teal)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FISIO<em>RESP</em></div>
+  <div class="nav-mod">/ Gasometría Arterial Interactiva</div>
+</nav>
+
+<div class="wrap">
+
+  <!-- MODE BAR -->
+  <div style="margin-bottom:1.25rem">
+    <div class="sec-title">Gasometría Arterial</div>
+    <div class="sec-sub">Intérprete paso a paso · Simulador con diales · 12 casos clínicos · Diagrama de Davenport</div>
+  </div>
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('guiado')">🎓 Modo Aprendizaje</button>
+    <button class="mode-btn" onclick="setMode('eval')">📝 Modo Evaluación</button>
+    <button class="mode-btn" onclick="setMode('sim')">⚙️ Simulador de Diales</button>
+    <button class="mode-btn" onclick="setMode('ref')">📖 Referencia Rápida</button>
+  </div>
+
+  <!-- ===================== MODO APRENDIZAJE ===================== -->
+  <div class="mode-section active" id="mode-guiado">
+    <div class="infobox"><strong>Modo Aprendizaje:</strong> Interpreta la GSA paso a paso. En cada etapa recibes pistas, fórmulas de compensación y explicación detallada antes de continuar.</div>
+
+    <!-- Case selector -->
+    <div class="mb-2">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Selecciona un caso clínico</div>
+      <div class="case-grid" id="caseGrid-guiado"></div>
+    </div>
+
+    <!-- Step engine -->
+    <div class="step-engine" id="stepEngine" style="display:none">
+      <div class="step-header">
+        <div class="step-title" id="stepEngineTitle">Interpretación GSA</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="score-badge" id="stepScore" style="display:none">0/5 correctas</span>
+          <button class="btn btn-s btn-sm" onclick="resetGuiado()">↺ Reiniciar</button>
+        </div>
+      </div>
+      <div class="step-track" id="stepTrack"></div>
+      <div class="step-body" id="stepBody"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODO EVALUACIÓN ===================== -->
+  <div class="mode-section" id="mode-eval">
+    <div class="infobox"><strong>Modo Evaluación:</strong> Sin pistas ni fórmulas. Las opciones son clínicamente plausibles — no basta buscar la más larga. Interpreta la GSA completa, luego recibe tu score y retroalimentación detallada.</div>
+    <div class="mb-2">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Selecciona un caso para evaluar</div>
+      <div class="case-grid" id="caseGrid-eval"></div>
+    </div>
+    <div id="evalEngine" style="display:none">
+      <div class="card mb-2">
+        <div class="flex-b mb-2">
+          <div style="font-family:var(--fh);font-size:1.1rem" id="evalCaseName"></div>
+          <button class="btn btn-s btn-sm" onclick="resetEval()">↺ Nuevo caso</button>
+        </div>
+        <div id="evalValues"></div>
+      </div>
+      <div id="evalQuestions"></div>
+      <div id="evalResult" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===================== SIMULADOR DIALES ===================== -->
+  <div class="mode-section" id="mode-sim">
+    <div class="infobox"><strong>Simulador:</strong> Mueve los diales de pH, PaCO₂ y HCO₃⁻. El diagnóstico se actualiza en tiempo real con el Diagrama de Davenport.</div>
+    <!-- Parameter reference cards -->
+    <div class="grid g2 mb-2" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">
+      <div class="card2" style="border-left:3px solid var(--blue)">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px">pH</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Mide la concentración de H⁺ en sangre arterial. Refleja el equilibrio ácido-base global. <span style="color:var(--text);font-family:var(--fm)">Normal: 7.35–7.45</span></div>
+      </div>
+      <div class="card2" style="border-left:3px solid var(--red)">
+        <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px">PaCO₂ — Presión parcial de CO₂</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Componente <strong style="color:var(--text)">respiratorio</strong>. Controlado por la ventilación alveolar. ↑ = hipoventilación · ↓ = hiperventilación. <span style="color:var(--text);font-family:var(--fm)">Normal: 35–45 mmHg</span></div>
+      </div>
+      <div class="card2" style="border-left:3px solid var(--teal)">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">HCO₃⁻ — Bicarbonato</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Componente <strong style="color:var(--text)">metabólico</strong>. Regulado por el riñón (días). Principal tampón del organismo. <span style="color:var(--text);font-family:var(--fm)">Normal: 22–26 mEq/L</span></div>
+      </div>
+      <div class="card2" style="border-left:3px solid var(--amber)">
+        <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px">PaO₂ — Presión parcial de O₂</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Oxígeno disuelto en plasma. Evalúa la función de intercambio gaseoso pulmonar. <span style="color:var(--text);font-family:var(--fm)">Normal: 80–100 mmHg</span></div>
+      </div>
+    </div>
+    <div class="warnbox" style="margin-bottom:1rem;font-size:12px">
+      💡 <strong>Cómo usar:</strong> Mueve los diales para simular distintos escenarios. El diagnóstico y el Diagrama de Davenport se actualizan en tiempo real. Usa los <strong>Presets rápidos</strong> para cargar casos clínicos tipo.
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:1rem">Parámetros</div>
+        <div class="dial-group">
+          <div class="dial-label"><span>pH</span><span class="dial-val" id="d-ph">7.40</span></div>
+          <div class="dial-range">
+            <span class="dial-ref">6.80</span>
+            <input type="range" id="sl-ph" min="680" max="800" value="740" oninput="updateSim()">
+            <span class="dial-ref">8.00</span>
+          </div>
+        </div>
+        <div class="dial-group">
+          <div class="dial-label"><span>PaCO₂ (mmHg)</span><span class="dial-val" id="d-pco2">40</span></div>
+          <div class="dial-range">
+            <span class="dial-ref">10</span>
+            <input type="range" id="sl-pco2" min="10" max="100" value="40" oninput="updateSim()">
+            <span class="dial-ref">100</span>
+          </div>
+        </div>
+        <div class="dial-group">
+          <div class="dial-label"><span>HCO₃⁻ (mEq/L)</span><span class="dial-val" id="d-hco3">24</span></div>
+          <div class="dial-range">
+            <span class="dial-ref">5</span>
+            <input type="range" id="sl-hco3" min="5" max="50" value="24" oninput="updateSim()">
+            <span class="dial-ref">50</span>
+          </div>
+        </div>
+        <div class="dial-group">
+          <div class="dial-label"><span>PaO₂ (mmHg)</span><span class="dial-val" id="d-pao2">90</span></div>
+          <div class="dial-range">
+            <span class="dial-ref">30</span>
+            <input type="range" id="sl-pao2" min="30" max="120" value="90" oninput="updateSim()">
+            <span class="dial-ref">120</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Presets -->
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.6rem">Presets rápidos</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="btn btn-s btn-sm" onclick="loadPreset('norm')">Normal</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('ar-ag')">Acid. Resp. Aguda</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('ar-cr')">Acid. Resp. Crónica</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('am')">Acid. Metabólica</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('alr')">Alc. Resp.</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('alm')">Alc. Metabólica</button>
+          <button class="btn btn-s btn-sm" onclick="loadPreset('mix')">Mixto</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card mb-2">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Diagnóstico en tiempo real</div>
+          <div id="simDiag"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Diagrama de Davenport</div>
+          <div class="davenport-wrap"><canvas id="davenportCanvas"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== REFERENCIA RÁPIDA ===================== -->
+  <div class="mode-section" id="mode-ref">
+    <div class="grid g2 mb-2">
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Valores normales</div>
+        <div class="val-row"><span class="val-name">pH</span><span class="val-num ok">7.35 – 7.45</span></div>
+        <div class="val-row"><span class="val-name">PaCO₂</span><span class="val-num ok">35 – 45 mmHg</span></div>
+        <div class="val-row"><span class="val-name">HCO₃⁻</span><span class="val-num ok">22 – 26 mEq/L</span></div>
+        <div class="val-row"><span class="val-name">PaO₂</span><span class="val-num ok">80 – 100 mmHg</span></div>
+        <div class="val-row"><span class="val-name">SaO₂</span><span class="val-num ok">> 95%</span></div>
+        <div class="val-row"><span class="val-name">BE (exceso de base)</span><span class="val-num ok">−2 a +2</span></div>
+        <div class="val-row"><span class="val-name">Anion gap</span><span class="val-num ok">8 – 12 mEq/L</span></div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Algoritmo de 5 pasos</div>
+        <div>
+          <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:13px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>
+            <span style="color:var(--text2)">pH: ¿acidemia (&lt;7.35), alcalemia (&gt;7.45) o normal?</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:13px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</span>
+            <span style="color:var(--text2)">Trastorno primario: ¿PaCO₂ o HCO₃⁻ explica la alteración del pH?</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:13px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
+            <span style="color:var(--text2)">Origen: si PaCO₂ → respiratorio; si HCO₃⁻ → metabólico</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:13px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</span>
+            <span style="color:var(--text2)">Compensación: ¿es adecuada? Usa fórmulas esperadas</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:13px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</span>
+            <span style="color:var(--text2)">Hipoxemia: PaO₂ &lt; 80 mmHg. Calcular gradiente A-a si aplica</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-2">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Fórmulas de compensación esperada</div>
+      <div class="grid g2">
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--red)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--red);margin-bottom:.5rem">Acidosis Respiratoria Aguda</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ HCO₃⁻ ↑ 1 mEq/L por cada 10 mmHg de ↑ PaCO₂</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ pH ↓ 0.08 por cada 10 mmHg de ↑ PaCO₂</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--orange)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--orange);margin-bottom:.5rem">Acidosis Respiratoria Crónica</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ HCO₃⁻ ↑ 3.5 mEq/L por cada 10 mmHg de ↑ PaCO₂</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ pH ↓ 0.03 por cada 10 mmHg de ↑ PaCO₂</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--blue)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--blue);margin-bottom:.5rem">Alcalosis Respiratoria Aguda</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ HCO₃⁻ ↓ 2 mEq/L por cada 10 mmHg de ↓ PaCO₂</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ pH ↑ 0.08 por cada 10 mmHg de ↓ PaCO₂</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--teal)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--teal);margin-bottom:.5rem">Alcalosis Respiratoria Crónica</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ HCO₃⁻ ↓ 5 mEq/L por cada 10 mmHg de ↓ PaCO₂</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ pH ↑ 0.03 por cada 10 mmHg de ↓ PaCO₂</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--amber)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--amber);margin-bottom:.5rem">Acidosis Metabólica</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ PaCO₂ esperada = 1.5 × HCO₃⁻ + 8 ± 2 (Winter)</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ pH ↓ 0.15 por cada 10 mEq/L de ↓ HCO₃⁻</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.9rem;border-left:3px solid var(--green)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--green);margin-bottom:.5rem">Alcalosis Metabólica</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ PaCO₂ ↑ 0.7 mmHg por cada 1 mEq/L de ↑ HCO₃⁻</div>
+          <div style="font-family:var(--fm);font-size:11.5px;color:var(--text2);margin-bottom:3px">→ Máximo: PaCO₂ ~55 mmHg (límite compensación)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Anion Gap y gradiente A-a</div>
+      <div class="grid g2">
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:.4rem">Anion Gap (AG)</div>
+          <div class="formula">AG = Na⁺ − (Cl⁻ + HCO₃⁻)<br>Normal: 8–12 mEq/L<br>Con albúmina: +2.5 × (4 − albúmina g/dL)</div>
+          <div style="font-size:12.5px;color:var(--text2);margin-top:.5rem">AG elevado → MUDPILES<br><span style="color:var(--text3);font-size:11.5px">Metanol, Uremia, DKA, Propilenglicol, INH/Hierro, Lactato, Etilenglicol, Salicilatos</span></div>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:.4rem">Gradiente Alvéolo-arterial (A-a)</div>
+          <div class="formula">PAO₂ = FiO₂ × (Patm − PH₂O) − PaCO₂/0.8<br>A-a = PAO₂ − PaO₂<br>Normal: &lt; 10 mmHg (AA, joven)</div>
+          <div style="font-size:12.5px;color:var(--text2);margin-top:.5rem">A-a elevado → shunt, V/Q, difusión<br><span style="color:var(--text3);font-size:11.5px">Normal con hipoxemia → hipoventilación pura</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+  <script src="../data/cases-gsa.js"></script>
+<script>
+/* ====================================================
+   GSA CASES DATA
+====================================================*/
+
+/* =====================================================
+   INTERPRETATION ENGINE
+======================================================*/
+function interpretGSA(pH, pco2, hco3, pao2){
+  const result = {};
+
+  // Step 1: pH
+  if(pH < 7.35) result.phStatus = 'acidemia';
+  else if(pH > 7.45) result.phStatus = 'alcalemia';
+  else result.phStatus = 'normal';
+
+  // Step 2-3: Primary disorder
+  if(result.phStatus === 'acidemia'){
+    if(pco2 > 45) result.primary = 'acid-resp';
+    else if(hco3 < 22) result.primary = 'acid-met';
+    else result.primary = 'mixed';
+  } else if(result.phStatus === 'alcalemia'){
+    if(pco2 < 35) result.primary = 'alc-resp';
+    else if(hco3 > 26) result.primary = 'alc-met';
+    else result.primary = 'mixed';
+  } else {
+    // Normal pH — check for mixed
+    if(pco2 > 45 && hco3 > 26) result.primary = 'mixed-alc-met+acid-resp';
+    else if(pco2 < 35 && hco3 < 22) result.primary = 'mixed-acid-met+alc-resp';
+    else result.primary = 'normal';
+  }
+
+  // Step 4: Compensation adequacy
+  const deltaPCO2 = pco2 - 40;
+  const deltaHCO3 = hco3 - 24;
+  result.comp = 'adecuada';
+  result.compNote = '';
+
+  if(result.primary === 'acid-resp'){
+    const hco3ExpAcute = 24 + (deltaPCO2/10)*1;
+    const hco3ExpChronic = 24 + (deltaPCO2/10)*3.5;
+    if(Math.abs(hco3 - hco3ExpAcute) <= 2) { result.compType = 'aguda'; result.compNote = `HCO₃⁻ esperado agudo: ${hco3ExpAcute.toFixed(1)}` }
+    else if(Math.abs(hco3 - hco3ExpChronic) <= 3) { result.compType = 'crónica'; result.compNote = `HCO₃⁻ esperado crónico: ${hco3ExpChronic.toFixed(1)}` }
+    else { result.compType = 'mixta'; result.comp = 'posible trastorno mixto' }
+  } else if(result.primary === 'acid-met'){
+    const pco2Winter = 1.5*hco3 + 8;
+    result.compNote = `PaCO₂ esperada (Winter): ${pco2Winter.toFixed(1)} ± 2`;
+    if(Math.abs(pco2 - pco2Winter) > 3) { result.comp = 'inadecuada'; result.compType = 'trastorno mixto posible' }
+    else result.compType = 'adecuada';
+  } else if(result.primary === 'alc-resp'){
+    const deltaPCO2neg = 40 - pco2;
+    const hco3ExpAcute = 24 - (deltaPCO2neg/10)*2;
+    const hco3ExpChronic = 24 - (deltaPCO2neg/10)*5;
+    if(Math.abs(hco3 - hco3ExpAcute) <= 2) { result.compType = 'aguda'; result.compNote = `HCO₃⁻ esperado agudo: ${hco3ExpAcute.toFixed(1)}` }
+    else if(Math.abs(hco3 - hco3ExpChronic) <= 3) { result.compType = 'crónica'; result.compNote = `HCO₃⁻ esperado crónico: ${hco3ExpChronic.toFixed(1)}` }
+    else { result.compType = 'mixta'; result.comp = 'posible trastorno mixto' }
+  } else if(result.primary === 'alc-met'){
+    const pco2Exp = 0.7*hco3 + 21;
+    result.compNote = `PaCO₂ esperada: ${pco2Exp.toFixed(1)} ± 5`;
+    if(Math.abs(pco2 - pco2Exp) > 5) { result.comp = 'inadecuada'; result.compType = 'trastorno mixto posible' }
+    else result.compType = 'adecuada';
+  }
+
+  // Step 5: Hypoxemia
+  if(pao2 >= 80) result.hypo = 'no';
+  else if(pao2 >= 60) result.hypo = 'leve';
+  else if(pao2 >= 40) result.hypo = 'moderada';
+  else result.hypo = 'severa';
+
+  // Final label
+  const primLabels = {
+    'normal':'GSA Normal',
+    'acid-resp':'Acidosis Respiratoria',
+    'acid-met':'Acidosis Metabólica',
+    'alc-resp':'Alcalosis Respiratoria',
+    'alc-met':'Alcalosis Metabólica',
+    'mixed':'Trastorno Mixto',
+    'mixed-alc-met+acid-resp':'Trastorno Mixto (Alc. Met. + Acid. Resp.)',
+    'mixed-acid-met+alc-resp':'Trastorno Mixto (Acid. Met. + Alc. Resp.)'
+  };
+  result.label = primLabels[result.primary] || 'Indeterminado';
+  result.cssClass = result.primary === 'normal' ? 'normal' :
+    result.primary.startsWith('acid-resp') ? 'acid-resp' :
+    result.primary.startsWith('acid-met') ? 'acid-met' :
+    result.primary.startsWith('alc-resp') ? 'alc-resp' :
+    result.primary.startsWith('alc-met') ? 'alc-met' : 'mixed';
+
+  return result;
+}
+
+/* =====================================================
+   MODE SWITCHING
+======================================================*/
+function setMode(m){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
+  const modes=['guiado','eval','sim','ref'];
+  document.querySelectorAll('.mode-btn')[modes.indexOf(m)].classList.add('active');
+  document.getElementById('mode-'+m).classList.add('active');
+  if(m==='sim') { setTimeout(initSim,100); }
+}
+
+/* =====================================================
+   CASE GRID BUILDER
+======================================================*/
+function buildCaseGrids(){
+  ['guiado','eval'].forEach(mode=>{
+    const el = document.getElementById('caseGrid-'+mode);
+    GSA_CASES.forEach(c=>{
+      const d = document.createElement('div');
+      d.className = 'case-card';
+      d.id = `ccard-${mode}-${c.id}`;
+      d.innerHTML = `
+        <span class="case-tag tag-${c.tag}">${c.tagLabel}</span>
+        <div class="case-name">${c.name}</div>
+        <div class="case-meta">${c.subtitle}</div>
+      `;
+      d.onclick = () => mode==='guiado' ? startGuiado(c.id) : startEval(c.id);
+      el.appendChild(d);
+    });
+  });
+}
+
+/* =====================================================
+   GUIDED MODE (APRENDIZAJE)
+======================================================*/
+let currentCase = null;
+let currentStep = 0;
+let stepScores = [];
+
+function startGuiado(id){
+  currentCase = GSA_CASES[id];
+  currentStep = 0;
+  stepScores = new Array(currentCase.steps.length).fill(null);
+  document.querySelectorAll('[id^="ccard-guiado"]').forEach(c=>c.classList.remove('active'));
+  document.getElementById(`ccard-guiado-${id}`).classList.add('active');
+  document.getElementById('stepEngine').style.display='block';
+  document.getElementById('stepEngineTitle').textContent = currentCase.name;
+  document.getElementById('stepScore').style.display='none';
+  buildStepTrack();
+  renderStep(0);
+  document.getElementById('stepEngine').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildStepTrack(){
+  const steps = currentCase.steps;
+  const names = ['1. pH','2. Trastorno','3. Compensación','4. Hipoxemia / AG','5. Diagnóstico'];
+  const el = document.getElementById('stepTrack');
+  el.innerHTML = steps.map((s,i)=>`
+    <div class="snode${i===0?' active':''}" id="snode-${i}">
+      <div class="snode-circle">${i+1}</div>
+      <div class="snode-label">${names[i]||'Paso '+(i+1)}</div>
+    </div>
+    ${i<steps.length-1?'<div class="sconnector" id="sconn-'+i+'"></div>':''}
+  `).join('');
+}
+
+function updateStepTrack(stepIdx){
+  for(let i=0;i<currentCase.steps.length;i++){
+    const node = document.getElementById('snode-'+i);
+    node.className = 'snode' + (i<stepIdx?' done':i===stepIdx?' active':'');
+    if(i<stepIdx-1){
+      const conn = document.getElementById('sconn-'+i);
+      if(conn) conn.classList.add('done');
+    }
+  }
+}
+
+function renderStep(idx){
+  currentStep = idx;
+  updateStepTrack(idx);
+  const c = currentCase;
+  const s = c.steps[idx];
+  const isLast = idx === c.steps.length-1;
+
+  document.getElementById('stepBody').innerHTML = `
+    <div style="margin-bottom:1.25rem">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Datos de la gasometría</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.5rem">
+        ${renderValPills(c.vals)}
+      </div>
+      <div style="font-size:13px;color:var(--text2);font-style:italic">${c.context}</div>
+    </div>
+    <div class="q-block">
+      <div class="q-label">Paso ${idx+1} de ${c.steps.length}</div>
+      <div class="q-text">${s.question}</div>
+      <div class="opts" id="stepOpts">
+        ${s.opts.map((o,i)=>`
+          <button class="opt" onclick="answerStep(${idx},${i})">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>${o}
+          </button>`).join('')}
+      </div>
+      <div class="feedback" id="stepFb"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+      <button class="btn btn-p" id="nextBtn" style="display:none" onclick="goNextStep()">
+        ${isLast ? '🏁 Ver diagnóstico final' : 'Siguiente paso →'}
+      </button>
+    </div>
+  `;
+}
+
+function renderValPills(vals){
+  const items = [
+    {l:'pH', v:vals.pH, lo:7.35, hi:7.45},
+    {l:'PaCO₂', v:vals.pco2, lo:35, hi:45, unit:'mmHg'},
+    {l:'HCO₃⁻', v:vals.hco3, lo:22, hi:26, unit:'mEq/L'},
+    {l:'PaO₂', v:vals.pao2, lo:80, hi:100, unit:'mmHg'},
+    {l:'SaO₂', v:vals.sao2, lo:95, hi:100, unit:'%'},
+    {l:'BE', v:vals.be, lo:-2, hi:2},
+  ];
+  return items.map(it=>{
+    const st = it.v < it.lo ? 'lo' : it.v > it.hi ? 'hi' : 'ok';
+    const stColor = st==='lo'?'var(--amber)':st==='hi'?'var(--red)':'var(--green)';
+    const arrow = st==='lo'?'↓':st==='hi'?'↑':'';
+    return `<div style="background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);padding:6px 12px;text-align:center">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${it.l}</div>
+      <div style="font-family:var(--fm);font-size:.95rem;font-weight:500;color:${stColor}">${it.v}${it.unit?'':''} ${arrow}</div>
+      ${it.unit?`<div style="font-size:9px;color:var(--text3)">${it.unit}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function answerStep(stepIdx, optIdx){
+  const s = currentCase.steps[stepIdx];
+  const opts = document.querySelectorAll('#stepOpts .opt');
+  opts.forEach(o=>o.disabled=true);
+  const isCorrect = optIdx === s.correct;
+  opts[optIdx].classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect) opts[s.correct].classList.add('correct');
+  stepScores[stepIdx] = isCorrect;
+
+  const fb = document.getElementById('stepFb');
+  fb.innerHTML = (isCorrect?'<strong style="color:var(--green)">✓ Correcto</strong><br>':'<strong style="color:var(--red)">✗ Incorrecto</strong><br>') + s.explanation;
+  fb.className = 'feedback show ' + (isCorrect?'ok':'err');
+
+  document.getElementById('nextBtn').style.display='inline-flex';
+
+  // Update score display
+  const answered = stepScores.filter(x=>x!==null).length;
+  const correct = stepScores.filter(x=>x===true).length;
+  const sc = document.getElementById('stepScore');
+  sc.style.display='inline-flex';
+  sc.textContent = `${correct}/${answered} correctas`;
+}
+
+function goNextStep(){
+  const next = currentStep + 1;
+  if(next < currentCase.steps.length){
+    renderStep(next);
+  } else {
+    renderFinalDiag();
+  }
+}
+
+function renderFinalDiag(){
+  const c = currentCase;
+  const interp = interpretGSA(c.vals.pH, c.vals.pco2, c.vals.hco3, c.vals.pao2);
+  const correct = stepScores.filter(x=>x===true).length;
+  const total = stepScores.length;
+  const pct = Math.round(correct/total*100);
+  updateStepTrack(total);
+
+  document.getElementById('stepBody').innerHTML = `
+    <div style="margin-bottom:1rem">
+      ${renderValPills(c.vals)}
+    </div>
+    <div class="result-box ${interp.cssClass}">
+      <div class="diag-title">${interp.label}${interp.compType?' — '+interp.compType:''}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem">${interp.compNote}</div>
+      ${interp.hypo!=='no'?`<div style="font-size:13px;color:var(--amber)">⚠ Hipoxemia ${interp.hypo} (PaO₂ ${c.vals.pao2} mmHg)</div>`:'<div style="font-size:13px;color:var(--green)">✓ Sin hipoxemia</div>'}
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--rs);padding:1rem;margin-top:1rem">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Tu desempeño</div>
+      <div style="font-family:var(--fh);font-size:2rem;color:${pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)'}">${pct}%</div>
+      <div style="font-size:13px;color:var(--text2)">${correct} de ${total} pasos correctos</div>
+      <div style="margin-top:.75rem;font-size:13px;color:var(--text2)">${pct>=80?'Excelente interpretación. Dominas el algoritmo GSA.':pct>=60?'Buen avance. Repasa los pasos donde fallaste.':'Repasa el algoritmo de 5 pasos en la sección Referencia Rápida.'}</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="resetGuiado()">Elegir otro caso</button>
+      <button class="btn btn-s" onclick="setMode('sim')">Ir al Simulador</button>
+    </div>
+  `;
+}
+
+function resetGuiado(){
+  document.getElementById('stepEngine').style.display='none';
+  document.querySelectorAll('[id^="ccard-guiado"]').forEach(c=>c.classList.remove('active'));
+}
+
+/* =====================================================
+   EVAL MODE
+======================================================*/
+let evalCase = null;
+let evalAnswers = [];
+
+function startEval(id){
+  evalCase = GSA_CASES[id];
+  evalAnswers = new Array(evalCase.steps.length).fill(null);
+  document.querySelectorAll('[id^="ccard-eval"]').forEach(c=>c.classList.remove('active'));
+  document.getElementById(`ccard-eval-${id}`).classList.add('active');
+  document.getElementById('evalEngine').style.display='block';
+  document.getElementById('evalCaseName').textContent = evalCase.name + ' — ' + evalCase.subtitle;
+
+  document.getElementById('evalValues').innerHTML = `
+    <div style="margin-bottom:.75rem;font-size:13px;color:var(--text2);font-style:italic">${evalCase.context}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${renderValPills(evalCase.vals)}</div>
+  `;
+
+  document.getElementById('evalResult').style.display='none';
+  const el = document.getElementById('evalQuestions');
+  el.innerHTML = evalCase.steps.map((s,i)=>{
+    const opts = s.evalOpts || s.opts;
+    const correct = s.evalCorrect !== undefined ? s.evalCorrect : s.correct;
+    // Store which correct index to use at submit time
+    s._evalCorrect = correct;
+    return `
+    <div class="card mb-2">
+      <div class="q-label">Pregunta ${i+1}</div>
+      <div class="q-text">${s.question}</div>
+      <div class="opts" id="eopts-${i}">
+        ${opts.map((o,oi)=>`
+          <button class="opt" onclick="selectEvalOpt(${i},${oi})" id="eopt-${i}-${oi}">
+            <span class="opt-letter">${String.fromCharCode(65+oi)}</span>${o}
+          </button>`).join('')}
+      </div>
+    </div>`;
+  }).join('') + `
+    <div style="display:flex;justify-content:flex-end;margin-top:.5rem">
+      <button class="btn btn-p" onclick="submitEval()">Enviar respuestas →</button>
+    </div>
+  `;
+  document.getElementById('evalEngine').scrollIntoView({behavior:'smooth'});
+}
+
+function selectEvalOpt(qi, oi){
+  // Allow reselection before submit
+  const prevSel = document.querySelector(`#eopts-${qi} .opt.selected`);
+  if(prevSel) prevSel.classList.remove('selected');
+  evalAnswers[qi] = oi;
+  document.getElementById(`eopt-${qi}-${oi}`).classList.add('selected');
+  // Dim others
+  document.querySelectorAll(`#eopts-${qi} .opt`).forEach((o,i)=>{
+    o.style.opacity = i===oi?'1':'0.5';
+  });
+}
+
+function submitEval(){
+  if(evalAnswers.some(a=>a===null)){
+    alert('Responde todas las preguntas antes de enviar.');
+    return;
+  }
+  // Disable all opts and show correct/wrong
+  evalCase.steps.forEach((s,i)=>{
+    const correct = s._evalCorrect !== undefined ? s._evalCorrect : s.correct;
+    const opts = document.querySelectorAll(`#eopts-${i} .opt`);
+    opts.forEach((o,oi)=>{
+      o.disabled=true;
+      o.style.opacity='1';
+      if(oi===correct) o.classList.add('correct');
+      else if(oi===evalAnswers[i]&&evalAnswers[i]!==correct) o.classList.add('wrong');
+    });
+    // Show explanation
+    const fb = document.createElement('div');
+    fb.className = 'feedback show ' + (evalAnswers[i]===correct?'ok':'err');
+    fb.innerHTML = (evalAnswers[i]===correct?'✓ ':'✗ ') + s.explanation;
+    document.getElementById(`eopts-${i}`).after(fb);
+  });
+  // Hide submit button
+  document.querySelector('#evalQuestions .btn-p').style.display='none';
+  // Show result
+  const correct = evalAnswers.filter((a,i)=>a===(evalCase.steps[i]._evalCorrect !== undefined ? evalCase.steps[i]._evalCorrect : evalCase.steps[i].correct)).length;
+  const pct = Math.round(correct/evalAnswers.length*100);
+  const interp = interpretGSA(evalCase.vals.pH,evalCase.vals.pco2,evalCase.vals.hco3,evalCase.vals.pao2);
+  const res = document.getElementById('evalResult');
+  res.style.display='block';
+  res.innerHTML = `
+    <div class="card result-box ${interp.cssClass}" style="margin-top:1rem">
+      <div class="diag-title">Diagnóstico: ${interp.label}</div>
+      <div style="font-size:13px;color:var(--text2)">${interp.compNote}</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--rs);padding:1.1rem;margin-top:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div style="font-family:var(--fh);font-size:2.2rem;color:${pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)'}">${pct}%</div>
+        <div style="font-size:13px;color:var(--text2)">${correct}/${evalAnswers.length} correctas</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-s" onclick="resetEval()">Otro caso</button>
+        <button class="btn btn-p" onclick="setMode('guiado')">Modo Aprendizaje</button>
+      </div>
+    </div>
+  `;
+  res.scrollIntoView({behavior:'smooth'});
+}
+
+function resetEval(){
+  document.getElementById('evalEngine').style.display='none';
+  document.querySelectorAll('[id^="ccard-eval"]').forEach(c=>c.classList.remove('active'));
+  evalCase=null; evalAnswers=[];
+}
+
+/* =====================================================
+   SIMULATOR MODE
+======================================================*/
+let davenportCtx = null;
+
+function initSim(){
+  updateSim();
+  drawDavenport();
+}
+
+function loadPreset(p){
+  const presets = {
+    norm:   {ph:740,pco2:40,hco3:24,pao2:90},
+    'ar-ag':{ph:728,pco2:65,hco3:26,pao2:62},
+    'ar-cr':{ph:734,pco2:60,hco3:31,pao2:58},
+    am:     {ph:718,pco2:22,hco3:8, pao2:95},
+    alr:    {ph:752,pco2:28,hco3:22,pao2:102},
+    alm:    {ph:754,pco2:48,hco3:38,pao2:88},
+    mix:    {ph:730,pco2:38,hco3:18,pao2:72},
+  };
+  const pr = presets[p];
+  document.getElementById('sl-ph').value = pr.ph;
+  document.getElementById('sl-pco2').value = pr.pco2;
+  document.getElementById('sl-hco3').value = pr.hco3;
+  document.getElementById('sl-pao2').value = pr.pao2;
+  updateSim();
+}
+
+function updateSim(){
+  const pH = parseInt(document.getElementById('sl-ph').value)/100;
+  const pco2 = parseInt(document.getElementById('sl-pco2').value);
+  const hco3 = parseInt(document.getElementById('sl-hco3').value);
+  const pao2 = parseInt(document.getElementById('sl-pao2').value);
+
+  document.getElementById('d-ph').textContent = pH.toFixed(2);
+  document.getElementById('d-pco2').textContent = pco2;
+  document.getElementById('d-hco3').textContent = hco3;
+  document.getElementById('d-pao2').textContent = pao2;
+
+  const interp = interpretGSA(pH, pco2, hco3, pao2);
+
+  const colors = {
+    'normal':'var(--green)',
+    'acid-resp':'var(--red)',
+    'acid-met':'var(--amber)',
+    'alc-resp':'var(--blue)',
+    'alc-met':'var(--teal)',
+    'mixed':'var(--purple)',
+  };
+  const col = colors[interp.cssClass] || 'var(--text)';
+
+  document.getElementById('simDiag').innerHTML = `
+    <div style="font-family:var(--fh);font-size:1.4rem;color:${col};margin-bottom:.5rem">${interp.label}</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem">${interp.phStatus === 'normal' ? 'pH en rango normal' : interp.phStatus === 'acidemia' ? 'Acidemia detectada' : 'Alcalemia detectada'}</div>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      ${interp.compNote ? `<div class="comp-row"><span class="comp-arrow">📐</span><span class="comp-formula">${interp.compNote}</span></div>` : ''}
+      ${interp.compType ? `<div class="comp-row"><span class="comp-arrow">🔄</span><span class="comp-text">Compensación: ${interp.compType}</span></div>` : ''}
+      <div class="comp-row">
+        <span class="comp-arrow">${interp.hypo==='no'?'✅':'⚠️'}</span>
+        <span class="comp-text">Oxigenación: ${interp.hypo==='no'?`PaO₂ ${pao2} mmHg — sin hipoxemia`:`Hipoxemia ${interp.hypo} (PaO₂ ${pao2} mmHg)`}</span>
+      </div>
+    </div>
+  `;
+  drawDavenport(pH, pco2, hco3);
+}
+
+function drawDavenport(pH=7.40, pco2=40, hco3=24){
+  const canvas = document.getElementById('davenportCanvas');
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.parentElement.clientWidth || 500;
+  const H = 260;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  // Axes: X = pH (6.8–7.8), Y = HCO3 (0–50)
+  const px = (ph) => ((ph-6.8)/(7.8-6.8))*W*0.85 + W*0.1;
+  const py = (h) => H*0.9 - (h/50)*H*0.8;
+
+  // Background zones
+  const zones = [
+    {x1:6.8,x2:7.35,y1:0,y2:50,color:'rgba(248,113,113,0.06)',label:'ACIDEMIA'},
+    {x1:7.35,x2:7.45,y1:0,y2:50,color:'rgba(74,222,128,0.05)',label:'NORMAL'},
+    {x1:7.45,x2:7.8,y1:0,y2:50,color:'rgba(56,189,248,0.06)',label:'ALCALEMIA'},
+  ];
+  zones.forEach(z=>{
+    ctx.fillStyle=z.color;
+    ctx.fillRect(px(z.x1),py(z.y2),px(z.x2)-px(z.x1),py(z.y1)-py(z.y2));
+    ctx.fillStyle='rgba(255,255,255,0.15)';
+    ctx.font=`bold 9px monospace`;
+    ctx.fillText(z.label, px((z.x1+z.x2)/2)-20, py(46));
+  });
+
+  // Normal HCO3 band
+  ctx.strokeStyle='rgba(74,222,128,0.25)';
+  ctx.lineWidth=1;
+  ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(px(6.8),py(22)); ctx.lineTo(px(7.8),py(22)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(6.8),py(26)); ctx.lineTo(px(7.8),py(26)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Buffer lines (isopleths for different PCO2)
+  const pco2Lines = [20,30,40,60,80];
+  pco2Lines.forEach(p=>{
+    ctx.strokeStyle = p===40 ? 'rgba(56,189,248,0.5)' : 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = p===40 ? 1.5 : 1;
+    ctx.beginPath();
+    let first=true;
+    for(let ph=6.8;ph<=7.8;ph+=0.01){
+      // Henderson-Hasselbalch: pH = 6.1 + log(HCO3/(0.0307*pCO2))
+      const h = 0.0307*p*Math.pow(10,ph-6.1);
+      if(h<0||h>50) continue;
+      const x=px(ph), y=py(h);
+      if(first){ctx.moveTo(x,y);first=false;}
+      else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // Label at pH=7.7
+    const hLabel = 0.0307*p*Math.pow(10,7.65-6.1);
+    if(hLabel>2&&hLabel<48){
+      ctx.fillStyle='rgba(255,255,255,0.3)';
+      ctx.font='9px monospace';
+      ctx.fillText(`${p}`, px(7.65), py(hLabel)-3);
+    }
+  });
+
+  // Axes
+  ctx.strokeStyle='rgba(255,255,255,0.2)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(px(6.8),py(0)); ctx.lineTo(px(7.8),py(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(6.8),py(0)); ctx.lineTo(px(6.8),py(50)); ctx.stroke();
+
+  // Axis ticks
+  ctx.fillStyle='rgba(148,163,184,0.7)';
+  ctx.font='9px monospace';
+  [7.0,7.1,7.2,7.3,7.35,7.4,7.45,7.5,7.6,7.7].forEach(p=>{
+    ctx.fillText(p.toFixed(2), px(p)-8, py(0)+12);
+    ctx.strokeStyle='rgba(255,255,255,0.08)';
+    ctx.beginPath(); ctx.moveTo(px(p),py(0)); ctx.lineTo(px(p),py(50)); ctx.stroke();
+  });
+  [10,20,24,26,30,40,50].forEach(h=>{
+    ctx.fillStyle='rgba(148,163,184,0.7)';
+    ctx.fillText(h, px(6.8)-22, py(h)+3);
+    ctx.strokeStyle='rgba(255,255,255,0.06)';
+    ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(px(6.8),py(h)); ctx.lineTo(px(7.8),py(h)); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Axis labels
+  ctx.fillStyle='rgba(148,163,184,0.8)';
+  ctx.font='10px monospace';
+  ctx.fillText('pH', W/2-5, py(0)+24);
+  ctx.save(); ctx.translate(10, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('HCO₃⁻ (mEq/L)', -30, 0); ctx.restore();
+
+  // Patient point
+  if(pH && hco3){
+    const x=px(pH), y=py(hco3);
+    ctx.shadowColor=pH<7.35?'#f87171':pH>7.45?'#38bdf8':'#4ade80';
+    ctx.shadowBlur=12;
+    ctx.fillStyle=pH<7.35?'#f87171':pH>7.45?'#38bdf8':'#4ade80';
+    ctx.beginPath();
+    ctx.arc(x,y,7,0,Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='white';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.arc(x,y,7,0,Math.PI*2);
+    ctx.stroke();
+    // Label
+    ctx.fillStyle='white';
+    ctx.font='bold 10px monospace';
+    ctx.fillText(`pH ${pH.toFixed(2)}`, x+10, y-6);
+    ctx.fillText(`HCO₃ ${hco3}`, x+10, y+7);
+  }
+}
+
+/* =====================================================
+   INIT
+======================================================*/
+buildCaseGrids();
+// Add 'selected' style
+const style = document.createElement('style');
+style.textContent = '.opt.selected{border-color:var(--blue)!important;background:rgba(56,189,248,.06)!important}';
+document.head.appendChild(style);
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>

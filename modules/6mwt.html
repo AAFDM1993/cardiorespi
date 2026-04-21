@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FisioResp — Test de Marcha 6 Minutos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="../data/cases-6mwt.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+.logo em{color:var(--teal);font-style:normal}
+/* TABS */
+.mode-bar{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+/* CARDS & LAYOUT */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+/* PATIENT SELECTOR */
+.patient-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:1.5rem}
+.pat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s}
+.pat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.pat-card.active{border-color:var(--blue);background:rgba(56,189,248,.06)}
+.pat-sev{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:.5rem}
+.pat-name{font-weight:600;font-size:.95rem;margin-bottom:.2rem}
+.pat-meta{font-size:11.5px;color:var(--text3)}
+/* TIMER */
+.timer-ring-wrap{display:flex;justify-content:center;align-items:center;margin:1rem 0}
+.timer-ring{position:relative;width:200px;height:200px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:var(--card2);stroke-width:12}
+.timer-ring-fill{fill:none;stroke:var(--blue);stroke-width:12;stroke-linecap:round;stroke-dasharray:565;stroke-dashoffset:0;transition:stroke-dashoffset .5s linear, stroke .3s}
+.timer-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.timer-min{font-family:var(--fh);font-size:3rem;color:var(--text);line-height:1}
+.timer-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+/* VITAL MONITORS */
+.monitor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
+@keyframes pulse-red{0%,100%{border-color:var(--red)}50%{border-color:rgba(248,113,113,.3)}}
+/* DISTANCE TRACK */
+.track-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1rem}
+.track-bar{height:16px;background:var(--card2);border-radius:100px;overflow:hidden;margin:8px 0;position:relative}
+.track-fill{height:100%;border-radius:100px;transition:width .5s ease;position:relative}
+.track-fill-patient{background:linear-gradient(90deg,var(--blue),var(--teal))}
+.track-fill-predicted{background:rgba(74,222,128,.3)}
+.track-marker{position:absolute;top:-4px;width:2px;height:24px;background:var(--green)}
+.track-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+.distance-big{font-family:var(--fh);font-size:2.5rem;color:var(--blue);line-height:1}
+.distance-pred{font-size:13px;color:var(--text2)}
+/* LOG */
+.event-log{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.85rem;max-height:160px;overflow-y:auto;font-family:var(--fm);font-size:11.5px;color:var(--text2);line-height:1.8}
+/* STOP CRITERIA */
+.stop-criteria{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;margin-bottom:1rem}
+.crit{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border-radius:var(--rs);font-size:12px}
+.crit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.crit-ok{background:var(--green)}
+.crit-warn{background:var(--amber)}
+.crit-alert{background:var(--red);animation:pulse-dot 1s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.crit-text{color:var(--text2)}
+/* RESULT PANEL */
+.result-section{display:none}
+.result-section.show{display:block}
+.result-hero{background:var(--card2);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem;text-align:center}
+.result-dist{font-family:var(--fh);font-size:3.5rem;color:var(--blue);line-height:1}
+.result-label{font-size:13px;color:var(--text2);margin-top:.3rem}
+.classification-badge{display:inline-block;padding:6px 18px;border-radius:100px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin:.75rem 0}
+.class-normal{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.class-mild{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+.class-mod{background:rgba(251,191,36,.2);color:var(--amber);border:1px solid rgba(251,191,36,.4)}
+.class-sev{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+/* CHART */
+.chart-wrap{position:relative;width:100%;height:220px}
+/* RECOVERY */
+.recovery-bar{height:8px;background:var(--card2);border-radius:100px;overflow:hidden;margin:6px 0}
+.recovery-fill{height:100%;border-radius:100px;transition:width 1s ease}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--fb)}
+.infobox strong{color:var(--blue)}
+/* FORMULA */
+.formula{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;font-family:var(--fm);font-size:12px;color:var(--teal);margin:.5rem 0;line-height:1.8}
+/* QUESTION BLOCK for interpretation mode */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem}
+.opt.correct .opt-letter{background:var(--green);color:#07090f}
+.opt.wrong .opt-letter{background:var(--red);color:#07090f}
+.active-speed{background:var(--blue)!important;color:#07090f!important;border-color:var(--blue)!important}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FISIO<em>RESP</em></div>
+  <div class="nav-mod">/ Test de Marcha 6 Minutos (6MWT)</div>
+</nav>
+
+<div class="wrap">
+  <div class="sec-title">Test de Marcha 6 Minutos</div>
+  <div class="sec-sub">Simulador en tiempo real · Criterios de parada · Cálculo de predichos · Interpretación clínica · Fase de recuperación</div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('sim')">🏃 Simulador</button>
+    <button class="mode-btn" onclick="setMode('calc')">📐 Calculadora</button>
+    <button class="mode-btn" onclick="setMode('interp')">🧠 Interpretación</button>
+    <button class="mode-btn" onclick="setMode('ref')">📖 Referencia</button>
+  </div>
+
+  <!-- ===================== SIMULADOR ===================== -->
+  <div class="mode-section active" id="mode-sim">
+
+    <!-- Patient selector -->
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Selecciona el perfil del paciente</div>
+    <div class="patient-grid" id="patientGrid"></div>
+
+    <div id="simPanel" style="display:none">
+      <!-- Patient summary -->
+      <div class="card mb-2" id="patSummary"></div>
+
+      <!-- Pre-test setup -->
+      <div id="preTest">
+        <div class="infobox"><strong>Protocolo ATS 2002:</strong> Corredor de 30 metros. Dos vueltas = 60m. El paciente camina lo más rápido posible durante 6 minutos. Puedes detenerlo si aparece un criterio de parada. No des ánimos excesivos — solo cuenta las vueltas en minutos 1, 2, 3, 4, 5.</div>
+
+        <!-- Stop criteria education -->
+        <div class="card mb-2">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Criterios de parada — ¿cuándo detener el test?</div>
+          <div class="stop-criteria" id="stopCritDisplay">
+            <div class="crit"><div class="crit-dot crit-ok"></div><div class="crit-text">SpO₂ ≥ 85% → continuar</div></div>
+            <div class="crit"><div class="crit-dot crit-ok"></div><div class="crit-text">Borg ≤ 7 → continuar</div></div>
+            <div class="crit"><div class="crit-dot crit-ok"></div><div class="crit-text">FC ≤ FCmáx → continuar</div></div>
+            <div class="crit"><div class="crit-dot crit-ok"></div><div class="crit-text">Sin síncope/angina/cianosis</div></div>
+          </div>
+        </div>
+
+        <!-- Basal vitals -->
+        <div class="card mb-2">
+          <div class="flex-b mb-1">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3)">Valores basales pre-test</div>
+          </div>
+          <div class="monitor-grid" id="basalMonitors"></div>
+          <div style="font-size:13px;color:var(--text2)">Anota los valores basales. El test debe iniciarse con SpO₂ estable y el paciente sentado al menos 10 minutos.</div>
+        </div>
+
+        <div style="text-align:center;margin-top:1.5rem">
+          <button class="btn btn-p btn-lg" onclick="startTest()">▶ Iniciar Test</button>
+        </div>
+      </div>
+
+      <!-- ACTIVE TEST -->
+      <div id="activeTest" style="display:none">
+        <div class="grid g2 mb-2">
+          <!-- Timer + distance -->
+          <div class="card">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem;text-align:center">Tiempo transcurrido</div>
+            <div class="timer-ring-wrap">
+              <div class="timer-ring">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  <circle class="timer-ring-bg" cx="100" cy="100" r="90"/>
+                  <circle class="timer-ring-fill" id="timerRingFill" cx="100" cy="100" r="90"/>
+                </svg>
+                <div class="timer-center">
+                  <div class="timer-min" id="timerDisplay">6:00</div>
+                  <div class="timer-label">restantes</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Distance -->
+            <div class="track-wrap">
+              <div class="flex-b mb-1">
+                <div class="distance-big" id="distDisplay">0 <span style="font-size:1.2rem">m</span></div>
+                <div style="text-align:right">
+                  <div class="distance-pred" id="predDisplay"></div>
+                  <div style="font-size:11px;color:var(--text3)">predicho</div>
+                </div>
+              </div>
+              <div class="track-bar">
+                <div class="track-fill track-fill-patient" id="trackFillPat" style="width:0%"></div>
+              </div>
+              <div class="track-labels">
+                <span>0 m</span>
+                <span id="trackMax">— m</span>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:.3rem">Vueltas (30m/vuelta): <span class="mono" id="lapDisplay">0</span></div>
+            </div>
+
+            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+              <button class="btn btn-g" onclick="addLap()" id="lapBtn">+ Vuelta (30m)</button>
+              <button class="btn btn-s btn-sm" onclick="removeLap()" id="lapUndoBtn" title="Deshacer última vuelta">↩ Deshacer vuelta</button>
+              <button class="btn btn-r" onclick="stopTestEarly()" id="stopBtn">⏹ Parada prematura</button>
+            </div>
+
+            <!-- Speed control -->
+            <div style="margin-top:1rem;padding:.75rem 1rem;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--border)">
+              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Velocidad de simulación</div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-s btn-sm speed-btn active-speed" onclick="setSimSpeed(1)" id="spd-1">×1</button>
+                <button class="btn btn-s btn-sm speed-btn" onclick="setSimSpeed(2)" id="spd-2">×2</button>
+                <button class="btn btn-s btn-sm speed-btn" onclick="setSimSpeed(5)" id="spd-5">×5</button>
+                <button class="btn btn-s btn-sm speed-btn" onclick="setSimSpeed(10)" id="spd-10">×10</button>
+                <span style="font-size:11px;color:var(--text3);margin-left:4px" id="speedLabel">Tiempo real</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live monitors -->
+          <div class="card">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Monitorización en tiempo real</div>
+            <div class="monitor-grid" id="liveMonitors"></div>
+
+            <!-- Stop criteria live -->
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Estado criterios de parada</div>
+            <div id="liveCriteria"></div>
+
+            <!-- Event log -->
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin:.75rem 0 .4rem">Registro de eventos</div>
+            <div class="event-log" id="eventLog"></div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card mb-2">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Curvas en tiempo real</div>
+          <div class="chart-wrap"><canvas id="liveChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- RECOVERY PHASE -->
+      <div id="recoveryPhase" style="display:none">
+        <div class="warnbox">⏱ <strong>Fase de recuperación (3 minutos).</strong> Indique al paciente que se siente. Registre Borg y SpO₂ cada minuto. La recuperación rápida de FC y SpO₂ indica buena reserva cardiorrespiratoria.</div>
+        <div class="card mb-2">
+          <div style="font-family:var(--fh);font-size:1.1rem;color:var(--blue);margin-bottom:.75rem">Recuperación post-esfuerzo</div>
+          <div class="monitor-grid" id="recovMonitors"></div>
+          <div style="margin-top:.75rem">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.4rem">SpO₂ — recuperación</div>
+            <div class="recovery-bar"><div class="recovery-fill" id="recovSpo2Bar" style="width:0%;background:var(--blue)"></div></div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin:.5rem 0 .4rem">FC — recuperación</div>
+            <div class="recovery-bar"><div class="recovery-fill" id="recovFcBar" style="width:0%;background:var(--orange)"></div></div>
+          </div>
+          <div class="event-log mt-1" id="recovLog"></div>
+        </div>
+        <div style="text-align:center">
+          <button class="btn btn-p btn-lg" onclick="showResults()">Ver resultados completos →</button>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="result-section" id="resultsSection">
+        <div class="result-hero">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.4rem">Distancia recorrida</div>
+          <div class="result-dist" id="resDist">—</div>
+          <div class="result-label">metros en 6 minutos</div>
+          <div id="resClassBadge"></div>
+          <div id="resPctPred" style="margin-top:.5rem;font-size:14px;color:var(--text2)"></div>
+        </div>
+
+        <div class="grid g2 mb-2">
+          <div class="card">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Valores pico vs basal</div>
+            <div id="peakVsBasal"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Interpretación clínica</div>
+            <div id="clinInterp"></div>
+          </div>
+        </div>
+
+        <div class="card mb-2">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Curvas completas — test + recuperación</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="fullChart"></canvas></div>
+        </div>
+
+        <div class="card mb-2">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Recomendaciones para el plan de rehabilitación</div>
+          <div id="rehabRec"></div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">
+          <button class="btn btn-p" onclick="resetSim()">↺ Nuevo test</button>
+          <button class="btn btn-s" onclick="setMode('interp')">🧠 Ir a Interpretación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CALCULADORA ===================== -->
+  <div class="mode-section" id="mode-calc">
+    <div class="infobox"><strong>Calculadora de distancia predicha 6MWT</strong> — Fórmulas Enright (ATS 2002) y Troosters. Úsala antes del test para saber qué distancia esperamos y poder clasificar el resultado.</div>
+    <div class="grid g2 mb-2">
+      <div class="card">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:1rem">Datos del paciente</div>
+        <div style="margin-bottom:.85rem">
+          <label class="small" style="display:block;margin-bottom:4px">Sexo</label>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-s btn-sm" id="cBtn-m" onclick="setCalcSex('m')" style="background:var(--blue);color:#07090f;border-color:var(--blue)">Masculino</button>
+            <button class="btn btn-s btn-sm" id="cBtn-f" onclick="setCalcSex('f')">Femenino</button>
+          </div>
+        </div>
+        <div style="margin-bottom:.85rem">
+          <label class="small" style="display:block;margin-bottom:4px">Edad: <span id="calcAgeV" class="mono">60</span> años</label>
+          <input type="range" id="calcAge" min="18" max="90" value="60" oninput="document.getElementById('calcAgeV').textContent=this.value;calcPredict()" style="width:100%;accent-color:var(--blue)">
+        </div>
+        <div style="margin-bottom:.85rem">
+          <label class="small" style="display:block;margin-bottom:4px">Talla: <span id="calcHtV" class="mono">165</span> cm</label>
+          <input type="range" id="calcHt" min="140" max="200" value="165" oninput="document.getElementById('calcHtV').textContent=this.value;calcPredict()" style="width:100%;accent-color:var(--blue)">
+        </div>
+        <div style="margin-bottom:.85rem">
+          <label class="small" style="display:block;margin-bottom:4px">Peso: <span id="calcWtV" class="mono">70</span> kg</label>
+          <input type="range" id="calcWt" min="40" max="150" value="70" oninput="document.getElementById('calcWtV').textContent=this.value;calcPredict()" style="width:100%;accent-color:var(--blue)">
+        </div>
+        <div>
+          <label class="small" style="display:block;margin-bottom:4px">Distancia obtenida: <span id="calcDistV" class="mono">—</span> m</label>
+          <input type="range" id="calcDist" min="50" max="800" value="400" oninput="document.getElementById('calcDistV').textContent=this.value;calcPredict()" style="width:100%;accent-color:var(--blue)">
+        </div>
+      </div>
+      <div>
+        <div class="card mb-2" id="calcResults"></div>
+        <div class="card">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Fórmulas de predicción</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:.3rem">Enright & Sherrill (Hombres)</div>
+          <div class="formula">D = 7.57 × Talla (cm) − 5.02 × Edad − 1.76 × Peso (kg) − 309</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--text);margin:.75rem 0 .3rem">Enright & Sherrill (Mujeres)</div>
+          <div class="formula">D = 2.11 × Talla (cm) − 2.29 × Peso (kg) − 5.78 × Edad + 667</div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--text);margin:.75rem 0 .3rem">LLN (Límite inferior de normalidad)</div>
+          <div class="formula">LLN Hombres = predicho − 153 m<br>LLN Mujeres = predicho − 139 m</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INTERPRETACIÓN ===================== -->
+  <div class="mode-section" id="mode-interp">
+    <div class="infobox"><strong>Modo Interpretación:</strong> Se presentan resultados reales de 6MWT de casos clínicos. Analiza los valores e identifica los hallazgos clave.</div>
+    <div id="interpCases"></div>
+  </div>
+
+  <!-- ===================== REFERENCIA ===================== -->
+  <div class="mode-section" id="mode-ref">
+    <div class="grid g2 mb-2">
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Protocolo ATS 2002 — Pasos clave</div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Ambiente</div>
+          <div style="color:var(--text2)">Corredor interior de 30m, marcado cada 3m. T° 20-24°C.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Pre-test</div>
+          <div style="color:var(--text2)">Paciente sentado 10 min. SpO₂, FC, Borg basal. SaO₂ basal > 88% para continuar.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Instrucción</div>
+          <div style="color:var(--text2)">"Camine lo más rápido que pueda durante 6 minutos. Puede reducir el paso o detenerse si lo necesita."</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Durante</div>
+          <div style="color:var(--text2)">No caminar al lado del paciente. Ánimos neutros en min 1-5 ("Va muy bien, le quedan X minutos").</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Parada prematura</div>
+          <div style="color:var(--text2)">SpO₂ &lt;85%, Borg &gt;8, angina, síncope, palidez intensa, disnea severa.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">Post-test inmediato</div>
+          <div style="color:var(--text2)">SpO₂, FC, Borg en 0, 1, 2, 3 min post-test. Distancia total = 30m × vueltas completas + última fracción.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:.75rem;font-size:13px">
+          <div style="min-width:90px;font-weight:600;color:var(--blue);font-size:12px">O₂ suplementario</div>
+          <div style="color:var(--text2)">Si el paciente usa O₂: documentar FiO₂. El test con O₂ no es directamente comparable con sin O₂.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Clasificación por % del predicho</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;border-left:3px solid var(--green)">
+          <div style="font-family:var(--fm);min-width:60px;font-size:12px;color:var(--green)">&gt;84%</div>
+          <div><div style="font-weight:600;font-size:13px;color:var(--green)">Normal</div><div style="font-size:11.5px;color:var(--text3)">Sin limitación significativa</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;border-left:3px solid var(--teal)">
+          <div style="font-family:var(--fm);min-width:60px;font-size:12px;color:var(--teal)">70–84%</div>
+          <div><div style="font-weight:600;font-size:13px;color:var(--teal)">Leve</div><div style="font-size:11.5px;color:var(--text3)">Limitación leve de la capacidad funcional</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;border-left:3px solid var(--amber)">
+          <div style="font-family:var(--fm);min-width:60px;font-size:12px;color:var(--amber)">60–69%</div>
+          <div><div style="font-weight:600;font-size:13px;color:var(--amber)">Moderada</div><div style="font-size:11.5px;color:var(--text3)">Limitación moderada. Considera PR.</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px;border-left:3px solid var(--red)">
+          <div style="font-family:var(--fm);min-width:60px;font-size:12px;color:var(--red)">&lt;60%</div>
+          <div><div style="font-weight:600;font-size:13px;color:var(--red)">Severa</div><div style="font-size:11.5px;color:var(--text3)">Limitación severa. Alta prioridad PR.</div></div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">DMCS — Diferencia mínima clínicamente significativa</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          <strong style="color:var(--text)">EPOC:</strong> 26–35 m<br>
+          <strong style="color:var(--text)">IC Crónica:</strong> 43 m<br>
+          <strong style="color:var(--text)">HTP:</strong> 33 m<br>
+          <strong style="color:var(--text)">Fibrosis Pulmonar:</strong> 24–45 m<br>
+          <span style="color:var(--text3);font-size:11.5px">Cualquier mejora ≥ DMCS es clínicamente relevante</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-2">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--blue);margin-bottom:.75rem">Desaturación de esfuerzo — definición e implicaciones</div>
+      <div class="grid g3">
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--blue)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--blue);margin-bottom:.3rem">Definición</div>
+          <div style="font-size:12.5px;color:var(--text2)">Caída ≥ 4% de SpO₂ desde el basal, o SpO₂ &lt; 90% durante el test.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--amber)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--amber);margin-bottom:.3rem">Significado clínico</div>
+          <div style="font-size:12.5px;color:var(--text2)">Predictor independiente de mortalidad en EPOC y FPI. Mayor riesgo de exacerbación.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--red)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--red);margin-bottom:.3rem">Umbral de parada</div>
+          <div style="font-size:12.5px;color:var(--text2)">SpO₂ &lt; 85% → parada inmediata. Entre 85-89%: valorar continuidad con O₂ suplementario.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--teal)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--teal);margin-bottom:.3rem">Recuperación</div>
+          <div style="font-size:12.5px;color:var(--text2)">SpO₂ debe recuperarse a valor basal en &lt; 3 min. Recuperación lenta indica intercambio gaseoso comprometido.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--green)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--green);margin-bottom:.3rem">O₂ de deambulación</div>
+          <div style="font-size:12.5px;color:var(--text2)">Si SpO₂ &lt; 88% durante esfuerzo, indica O₂ ambulatorio. Prescribir flujo para mantener SpO₂ ≥ 90%.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;border-left:3px solid var(--purple)">
+          <div style="font-weight:600;font-size:12.5px;color:var(--purple);margin-bottom:.3rem">6MWT vs CPET</div>
+          <div style="font-size:12.5px;color:var(--text2)">El 6MWT evalúa la respuesta submáxima (80-85% VO₂máx). El CPET evalúa el máximo. Son complementarios.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====================================================
+   PATIENT PROFILES
+====================================================*/
+
+/* ====================================================
+   INTERPRETATION CASES
+====================================================*/
+
+/* ====================================================
+   GLOBALS
+====================================================*/
+let activePatient = null;
+let testInterval = null;
+let testElapsed = 0; // seconds
+let testRunning = false;
+let laps = 0;
+let distanceTraveled = 0;
+let peakVals = {spo2:999, fc:0, borg:0};
+let liveChartInst = null;
+let chartData = {labels:[], spo2:[], fc:[], borg:[]};
+let recovData = {spo2:[], fc:[], borg:[]};
+let testStopped = false;
+let stopReason = '';
+let calcSex = 'm';
+let simSpeed = 1; // multiplier: 1, 2, 5, 10
+
+/* ====================================================
+   MODE
+====================================================*/
+function setMode(m){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
+  const modes=['sim','calc','interp','ref'];
+  document.querySelectorAll('.mode-btn')[modes.indexOf(m)].classList.add('active');
+  document.getElementById('mode-'+m).classList.add('active');
+  if(m==='calc') calcPredict();
+  if(m==='interp') buildInterpCases();
+}
+
+/* ====================================================
+   PATIENT GRID
+====================================================*/
+function buildPatientGrid(){
+  const el = document.getElementById('patientGrid');
+  PATIENTS.forEach(p=>{
+    const d = document.createElement('div');
+    d.className='pat-card';
+    d.id='patCard-'+p.id;
+    d.innerHTML=`
+      <span class="pat-sev ${p.sev==='sev'?'sev-sev':p.sev==='mod'?'sev-mod':'sev-mild'}">${p.sevLabel}</span>
+      <div class="pat-name">${p.name}</div>
+      <div class="pat-meta">${p.age}a · ${p.sex==='m'?'Masculino':'Femenino'} · ${p.weight}kg · ${p.height}cm</div>
+      <div class="pat-meta" style="margin-top:3px;color:var(--text3)">${p.dx}</div>
+    `;
+    d.onclick=()=>selectPatient(p.id);
+    el.appendChild(d);
+  });
+}
+
+function selectPatient(id){
+  activePatient = PATIENTS[id];
+  document.querySelectorAll('.pat-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('patCard-'+id).classList.add('active');
+  resetSimState();
+  renderPatSummary();
+  document.getElementById('simPanel').style.display='block';
+  document.getElementById('preTest').style.display='block';
+  document.getElementById('activeTest').style.display='none';
+  document.getElementById('recoveryPhase').style.display='none';
+  document.getElementById('resultsSection').classList.remove('show');
+  document.getElementById('simPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function renderPatSummary(){
+  const p = activePatient;
+  const pred = calcEnright(p.sex, p.age, p.height, p.weight);
+  const fcMax = p.fcMax || (220-p.age);
+  document.getElementById('patSummary').innerHTML=`
+    <div class="flex-b">
+      <div>
+        <div style="font-family:var(--fh);font-size:1.1rem;margin-bottom:.2rem">${p.name}</div>
+        <div style="font-size:12px;color:var(--blue)">${p.dx}</div>
+      </div>
+      <span class="pat-sev ${p.sev==='sev'?'sev-sev':p.sev==='mod'?'sev-mod':'sev-mild'}">${p.sevLabel}</span>
+    </div>
+    <div class="divider"></div>
+    <div class="g4" style="display:grid;gap:8px">
+      ${[
+        ['Edad',p.age+' años'],['Sexo',p.sex==='m'?'Masculino':'Femenino'],
+        ['Talla',p.height+' cm'],['Peso',p.weight+' kg'],
+        ['FEV₁',p.spiro.fev1+'% pred'],['FVCp',p.spiro.fvc+'% pred'],
+        ['FC máx estimada',fcMax+' lpm'],['Dist. predicha',Math.round(pred.enright)+' m (Enright)']
+      ].map(([l,v])=>`<div style="background:var(--bg3);border-radius:var(--rs);padding:.6rem .85rem"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.6px">${l}</div><div style="font-family:var(--fm);font-size:.95rem;color:var(--text)">${v}</div></div>`).join('')}
+    </div>
+  `;
+
+  // Basal monitors
+  const bv = p.basal;
+  document.getElementById('basalMonitors').innerHTML = renderMonitors(bv, p, false);
+
+  // Predicted distance for track
+  document.getElementById('predDisplay').textContent = Math.round(pred.enright)+'m';
+  document.getElementById('trackMax').textContent = Math.round(pred.enright*1.1)+'m';
+}
+
+function renderMonitors(vals, patient, live){
+  const fcMax = patient.fcMax || (220-patient.age);
+  const spo2Class = vals.spo2 < 85 ? 'val-alert' : vals.spo2 < 90 ? 'val-warn' : 'val-ok';
+  const fcClass = vals.fc > fcMax*0.95 ? 'val-alert' : vals.fc > fcMax*0.85 ? 'val-warn' : 'val-neutral';
+  const borgClass = vals.borg >= 8 ? 'val-alert' : vals.borg >= 6 ? 'val-warn' : 'val-ok';
+  const frClass = vals.fr > 30 ? 'val-warn' : 'val-ok';
+  const alert_spo2 = vals.spo2 < 85;
+  const alert_borg = vals.borg >= 8;
+
+  return [
+    {l:'SpO₂',v:vals.spo2+'%', cls:spo2Class, alert:alert_spo2},
+    {l:'FC',v:vals.fc+' lpm', cls:fcClass, alert:false},
+    {l:'Borg',v:vals.borg+'/10', cls:borgClass, alert:alert_borg},
+    {l:'FR',v:vals.fr+' rpm', cls:frClass, alert:false},
+    {l:'PAS',v:(vals.pas||'—')+' mmHg', cls:'val-neutral', alert:false},
+  ].map(m=>`
+    <div class="monitor-card${m.alert?' alert':''}">
+      <div class="mon-label">${m.l}</div>
+      <div class="mon-val ${m.cls}">${m.v}</div>
+    </div>`).join('');
+}
+
+/* ====================================================
+   TEST ENGINE
+====================================================*/
+function resetSimState(){
+  clearInterval(testInterval);
+  testElapsed=0; laps=0; distanceTraveled=0;
+  peakVals={spo2:999,fc:0,borg:0};
+  chartData={labels:[],spo2:[],fc:[],borg:[]};
+  recovData={spo2:[],fc:[],borg:[]};
+  testStopped=false; stopReason='';
+  if(liveChartInst){liveChartInst.destroy();liveChartInst=null;}
+}
+
+function startTest(){
+  if(!activePatient) return;
+  resetSimState();
+  document.getElementById('preTest').style.display='none';
+  document.getElementById('activeTest').style.display='block';
+  document.getElementById('recoveryPhase').style.display='none';
+  document.getElementById('resultsSection').classList.remove('show');
+
+  testRunning=true;
+  initLiveChart();
+  logEvent('▶ Test iniciado — 6 minutos','log-info');
+  logEvent(`Basales: SpO₂ ${activePatient.basal.spo2}% · FC ${activePatient.basal.fc}lpm · Borg ${activePatient.basal.borg}`,'log-ok');
+
+  testInterval = setInterval(tickTest, Math.round(1000/simSpeed));
+}
+
+function setSimSpeed(s){
+  simSpeed = s;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active-speed'));
+  document.getElementById('spd-'+s).classList.add('active-speed');
+  const labels={1:'Tiempo real',2:'×2 rápido',5:'×5 rápido',10:'×10 máximo'};
+  document.getElementById('speedLabel').textContent = labels[s];
+  // Restart interval with new speed if test is running
+  if(testRunning){
+    clearInterval(testInterval);
+    testInterval = setInterval(tickTest, Math.round(1000/s));
+  }
+}
+
+function removeLap(){
+  if(laps <= 0) return;
+  laps--;
+  distanceTraveled = Math.max(0, laps * 30);
+  updateDistanceDisplay();
+  logEvent(`↩ Vuelta corregida → ${laps} vueltas (${laps*30}m)`,'log-warn');
+}
+
+function tickTest(){
+  if(!testRunning) return;
+  testElapsed++;
+
+  const totalSec = 360;
+  const remaining = totalSec - testElapsed;
+  const profileIdx = Math.min(Math.floor(testElapsed/30), activePatient.profile.spo2.length-1);
+
+  // Get current values from profile
+  const spo2 = activePatient.profile.spo2[profileIdx];
+  const fc = activePatient.profile.fc[profileIdx];
+  const borg = activePatient.profile.borg[profileIdx];
+  const fr = activePatient.profile.fr[profileIdx];
+
+  // Track peak
+  if(spo2 < peakVals.spo2) peakVals.spo2=spo2;
+  if(fc > peakVals.fc) peakVals.fc=fc;
+  if(borg > peakVals.borg) peakVals.borg=borg;
+
+  // Update distance (continuous from speed profile)
+  const speedIdx = Math.min(Math.floor(testElapsed/30), activePatient.speed.length-1);
+  const speed = activePatient.speed[speedIdx]; // m/min
+  distanceTraveled += speed/60; // per second
+
+  // Update UI every second
+  updateTimerDisplay(remaining);
+  updateLiveMonitors({spo2,fc,borg,fr,pas:activePatient.basal.pas});
+  updateDistanceDisplay();
+  updateCriteria(spo2,fc,borg);
+
+  // Chart every 30s
+  if(testElapsed%30===0){
+    const min = testElapsed/60;
+    chartData.labels.push(min+'m');
+    chartData.spo2.push(spo2);
+    chartData.fc.push(fc);
+    chartData.borg.push(borg*10); // scale for display
+    updateLiveChart();
+    logEvent(`Minuto ${Math.floor(min)}: SpO₂ ${spo2}% · FC ${fc}lpm · Borg ${borg} · ${Math.round(distanceTraveled)}m`,'log-ok');
+  }
+
+  // Check stop event from profile
+  if(activePatient.stopEvent && profileIdx >= activePatient.stopEvent.at && !testStopped){
+    stopTestAuto(activePatient.stopEvent.reason);
+    return;
+  }
+
+  // Check automatic stop criteria
+  if(spo2 < 85 && !testStopped){
+    stopTestAuto('SpO₂ < 85% — Criterio de parada automático');
+    return;
+  }
+  if(borg >= 9 && !testStopped){
+    stopTestAuto('Borg ≥ 9 — Esfuerzo máximo referido');
+    return;
+  }
+
+  // Test complete
+  if(testElapsed >= totalSec && !testStopped){
+    endTest(false);
+  }
+}
+
+function updateTimerDisplay(remaining){
+  const m = Math.floor(remaining/60);
+  const s = remaining%60;
+  document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  const pct = (360-remaining)/360;
+  const circ = 2*Math.PI*90;
+  const offset = circ*(1-pct);
+  const ring = document.getElementById('timerRingFill');
+  ring.style.strokeDashoffset = offset;
+  // Color shift
+  ring.style.stroke = remaining<60?'var(--red)':remaining<120?'var(--amber)':'var(--blue)';
+}
+
+function updateLiveMonitors(vals){
+  document.getElementById('liveMonitors').innerHTML = renderMonitors(vals, activePatient, true);
+}
+
+function updateDistanceDisplay(){
+  const d = Math.round(distanceTraveled);
+  document.getElementById('distDisplay').innerHTML = `${d} <span style="font-size:1.2rem">m</span>`;
+  const pred = calcEnright(activePatient.sex, activePatient.age, activePatient.height, activePatient.weight);
+  const maxD = pred.enright * 1.1;
+  const pct = Math.min(d/maxD*100, 100);
+  document.getElementById('trackFillPat').style.width = pct+'%';
+  document.getElementById('lapDisplay').textContent = Math.floor(d/30);
+}
+
+function updateCriteria(spo2,fc,borg){
+  const fcMax = activePatient.fcMax || (220-activePatient.age);
+  const crits = [
+    {label:`SpO₂: ${spo2}% (límite <85%)`, ok: spo2>=85, warn: spo2<90&&spo2>=85},
+    {label:`Borg: ${borg}/10 (límite ≥8)`, ok: borg<6, warn: borg>=6&&borg<8},
+    {label:`FC: ${fc}/${Math.round(fcMax*0.95)}lpm (límite ≥95%FCmáx)`, ok: fc<fcMax*0.85, warn: fc>=fcMax*0.85&&fc<fcMax*0.95},
+    {label:'Sin síntomas de alarma', ok: !testStopped, warn: false},
+  ];
+  document.getElementById('liveCriteria').innerHTML = crits.map(c=>`
+    <div class="crit" style="margin-bottom:4px">
+      <div class="crit-dot ${c.ok?'crit-ok':c.warn?'crit-warn':'crit-alert'}"></div>
+      <div class="crit-text">${c.label}</div>
+    </div>`).join('');
+}
+
+function addLap(){
+  laps++;
+  distanceTraveled = laps*30;
+  updateDistanceDisplay();
+  logEvent(`Vuelta ${laps} — ${laps*30}m`,'log-info');
+}
+
+function stopTestEarly(){
+  stopTestAuto('Parada voluntaria por evaluador');
+}
+
+function stopTestAuto(reason){
+  testStopped=true;
+  stopReason=reason;
+  clearInterval(testInterval);
+  testRunning=false;
+  document.getElementById('lapBtn').disabled=true;
+  document.getElementById('stopBtn').disabled=true;
+  logEvent(`⏹ PARADA: ${reason}`,'log-stop');
+  logEvent(`Distancia al parar: ${Math.round(distanceTraveled)}m en ${Math.floor(testElapsed/60)}:${(testElapsed%60).toString().padStart(2,'0')}`,'log-alert');
+  setTimeout(startRecovery, 1500);
+}
+
+function endTest(stopped){
+  clearInterval(testInterval);
+  testRunning=false;
+  if(!stopped){
+    logEvent('✓ Test completado — 6 minutos','log-ok');
+    logEvent(`Distancia total: ${Math.round(distanceTraveled)}m`,'log-ok');
+  }
+  document.getElementById('lapBtn').disabled=true;
+  document.getElementById('stopBtn').disabled=true;
+  setTimeout(startRecovery, 1000);
+}
+
+/* ====================================================
+   RECOVERY
+====================================================*/
+let recovInterval=null, recovElapsed=0;
+
+function startRecovery(){
+  document.getElementById('recoveryPhase').style.display='block';
+  recovElapsed=0;
+
+  const rLog = document.getElementById('recovLog');
+  rLog.innerHTML='';
+  const rLogEntry=(msg,cls)=>{rLog.innerHTML+=`<div class="${cls}">${msg}</div>`;rLog.scrollTop=rLog.scrollHeight;};
+
+  rLogEntry('▶ Fase de recuperación iniciada','log-info');
+  rLogEntry(`Post-test: SpO₂ ${activePatient.profile.spo2[activePatient.profile.spo2.length-1]}% · FC ${activePatient.profile.fc[activePatient.profile.fc.length-1]}lpm`,'log-ok');
+
+  const recMonEl = document.getElementById('recovMonitors');
+  const spo2Bar = document.getElementById('recovSpo2Bar');
+  const fcBar = document.getElementById('recovFcBar');
+
+  recovInterval = setInterval(()=>{
+    recovElapsed++;
+    const idx = Math.min(recovElapsed-1, activePatient.recovery.spo2.length-1);
+    const rSpo2 = activePatient.recovery.spo2[idx];
+    const rFc = activePatient.recovery.fc[idx];
+    const rBorg = activePatient.recovery.borg[idx];
+    recovData.spo2.push(rSpo2);
+    recovData.fc.push(rFc);
+    recovData.borg.push(rBorg);
+
+    recMonEl.innerHTML=`
+      <div class="monitor-card"><div class="mon-label">SpO₂</div><div class="mon-val ${rSpo2<88?'val-warn':'val-ok'}">${rSpo2}%</div></div>
+      <div class="monitor-card"><div class="mon-label">FC</div><div class="mon-val val-neutral">${rFc} lpm</div></div>
+      <div class="monitor-card"><div class="mon-label">Borg</div><div class="mon-val val-ok">${rBorg}/10</div></div>
+      <div class="monitor-card"><div class="mon-label">Tiempo</div><div class="mon-val val-neutral">${recovElapsed} min</div></div>
+    `;
+    spo2Bar.style.width=(rSpo2/100*100)+'%';
+    spo2Bar.style.background=rSpo2>=95?'var(--green)':rSpo2>=90?'var(--teal)':'var(--amber)';
+    const fcMax2=activePatient.fcMax||(220-activePatient.age);
+    fcBar.style.width=(rFc/fcMax2*100)+'%';
+    fcBar.style.background='var(--orange)';
+
+    rLogEntry(`Min ${recovElapsed}: SpO₂ ${rSpo2}% · FC ${rFc}lpm · Borg ${rBorg}`,'log-ok');
+
+    if(recovElapsed>=3){
+      clearInterval(recovInterval);
+      rLogEntry('✓ Recuperación completada (3 min)','log-info');
+    }
+  }, Math.round(600/simSpeed)); // accelerated proportionally to sim speed
+}
+
+/* ====================================================
+   RESULTS
+======================================================*/
+function showResults(){
+  document.getElementById('resultsSection').classList.add('show');
+  const p = activePatient;
+  const dist = Math.round(distanceTraveled);
+  const pred = calcEnright(p.sex, p.age, p.height, p.weight);
+  const lln = pred.lln;
+  const pct = Math.round(dist/pred.enright*100);
+
+  // Classification
+  let classLabel, classCss;
+  if(pct>84){classLabel='Normal';classCss='class-normal';}
+  else if(pct>=70){classLabel='Limitación Leve';classCss='class-mild';}
+  else if(pct>=60){classLabel='Limitación Moderada';classCss='class-mod';}
+  else{classLabel='Limitación Severa';classCss='class-sev';}
+
+  document.getElementById('resDist').textContent = dist;
+  document.getElementById('resClassBadge').innerHTML = `<span class="classification-badge ${classCss}">${classLabel}</span>`;
+  document.getElementById('resPctPred').innerHTML = `
+    <strong>${pct}%</strong> del predicho (${Math.round(pred.enright)}m) · 
+    LLN: ${Math.round(lln)}m · 
+    ${dist>=lln?'<span style="color:var(--green)">▲ Sobre LLN</span>':'<span style="color:var(--red)">▼ Bajo LLN</span>'}
+    ${testStopped?`<br><span style="color:var(--red)">⏹ Test interrumpido: ${stopReason}</span>`:''}
+  `;
+
+  // Peak vs basal
+  const basalSpo2 = p.basal.spo2;
+  const deltaSpo2 = basalSpo2 - peakVals.spo2;
+  document.getElementById('peakVsBasal').innerHTML=[
+    ['SpO₂ basal → mínima',`${basalSpo2}% → ${peakVals.spo2}%`,deltaSpo2>=4?'⚠ Desaturación significativa (≥4%)':'✓ Sin desaturación significativa',deltaSpo2>=4?'var(--amber)':'var(--green)'],
+    ['FC basal → pico',`${p.basal.fc} → ${peakVals.fc} lpm`,`Reserva usada: ${Math.round((peakVals.fc-p.basal.fc)/((p.fcMax||(220-p.age))-p.basal.fc)*100)}%`,'var(--blue)'],
+    ['Borg basal → final',`${p.basal.borg} → ${peakVals.borg}/10`,peakVals.borg>=8?'⚠ Esfuerzo máximo':'Esfuerzo tolerable','var(--text2)'],
+    ['SpO₂ recuperación 3min',`${recovData.spo2[recovData.spo2.length-1]||'—'}%`,recovData.spo2[recovData.spo2.length-1]>=basalSpo2-2?'✓ Recuperación adecuada':'⚠ Recuperación lenta','var(--teal)'],
+  ].map(([l,v,note,c])=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">${l}</div>
+      <div style="font-family:var(--fm);font-size:.95rem;color:${c};margin:2px 0">${v}</div>
+      <div style="font-size:12px;color:var(--text2)">${note}</div>
+    </div>`).join('');
+
+  document.getElementById('clinInterp').innerHTML=`
+    <div style="font-size:13px;color:var(--text2);line-height:1.7">${p.clinNotes}</div>
+  `;
+
+  document.getElementById('rehabRec').innerHTML=`
+    <div style="font-size:13px;color:var(--text2);line-height:1.7">${p.rehabRec}</div>
+  `;
+
+  buildFullChart(pred.enright);
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+}
+
+/* ====================================================
+   CHARTS
+======================================================*/
+function initLiveChart(){
+  const ctx = document.getElementById('liveChart').getContext('2d');
+  liveChartInst = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['0'],
+      datasets:[
+        {label:'SpO₂ (%)',data:[activePatient.basal.spo2],borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.08)',fill:true,tension:0.4,pointRadius:3,yAxisID:'y'},
+        {label:'FC (lpm)',data:[activePatient.basal.fc],borderColor:'#fb923c',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:3,yAxisID:'y2'},
+        {label:'Borg ×10',data:[activePatient.basal.borg*10],borderColor:'#a78bfa',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:3,yAxisID:'y'},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:200},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{type:'linear',min:60,max:105,ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'SpO₂ / Borg×10',color:'#475569',font:{size:10}}},
+        y2:{type:'linear',min:50,max:200,position:'right',ticks:{color:'#fb923c',font:{size:10}},grid:{display:false},title:{display:true,text:'FC (lpm)',color:'#fb923c',font:{size:10}}}
+      }
+    }
+  });
+  // Seed with basal
+  chartData.labels=['0m'];
+  chartData.spo2=[activePatient.basal.spo2];
+  chartData.fc=[activePatient.basal.fc];
+  chartData.borg=[activePatient.basal.borg*10];
+}
+
+function updateLiveChart(){
+  if(!liveChartInst) return;
+  liveChartInst.data.labels = chartData.labels;
+  liveChartInst.data.datasets[0].data = chartData.spo2;
+  liveChartInst.data.datasets[1].data = chartData.fc;
+  liveChartInst.data.datasets[2].data = chartData.borg;
+  liveChartInst.update();
+}
+
+function buildFullChart(pred){
+  const ctx = document.getElementById('fullChart').getContext('2d');
+  const allLabels = [...chartData.labels, '6m+1','6m+2','6m+3'];
+  const allSpo2 = [...chartData.spo2, ...recovData.spo2];
+  const allFc = [...chartData.fc, ...recovData.fc];
+
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:allLabels,
+      datasets:[
+        {label:'SpO₂ (%)',data:allSpo2,borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.08)',fill:true,tension:0.4,pointRadius:3,yAxisID:'y'},
+        {label:'FC (lpm)',data:allFc,borderColor:'#fb923c',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:3,yAxisID:'y2'},
+        // Reference SpO2 threshold
+        {label:'SpO₂ mín (85%)',data:new Array(allLabels.length).fill(85),borderColor:'rgba(248,113,113,.4)',borderDash:[5,5],pointRadius:0,fill:false,yAxisID:'y'},
+        {label:'SpO₂ basal',data:new Array(allLabels.length).fill(activePatient.basal.spo2),borderColor:'rgba(74,222,128,.3)',borderDash:[3,3],pointRadius:0,fill:false,yAxisID:'y'},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},
+           afterDrawCallbacks:[]},
+        y:{type:'linear',min:60,max:105,ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+        y2:{type:'linear',min:50,max:200,position:'right',ticks:{color:'#fb923c',font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+/* ====================================================
+   CALCULATOR
+======================================================*/
+function calcEnright(sex, age, height, weight){
+  let enright;
+  if(sex==='m'){
+    enright = 7.57*height - 5.02*age - 1.76*weight - 309;
+  } else {
+    enright = 2.11*height - 2.29*weight - 5.78*age + 667;
+  }
+  enright = Math.max(enright, 100);
+  const lln = sex==='m' ? enright-153 : enright-139;
+  return {enright, lln};
+}
+
+function setCalcSex(s){
+  calcSex=s;
+  document.getElementById('cBtn-m').className='btn btn-s btn-sm'+(s==='m'?' btn-p':'');
+  document.getElementById('cBtn-f').className='btn btn-s btn-sm'+(s==='f'?' btn-p':'');
+  calcPredict();
+}
+
+function calcPredict(){
+  const age=parseInt(document.getElementById('calcAge').value);
+  const ht=parseInt(document.getElementById('calcHt').value);
+  const wt=parseInt(document.getElementById('calcWt').value);
+  const dist=parseInt(document.getElementById('calcDist').value);
+  document.getElementById('calcDistV').textContent=dist;
+
+  const {enright, lln} = calcEnright(calcSex, age, ht, wt);
+  const pct = Math.round(dist/enright*100);
+  let classLabel='', classColor='var(--green)';
+  if(pct>84){classLabel='Normal';classColor='var(--green)';}
+  else if(pct>=70){classLabel='Limitación Leve';classColor='var(--teal)';}
+  else if(pct>=60){classLabel='Limitación Moderada';classColor='var(--amber)';}
+  else{classLabel='Limitación Severa';classColor='var(--red)';}
+
+  document.getElementById('calcResults').innerHTML=`
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.85rem">Resultado</div>
+    <div style="margin-bottom:1rem">
+      <div style="font-size:10.5px;color:var(--text3);margin-bottom:2px;text-transform:uppercase">Distancia predicha (Enright)</div>
+      <div style="font-family:var(--fh);font-size:2rem;color:var(--blue)">${Math.round(enright)} m</div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div style="font-size:10.5px;color:var(--text3);margin-bottom:2px;text-transform:uppercase">Límite inferior de normalidad (LLN)</div>
+      <div style="font-family:var(--fm);font-size:1.2rem;color:var(--text2)">${Math.round(lln)} m</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--rs);padding:.85rem;margin-bottom:1rem">
+      <div style="font-size:10.5px;color:var(--text3);margin-bottom:.4rem;text-transform:uppercase">Distancia obtenida: ${dist}m</div>
+      <div style="height:10px;background:var(--card2);border-radius:100px;overflow:hidden;margin-bottom:.4rem">
+        <div style="height:100%;width:${Math.min(pct,100)}%;background:${classColor};border-radius:100px;transition:width .5s"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+        <span>0m</span><span>${Math.round(enright)}m (100%)</span>
+      </div>
+    </div>
+    <div style="font-family:var(--fh);font-size:1.3rem;color:${classColor};margin-bottom:.3rem">${pct}% del predicho</div>
+    <div style="font-size:13px;font-weight:600;color:${classColor}">${classLabel}</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:.3rem">${dist>=lln?'▲ Sobre el LLN':'▼ Por debajo del LLN'}</div>
+  `;
+}
+
+/* ====================================================
+   INTERPRETATION CASES
+======================================================*/
+function buildInterpCases(){
+  const el = document.getElementById('interpCases');
+  el.innerHTML='';
+  INTERP_CASES.forEach((ic,ci)=>{
+    const d = document.createElement('div');
+    d.innerHTML=`
+      <div class="card mb-2">
+        <div style="font-family:var(--fh);font-size:1.1rem;color:var(--blue);margin-bottom:.75rem">${ic.name}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:1rem">
+          ${Object.entries(ic.data).map(([k,v])=>{
+            const labels={dist:'Distancia',pred:'Predicho',lln:'LLN',spo2_basal:'SpO₂ Basal',spo2_min:'SpO₂ Mínima',
+                         spo2_recov3:'SpO₂ Recup 3m',fc_basal:'FC Basal',fc_peak:'FC Pico',borg_basal:'Borg Basal',
+                         borg_end:'Borg Final',parada:'Parada'};
+            return `<div style="background:var(--bg3);border-radius:var(--rs);padding:.6rem .8rem">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">${labels[k]||k}</div>
+              <div style="font-family:var(--fm);font-size:.9rem;color:var(--text)">${v===null?'No':''+v}${k.includes('spo2')?'%':k.includes('fc')?'lpm':k.includes('dist')||k==='lln'||k==='pred'?'m':''}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        ${ic.questions.map((q,qi)=>`
+          <div class="q-card">
+            <div class="q-label">Pregunta ${qi+1} — ${ic.name}</div>
+            <div class="q-text">${q.q}</div>
+            <div class="opts" id="iopts-${ci}-${qi}">
+              ${q.opts.map((o,oi)=>`
+                <button class="opt" onclick="answerInterp(${ci},${qi},${oi})">
+                  <span class="opt-letter">${String.fromCharCode(65+oi)}</span>${o}
+                </button>`).join('')}
+            </div>
+            <div class="feedback" id="ifb-${ci}-${qi}"></div>
+          </div>`).join('')}
+      </div>
+    `;
+    el.appendChild(d);
+  });
+}
+
+function answerInterp(ci,qi,oi){
+  const q=INTERP_CASES[ci].questions[qi];
+  const opts=document.querySelectorAll(`#iopts-${ci}-${qi} .opt`);
+  opts.forEach(o=>o.disabled=true);
+  opts[oi].classList.add(oi===q.correct?'correct':'wrong');
+  if(oi!==q.correct) opts[q.correct].classList.add('correct');
+  const fb=document.getElementById(`ifb-${ci}-${qi}`);
+  fb.innerHTML=(oi===q.correct?'<strong style="color:var(--green)">✓ Correcto</strong> — ':'<strong style="color:var(--red)">✗ Incorrecto</strong> — ')+q.exp;
+  fb.className='feedback show '+(oi===q.correct?'ok':'err');
+}
+
+/* ====================================================
+   LOG HELPER
+======================================================*/
+function logEvent(msg, cls){
+  const el=document.getElementById('eventLog');
+  if(!el) return;
+  const now=new Date();
+  const t=`${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+  el.innerHTML+=`<div class="${cls}">[${t}] ${msg}</div>`;
+  el.scrollTop=el.scrollHeight;
+}
+
+function resetSim(){
+  clearInterval(testInterval);
+  clearInterval(recovInterval);
+  resetSimState();
+  simSpeed = 1;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active-speed'));
+  const spdBtn = document.getElementById('spd-1');
+  if(spdBtn) spdBtn.classList.add('active-speed');
+  const spdLabel = document.getElementById('speedLabel');
+  if(spdLabel) spdLabel.textContent = 'Tiempo real';
+  document.getElementById('simPanel').style.display='none';
+  document.getElementById('preTest').style.display='block';
+  document.getElementById('activeTest').style.display='none';
+  document.getElementById('recoveryPhase').style.display='none';
+  document.getElementById('resultsSection').classList.remove('show');
+  document.querySelectorAll('.pat-card').forEach(c=>c.classList.remove('active'));
+  activePatient=null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ====================================================
+   INIT
+======================================================*/
+buildPatientGrid();
+calcPredict();
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>

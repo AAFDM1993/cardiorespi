@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FisioResp — Plataforma de Fisioterapia Respiratoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/fisioresp.css">
+  <style>
+/* ── GLOW ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:drift 18s ease-in-out infinite alternate}
+.orb1{width:500px;height:500px;background:rgba(56,189,248,.06);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:rgba(45,212,191,.05);bottom:-80px;right:-80px;animation-delay:-6s}
+.orb3{width:300px;height:300px;background:rgba(167,139,250,.04);top:40%;left:50%;animation-delay:-12s}
+
+/* ── INDEX NAV ── */
+.nav-logo{font-family:var(--fh);font-size:1.15rem;color:var(--blue);letter-spacing:1px;display:flex;align-items:center;gap:.5rem}
+.nav-logo span{color:var(--teal)}
+.nav-pill{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:600;color:var(--blue);letter-spacing:.4px;margin-left:auto}
+
+/* ── INDEX HERO ── */
+.hero{position:relative;z-index:1;text-align:center;padding:5rem 1.5rem 3.5rem;max-width:700px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:100px;padding:5px 16px;font-size:11.5px;font-weight:600;color:var(--teal);letter-spacing:.5px;margin-bottom:1.5rem;animation:fadeDown .6s ease both}
+.hero h1{font-family:var(--fh);font-size:clamp(2.2rem,6vw,3.8rem);line-height:1.05;letter-spacing:-1px;margin-bottom:1rem;animation:fadeDown .6s .1s ease both}
+.hero h1 .accent{background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:1rem;max-width:480px;margin:0 auto 2rem;animation:fadeDown .6s .2s ease both}
+.hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;animation:fadeDown .6s .3s ease both}
+.stat{text-align:center}
+.stat-num{font-family:var(--fh);font-size:1.6rem;color:var(--blue);line-height:1}
+.stat-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* ── SECTION ── */
+.section{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:0 1.5rem 4rem}
+.section-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── FEATURED CARD ── */
+.featured-card{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;background:var(--card);border:1px solid rgba(56,189,248,.2);border-radius:var(--r);padding:1.75rem;text-decoration:none;color:inherit;transition:all .25s;margin-bottom:1rem}
+.featured-card:hover{border-color:rgba(56,189,248,.4);background:var(--card2);transform:translateY(-2px)}
+.featured-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:.5rem}
+.featured-title{font-family:var(--fh);font-size:1.35rem;margin-bottom:.5rem}
+.featured-desc{color:var(--text2);font-size:13px;line-height:1.6;margin-bottom:1rem;max-width:600px}
+.featured-pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;border:1px solid;background:rgba(255,255,255,.03)}
+.featured-arrow{font-size:1.5rem;color:var(--blue);flex-shrink:0;opacity:.6;transition:all .2s}
+.featured-card:hover .featured-arrow{opacity:1;transform:translateX(4px)}
+
+/* ── MODULE GRID ── */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.mod-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;text-decoration:none;color:inherit;display:block;transition:all .25s;position:relative;overflow:hidden}
+.mod-card::before{content:'';position:absolute;inset:0;background:var(--card-accent,transparent);opacity:0;transition:opacity .2s;pointer-events:none}
+.mod-card:hover{border-color:var(--card-color,var(--border2));transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.mod-card:hover::before{opacity:1}
+.mod-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.mod-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.mod-phase{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:100px;border:1px solid}
+.mod-title{font-family:var(--fh);font-size:1rem;margin-bottom:.5rem;position:relative;z-index:1}
+.mod-desc{font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:1rem;position:relative;z-index:1}
+.mod-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem;position:relative;z-index:1}
+.mod-tags .tag{font-size:10.5px;padding:3px 8px;border-radius:100px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.12);color:var(--text3)}
+.mod-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;position:relative;z-index:1}
+.mod-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.mod-open{font-weight:600;font-size:12px;transition:transform .2s}
+.mod-card:hover .mod-open{transform:translateX(3px)}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;text-align:center;padding:2rem 1.5rem;color:var(--text3);font-size:12px;border-top:1px solid var(--border);margin-top:2rem}
+code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,189,248,.08);padding:2px 6px;border-radius:4px}
+
+@media(max-width:600px){.featured-card{flex-direction:column}.featured-arrow{display:none}.modules-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    🫁 Fisio<span>Resp</span>
+  </div>
+  <div class="nav-pill">v7 · 7 módulos</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    🎓 Plataforma educativa · Fisioterapia Respiratoria
+  </div>
+  <h1>Aprende.<br><span class="accent">Evalúa. Decide.</span></h1>
+  <p>Simuladores clínicos interactivos para estudiantes y docentes de fisioterapia respiratoria. Casos reales, decisiones reales.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Módulos</div></div>
+    <div class="stat"><div class="stat-num">9+</div><div class="stat-lbl">Casos clínicos</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Modos de uso</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Sin internet</div></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="section">
+  <div class="section-label">Aplicación principal</div>
+
+  <a class="featured-card" href="modules/fisioterapia_v7.html" target="_blank">
+    <div>
+      <div class="featured-label">⭐ Módulo central</div>
+      <div class="featured-title">FisioResp — App Principal</div>
+      <div class="featured-desc">
+        Espirometría interactiva con curvas fisiológicamente precisas, 5 casos clínicos con evaluación ABCDE, simulador de ejercicio, banco de preguntas y referencia rápida.
+      </div>
+      <div class="featured-pills">
+        <span class="pill" style="color:var(--blue);border-color:rgba(56,189,248,.3)">Espirometría</span>
+        <span class="pill" style="color:var(--teal);border-color:rgba(45,212,191,.3)">Casos clínicos</span>
+        <span class="pill" style="color:var(--amber);border-color:rgba(251,191,36,.3)">ABCDE interactivo</span>
+        <span class="pill" style="color:var(--green);border-color:rgba(74,222,128,.3)">Simulador ejercicio</span>
+        <span class="pill" style="color:var(--purple);border-color:rgba(167,139,250,.3)">Banco de preguntas</span>
+      </div>
+    </div>
+    <div class="featured-arrow">→</div>
+  </a>
+
+  <!-- MÓDULOS FASES -->
+  <div class="section-label" style="margin-top:2rem">Módulos por fases</div>
+
+  <div class="modules-grid">
+
+    <!-- FASE 1: GSA -->
+    <a class="mod-card" href="modules/gasometria.html" target="_blank"
+       style="--card-color:rgba(248,113,113,.4);--card-accent:rgba(248,113,113,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(248,113,113,.12);color:#f87171">🩸</div>
+        <div class="mod-phase" style="color:var(--red);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)">Fase 1</div>
+      </div>
+      <div class="mod-title">Gasometría Arterial Interactiva</div>
+      <div class="mod-desc">Interpretación paso a paso con 8 casos clínicos, simulador de diales en tiempo real, diagrama de Davenport y referencia rápida con fórmulas de compensación.</div>
+      <div class="mod-tags">
+        <span class="tag">Modo aprendizaje</span>
+        <span class="tag">Modo evaluación</span>
+        <span class="tag">Simulador</span>
+        <span class="tag">Referencia</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">8 casos · Diagrama Davenport</span>
+        </div>
+        <div class="mod-open" style="color:var(--red)">Abrir →</div>
+      </div>
+    </a>
+
+    <!-- FASE 2: 6MWT -->
+    <a class="mod-card" href="modules/6mwt.html" target="_blank"
+       style="--card-color:rgba(74,222,128,.4);--card-accent:rgba(74,222,128,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(74,222,128,.12);color:var(--green)">🏃</div>
+        <div class="mod-phase" style="color:var(--green);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08)">Fase 2</div>
+      </div>
+      <div class="mod-title">Test de Marcha 6 Minutos</div>
+      <div class="mod-desc">Simulador en tiempo real con 5 perfiles de paciente, monitorización de SpO₂/FC/Borg, criterios de parada automáticos, calculadora de predichos y casos de interpretación.</div>
+      <div class="mod-tags">
+        <span class="tag">Tiempo real</span>
+        <span class="tag">5 perfiles</span>
+        <span class="tag">Predichos</span>
+        <span class="tag">Interpretación</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">5 pacientes · Protocolo ATS</span>
+        </div>
+        <div class="mod-open" style="color:var(--green)">Abrir →</div>
+      </div>
+    </a>
+
+    <!-- FASE 3: Aclaramiento -->
+    <a class="mod-card" href="modules/aclaramiento.html" target="_blank"
+       style="--card-color:rgba(45,212,191,.4);--card-accent:rgba(45,212,191,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(45,212,191,.12);color:var(--teal)">💨</div>
+        <div class="mod-phase" style="color:var(--teal);border-color:rgba(45,212,191,.3);background:rgba(45,212,191,.08)">Fase 3</div>
+      </div>
+      <div class="mod-title">Técnicas de Aclaramiento Bronquial</div>
+      <div class="mod-desc">Biblioteca de 8 técnicas con animaciones SVG del principio físico, comparador lado a lado, selector clínico por escenario y secuenciador de sesión.</div>
+      <div class="mod-tags">
+        <span class="tag">8 técnicas</span>
+        <span class="tag">Animaciones</span>
+        <span class="tag">Selector clínico</span>
+        <span class="tag">Secuenciador</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">CATR · Flutter · PEP · Mi-E</span>
+        </div>
+        <div class="mod-open" style="color:var(--teal)">Abrir →</div>
+      </div>
+    </a>
+
+    <!-- FASE 4: Calculadoras -->
+    <a class="mod-card" href="modules/calculadoras.html" target="_blank"
+       style="--card-color:rgba(251,191,36,.4);--card-accent:rgba(251,191,36,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(251,191,36,.12);color:var(--amber)">🧮</div>
+        <div class="mod-phase" style="color:var(--amber);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.08)">Fase 4</div>
+      </div>
+      <div class="mod-title">Calculadoras Clínicas Integradas</div>
+      <div class="mod-desc">Índice BODE con curva de supervivencia, clasificación GOLD 2024 completa, puntaje CAT, escala MRC visual y predichos espirométricos GLI 2012 con puntaje z y límite inferior de normalidad.</div>
+      <div class="mod-tags">
+        <span class="tag">BODE</span>
+        <span class="tag">GOLD 2024</span>
+        <span class="tag">CAT</span>
+        <span class="tag">MRC</span>
+        <span class="tag">GLI 2012</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">5 calculadoras · Puntaje z</span>
+        </div>
+        <div class="mod-open" style="color:var(--amber)">Abrir →</div>
+      </div>
+    </a>
+
+    <!-- FASE 5: Historial -->
+    <a class="mod-card" href="modules/historial.html" target="_blank"
+       style="--card-color:rgba(167,139,250,.4);--card-accent:rgba(167,139,250,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(167,139,250,.12);color:var(--purple)">📈</div>
+        <div class="mod-phase" style="color:var(--purple);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)">Fase 5</div>
+      </div>
+      <div class="mod-title">Historial Longitudinal del Paciente</div>
+      <div class="mod-desc">Sigue 4 pacientes durante 12 semanas de rehabilitación pulmonar. Puntos de decisión clínica, modo evaluación con puntuación y modo presentación para docentes.</div>
+      <div class="mod-tags">
+        <span class="tag">4 pacientes</span>
+        <span class="tag">12 semanas</span>
+        <span class="tag">Decisiones</span>
+        <span class="tag">Docentes</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">EPOC · FQ · Post-COVID</span>
+        </div>
+        <div class="mod-open" style="color:var(--purple)">Abrir →</div>
+      </div>
+    </a>
+
+    <!-- FASE 6: Cardiovascular -->
+    <a class="mod-card" href="modules/casos_cardiovascular.html" target="_blank"
+       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6">❤️</div>
+        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Fase 6</div>
+      </div>
+      <div class="mod-title">Casos Cardiovasculares</div>
+      <div class="mod-desc">Casos clínicos de patología cardiovascular con evaluación ABCDE, monitorización hemodinámica, banco de preguntas y razonamiento clínico integrado.</div>
+      <div class="mod-tags">
+        <span class="tag">Casos clínicos</span>
+        <span class="tag">ABCDE</span>
+        <span class="tag">Hemodinámica</span>
+        <span class="tag">Preguntas</span>
+      </div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">Cardiopatía · ICC · Post-IAM</span>
+        </div>
+        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+      </div>
+    </a>
+
+
+  </div><!-- /modules-grid -->
+</div><!-- /section -->
+
+<footer>
+  <b>FisioResp</b> — Plataforma educativa de fisioterapia respiratoria &nbsp;·&nbsp; Para uso académico
+</footer>
+
+  <script src="assets/js/ui.js"></script>
+</body>
+</html>

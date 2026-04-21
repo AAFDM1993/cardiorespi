@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FisioResp — Técnicas de Aclaramiento Bronquial</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+.logo em{color:var(--teal);font-style:normal}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+.tech-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;text-align:center}
+.tech-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.tech-card.active{border-color:var(--blue);background:rgba(56,189,248,.07)}
+.tech-icon{font-size:2rem;margin-bottom:.5rem;display:block}
+.tech-name{font-weight:600;font-size:.85rem;color:var(--text);margin-bottom:.2rem}
+.tech-cat{font-size:10.5px;color:var(--text3)}
+.detail-panel{display:none}
+.detail-panel.show{display:block}
+/* SVG animation area — taller for better diagrams */
+.anim-stage{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0;overflow:hidden;position:relative;height:300px;display:flex;align-items:center;justify-content:center}
+.anim-stage svg{width:100%;height:100%}
+.tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;margin:2px}
+.tag-ind{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.tag-ci{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.tag-prec{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.param-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;gap:10px}
+.param-label{color:var(--text3);font-size:12px;min-width:130px;flex-shrink:0}
+.param-val{color:var(--text);text-align:right;flex:1}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:1.5rem}
+.cmp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s}
+.cmp-card:hover{border-color:var(--border2)}
+.cmp-card.selected{border-color:var(--blue);background:rgba(56,189,248,.06)}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp-table th{padding:8px 10px;background:var(--bg3);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:600;text-align:left;border-bottom:1px solid var(--border)}
+.cmp-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.cmp-table td:first-child{color:var(--text3);font-size:11.5px;font-weight:500}
+.cmp-table tr:last-child td{border-bottom:none}
+.better{color:var(--green);font-weight:600}
+.worse{color:var(--amber)}
+.neutral{color:var(--text2)}
+.scenario-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem;margin-bottom:1rem}
+.sc-title{font-weight:600;font-size:.95rem;margin-bottom:.75rem;color:var(--text)}
+.sc-vitals{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.85rem}
+.sc-vital{background:var(--card2);border-radius:var(--rs);padding:4px 10px;font-family:var(--fm);font-size:12px;color:var(--text2)}
+.sc-vital.alert{color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.sc-vital.warn{color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.tech-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.tech-opt{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;cursor:pointer;transition:all .2s;font-size:13px;color:var(--text);text-align:left;font-family:var(--fb)}
+.tech-opt:hover:not(:disabled){border-color:var(--blue);background:rgba(56,189,248,.05)}
+.tech-opt:disabled{cursor:default;opacity:.75}
+.tech-opt.correct{border-color:var(--green)!important;background:rgba(74,222,128,.08)!important;color:var(--green)!important}
+.tech-opt.wrong{border-color:var(--red)!important;background:rgba(248,113,113,.08)!important;color:var(--red)!important}
+.tech-opt.partial{border-color:var(--amber)!important;background:rgba(251,191,36,.08)!important;color:var(--amber)!important}
+.sc-feedback{border-left:3px solid var(--blue);padding:.85rem 1rem;margin-top:.85rem;font-size:13px;color:var(--text2);line-height:1.7;background:var(--card2);border-radius:0 var(--rs) var(--rs) 0;display:none}
+.sc-feedback.show{display:block}
+.sc-feedback.ok{border-left-color:var(--green)}
+.sc-feedback.warn{border-left-color:var(--amber)}
+.sc-feedback.err{border-left-color:var(--red)}
+.seq-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:.75rem;background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--rs);margin-bottom:.75rem}
+.seq-item{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;font-size:12.5px;color:var(--text);cursor:grab;user-select:none;transition:all .2s}
+.seq-item:hover{border-color:var(--blue)}
+.seq-item.dragging{opacity:.4;transform:scale(.95)}
+.seq-item.correct-pos{border-color:var(--green);background:rgba(74,222,128,.08);color:var(--green)}
+.seq-item.wrong-pos{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+.infobox strong{color:var(--blue)}
+.ev-pill{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:700;margin-left:6px}
+.ev-a{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.ev-b{background:rgba(56,189,248,.12);color:var(--blue);border:1px solid rgba(56,189,248,.25)}
+.ev-c{background:rgba(148,163,184,.1);color:var(--text2);border:1px solid rgba(148,163,184,.2)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FISIO<em>RESP</em></div>
+  <div class="nav-mod">/ Técnicas de Aclaramiento Bronquial</div>
+</nav>
+
+<div class="wrap">
+  <div class="sec-title">Aclaramiento Bronquial</div>
+  <div class="sec-sub">Biblioteca de técnicas · Animaciones · Comparador · Selector clínico · Secuenciador de sesión</div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setMode('biblioteca')">📚 Biblioteca</button>
+    <button class="mode-btn" onclick="setMode('comparar')">⚖️ Comparar</button>
+    <button class="mode-btn" onclick="setMode('selector')">🎯 Selector Clínico</button>
+    <button class="mode-btn" onclick="setMode('secuencia')">🔗 Secuenciador</button>
+  </div>
+
+  <div class="mode-section active" id="mode-biblioteca">
+    <div class="infobox"><strong>Biblioteca:</strong> Selecciona una técnica para ver su principio físico animado, indicaciones, contraindicaciones y parámetros de prescripción.</div>
+    <div class="tech-grid" id="techGrid"></div>
+    <div class="detail-panel" id="detailPanel"></div>
+  </div>
+
+  <div class="mode-section" id="mode-comparar">
+    <div class="infobox"><strong>Comparador:</strong> Selecciona dos técnicas para ver una tabla comparativa lado a lado.</div>
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.75rem">Elige dos técnicas</div>
+    <div class="compare-grid" id="compareGrid"></div>
+    <div id="compareTable" style="display:none"></div>
+  </div>
+
+  <div class="mode-section" id="mode-selector">
+    <div class="infobox"><strong>Selector Clínico:</strong> Se presenta un caso. Elige la técnica o combinación más apropiada y recibe retroalimentación detallada.</div>
+    <div id="selectorCases"></div>
+  </div>
+
+  <div class="mode-section" id="mode-secuencia">
+    <div class="infobox"><strong>Secuenciador de sesión:</strong> Ordena los pasos de una sesión de aclaramiento de mayor a menor prioridad. El orden correcto maximiza la efectividad y la seguridad.</div>
+    <div id="sequencerContent"></div>
+  </div>
+</div>
+
+<script>
+/* ====================================================
+   TECHNIQUES DATA — siglas expandidas al español
+====================================================*/
+const TECHNIQUES = [
+  {
+    id:'dab',
+    name:'Drenaje Autógeno (DA)',
+    icon:'🫁',
+    cat:'Técnica activa autoadministrable',
+    evidence:'A',
+    mechanism:'Movilización de secreciones desde vías aéreas periféricas hacia las centrales mediante control preciso del flujo espiratorio en tres fases: despegamiento (volumen de reserva espiratorio bajo), acumulación (volumen corriente) y evacuación (volumen de reserva inspiratorio).',
+    phases:[
+      'Despegamiento: espiración lenta hasta el volumen de reserva espiratorio — flujo bajo que despega moco periférico',
+      'Acumulación: respiración en volumen corriente — flujo medio que acumula moco en vías aéreas centrales',
+      'Evacuación: inspiración profunda + espiración forzada (huffing) con glotis abierta — evacua el moco central',
+    ],
+    indications:['Fibrosis quística (estándar de oro)','EPOC con producción ≥ 25 mL/día','Bronquiectasias','Discinesia ciliar primaria'],
+    contraindications:['Hemoptisis activa moderada-severa','SpO₂ < 85% sin oxígeno suplementario','Fatiga muscular severa (Guillain-Barré, miastenia)','Incapacidad de cooperación'],
+    precautions:['Hipercapnia severa — reducir esfuerzo espiratorio','Post-cirugía torácica — validar capacidad vital mínima','Reflujo gastroesofágico — evitar posición de Trendelenburg'],
+    params:[
+      ['Posición','Sedestación o semisupino'],
+      ['Duración','15–30 min por sesión'],
+      ['Frecuencia','1–3 sesiones/día según producción de esputo'],
+      ['Supervisión','Requiere aprendizaje supervisado (3–5 sesiones)'],
+      ['Dispositivos complementarios','Sin dispositivo / puede combinarse con Acapella'],
+    ],
+    animation:'dab',
+    color:'#38bdf8',
+    mcid:'Reducción esputo > 30% o mejoría capacidad vital forzada > 150 mL',
+  },
+  {
+    id:'acbt',
+    name:'Ciclo Activo de Técnicas Respiratorias (CATR)',
+    icon:'🔄',
+    cat:'Ciclo activo de técnicas respiratorias',
+    evidence:'A',
+    mechanism:'Ciclo de tres componentes: Control Respiratorio (respiración tidal relajada) para descanso y broncodilatación refleja → Ejercicios de Expansión Torácica (inspiraciones profundas con apnea breve) para insuflar zonas colapsadas → Técnica de Espiración Forzada (huffing con glotis abierta) para evacuar el moco movilizado.',
+    phases:[
+      'Control Respiratorio: respiración tidal relajada, 3–5 ciclos — resetea el patrón y previene broncoespasmo',
+      'Expansión Torácica: inspiraciones profundas con apnea de 3 s — recluta alvéolos colapsados mediante canales de Kohn',
+      'Técnica de Espiración Forzada (huffing): espiración forzada con glotis abierta ("haaaaa") — desplaza moco central sin colapso aéreo',
+    ],
+    indications:['EPOC con producción de esputo','Post-operatorio torácico y abdominal','Atelectasias','Neumonía/bronquitis aguda con secreciones'],
+    contraindications:['Hemoptisis activa','Neumotórax no drenado','Inestabilidad hemodinámica severa'],
+    precautions:['Broncoespasmo: iniciar siempre con fase de Control Respiratorio más larga','Asma: cuidado con la Técnica de Espiración Forzada vigorosa en fase aguda','Fatiga: reducir ciclos de expansión torácica'],
+    params:[
+      ['Ciclos por sesión','3–6 ciclos completos'],
+      ['Duración','20–40 min'],
+      ['Frecuencia','2–4 × /día en fase aguda, 1–2 × /día en fase estable'],
+      ['Posición','Sedestación o decúbito lateral para drenar bases'],
+      ['Combinable con','Drenaje postural, percusión, Flutter/Acapella'],
+    ],
+    animation:'acbt',
+    color:'#2dd4bf',
+    mcid:'Reducción síntomas disnea + esputo en ≥ 2 ciclos',
+  },
+  {
+    id:'flutter',
+    name:'Flutter / Acapella',
+    icon:'🌊',
+    cat:'Dispositivo de presión espiratoria positiva oscilatoria',
+    evidence:'B',
+    mechanism:'El dispositivo genera presión espiratoria positiva (10–20 cmH₂O) combinada con oscilaciones de alta frecuencia (6–26 Hz). Las oscilaciones rompen la viscoelasticidad del moco y la presión positiva espiratoria previene el colapso de la vía aérea durante la espiración, facilitando el transporte de moco hacia las vías centrales.',
+    phases:[
+      'Inspiración controlada hasta 3/4 de la capacidad pulmonar total',
+      'Espiración activa a través del dispositivo (2–3 s) — se siente vibración torácica',
+      '3–4 respiraciones → huffing para evacuar el moco movilizado',
+      'Repetir 10–15 ciclos por sesión',
+    ],
+    indications:['Fibrosis quística (especialmente adultos)','EPOC con hipersecreción','Bronquiectasias','Pacientes que prefieren técnica independiente'],
+    contraindications:['Hemoptisis activa','Neumotórax no drenado','Cirugía facial/oral reciente (Flutter)','SpO₂ basal < 85%'],
+    precautions:['Ajustar ángulo del Flutter para optimizar oscilación (10–20°)','Acapella preferible en posición supina o Trendelenburg','Limpiar y desinfectar diariamente'],
+    params:[
+      ['Dispositivo','Flutter VRP1 / Acapella Choice / RC Cornet'],
+      ['Presión generada','10–20 cmH₂O (ajustable por ángulo o resistencia)'],
+      ['Frecuencia de oscilación','6–26 Hz (Flutter) / 0–35 Hz (Acapella)'],
+      ['Ciclos / sesión','10–15 ciclos de 3–4 respiraciones + huffing'],
+      ['Sesiones / día','2 × /día en agudo, 1 × /día en estable'],
+    ],
+    animation:'flutter',
+    color:'#a78bfa',
+    mcid:'Reducción viscosidad esputo y volumen ≥ 20%',
+  },
+  {
+    id:'pep',
+    name:'Presión Espiratoria Positiva (PEP)',
+    icon:'😷',
+    cat:'Presión espiratoria positiva',
+    evidence:'B',
+    mechanism:'La resistencia espiratoria genera una presión positiva de 10–20 cmH₂O que mantiene abierta la vía aérea durante la espiración (evita colapso dinámico en EPOC), permite que el aire pase por detrás del moco a través de vías colaterales (canales de Kohn y poros de Lambert), y "empuja" las secreciones hacia vías centrales.',
+    phases:[
+      'Inspiración activa (no forzada) — 2–3 s',
+      'Espiración a través de la resistencia durante 3–4 s — mantener presión 10–20 cmH₂O',
+      'Huffing al final de cada 10–15 respiraciones para evacuar el moco movilizado',
+      'Repetir 2–3 series de 10–15 respiraciones',
+    ],
+    indications:['EPOC con hiperinflación dinámica y secreciones','Fibrosis quística (especialmente niños)','Post-operatorio — prevención de atelectasias','Bronquiectasias con colapso espiratorio'],
+    contraindications:['Sinusitis aguda (máscara PEP)','Otitis media aguda','Hemoptisis activa','Neumotórax no drenado','Insuficiencia cardíaca descompensada severa'],
+    precautions:['Hipertensión intracraneal: evitar presión alta','Náuseas/vómitos activos','Verificar presión con manómetro durante la sesión'],
+    params:[
+      ['Presión objetivo','10–20 cmH₂O (medir con manómetro)'],
+      ['Resistencias','Colores según diámetro: comenzar con mayor apertura'],
+      ['Respiraciones / serie','10–15 respiraciones + huffing'],
+      ['Series / sesión','2–3 series'],
+      ['Modalidades','Presión baja (10 cmH₂O) al inicio; alta (> 20) en casos avanzados'],
+    ],
+    animation:'pep',
+    color:'#fb923c',
+    mcid:'Reducción de esputo + mejoría VEF₁ ≥ 12%',
+  },
+  {
+    id:'drenaje',
+    name:'Drenaje Postural',
+    icon:'🛏️',
+    cat:'Drenaje gravitacional segmentario',
+    evidence:'C',
+    mechanism:'Aprovecha la gravedad para drenar secreciones desde segmentos bronquiales específicos hacia los bronquios principales. Cada segmento pulmonar tiene una posición óptima en la que queda "cuesta arriba" respecto a su bronquio de drenaje, favoreciendo el desplazamiento del moco por acción gravitacional.',
+    phases:[
+      'Identificar segmento(s) afectados por radiografía, tomografía o auscultación',
+      'Colocar al paciente en la posición de drenaje correspondiente durante 15–20 min',
+      'Combinación con percusión o vibración manual sobre el segmento afectado',
+      'Finalizar con Técnica de Espiración Forzada o tos asistida para evacuar',
+    ],
+    indications:['Bronquiectasias segmentarias','Absceso pulmonar','Fibrosis quística con compromiso lobar específico','Atelectasia por tapón mucoso'],
+    contraindications:['Hemoptisis activa (posición Trendelenburg)','Hipertensión intracraneal (posición cabeza abajo)','Cirugía torácica reciente','Reflujo gastroesofágico (Trendelenburg)','Insuficiencia cardíaca descompensada'],
+    precautions:['EPOC: evitar Trendelenburg (hiperinflación)','Post-comida: esperar ≥ 2 h','SpO₂ < 88% en posición: cambiar inmediatamente','Edad avanzada: tolerar menos tiempo por posición'],
+    params:[
+      ['Posiciones','5 posiciones para 18 segmentos bronquiales'],
+      ['Duración por posición','10–20 min'],
+      ['Frecuencia','2–4 × /día en fase aguda'],
+      ['Combinación','+ Percusión manual / vibración / Ciclo Activo de Técnicas Respiratorias'],
+      ['Evidencia actual','Menor evidencia que DA/CATR como monoterapia'],
+    ],
+    animation:'drenaje',
+    color:'#4ade80',
+    mcid:'Drenaje > 10 mL esputo por sesión (producción elevada)',
+  },
+  {
+    id:'percusion',
+    name:'Percusión / Vibración Manual',
+    icon:'👐',
+    cat:'Técnica manual pasiva',
+    evidence:'C',
+    mechanism:'La percusión transmite ondas mecánicas a través de la pared torácica que alteran la viscoelasticidad del moco y lo despegan de la mucosa bronquial. La vibración manual aplica ondas de baja frecuencia durante la espiración para facilitar el transporte mucociliar hacia vías centrales.',
+    phases:[
+      'Percusión rítmica con mano en copa sobre el segmento a drenar (no sobre columna, esternón ni cicatrices)',
+      'Frecuencia: 2–5 Hz (2–5 golpes/segundo), ritmo constante',
+      'Vibración: presión isométrica sobre la caja torácica solo durante la espiración',
+      'Combinación habitual con drenaje postural y Ciclo Activo de Técnicas Respiratorias',
+    ],
+    indications:['Complemento del Ciclo Activo de Técnicas Respiratorias o drenaje postural','Pacientes que no pueden realizar técnicas activas','Pediatría (lactantes y niños pequeños)','Fibrosis quística — alternativa cuando drenaje autógeno no es suficiente'],
+    contraindications:['Hemoptisis activa','Osteoporosis severa o costillas frágiles','Trombocitopenia severa (< 50.000 plaquetas)','Cirugía torácica reciente (< 4 semanas)','Heridas abiertas, quemaduras o metástasis óseas'],
+    precautions:['Evitar zona cardíaca (no percutir sobre el corazón)','Broncoespasmo: suspender y administrar broncodilatador','Dolor con escala de Borg > 4: reducir intensidad o suspender'],
+    params:[
+      ['Técnica de mano','Mano en copa (no plana) — amortigua el impacto'],
+      ['Zona segura','Sobre parénquima pulmonar — evitar columna y esternón'],
+      ['Duración','3–5 min por segmento'],
+      ['Frecuencia','2–5 Hz (percusión), < 2 Hz (vibración)'],
+      ['Siempre combinar','Con técnica de evacuación (Técnica de Espiración Forzada, tos asistida)'],
+    ],
+    animation:'percusion',
+    color:'#fbbf24',
+    mcid:'Medido como complemento — no como monoterapia en adultos',
+  },
+  {
+    id:'tos',
+    name:'Tos Asistida / Técnica de Espiración Forzada',
+    icon:'💨',
+    cat:'Técnica de evacuación',
+    evidence:'A',
+    mechanism:'La Técnica de Espiración Forzada (huffing) genera un flujo espiratorio alto con glotis abierta que desplaza el moco desde vías centrales. La tos asistida (compresión abdominal manual) amplifica el flujo en pacientes con musculatura débil. El Asistente Mecánico de Tos (Cough Assist) genera flujo espiratorio > 270 L/min mediante transición brusca de presión positiva a negativa.',
+    phases:[
+      'Técnica de Espiración Forzada (huffing): inspiración profunda → "haaaaa" con glotis abierta (no tos cerrada)',
+      'Tos dirigida: preparar + compresión abdominal en el pico espiratorio',
+      'Tos asistida manual: terapeuta aplica compresión abdominal sincronizada con el esfuerzo tosedor del paciente',
+      'Asistente Mecánico de Tos: fase insufladora (+30–40 cmH₂O) → fase exsufladora (−30–40 cmH₂O), 1–2 s cada fase',
+    ],
+    indications:['Técnica de Espiración Forzada: complemento de cualquier técnica de aclaramiento','Tos asistida: Guillain-Barré, miastenia gravis, lesión medular cervical, distrofia muscular de Duchenne','Asistente Mecánico de Tos: flujo pico de tos < 270 L/min o incapacidad de tos eficaz'],
+    contraindications:['Hemoptisis activa (tos forzada)','Neumotórax no drenado','Cirugía abdominal reciente (tos asistida manual)','Hernia hiatal severa (presión abdominal)'],
+    precautions:['Guillain-Barré / lesión alta: monitorizar SpO₂ durante el asistente mecánico','Traqueostomía: adaptar técnica al circuito','Flujo pico límite: medir antes de prescribir el asistente mecánico'],
+    params:[
+      ['Flujo pico de tos eficaz','> 270 L/min'],
+      ['Umbral para Asistente Mecánico','< 270 L/min → indicación de asistente mecánico'],
+      ['Parámetros asistente mecánico','± 30–40 cmH₂O; Ti 2–3 s / Te 2–3 s / pausa 1 s'],
+      ['Ciclos asistente mecánico','5 ciclos → descanso 30 s → repetir × 3–5 series'],
+      ['Huffing en sesión','2–3 huffs por serie, no > 5 seguidos (hipocapnia)'],
+    ],
+    animation:'tos',
+    color:'#f87171',
+    mcid:'Flujo pico de tos ≥ 270 L/min post-intervención',
+  },
+  {
+    id:'imt',
+    name:'Entrenamiento Muscular Inspiratorio (EMI)',
+    icon:'💪',
+    cat:'Entrenamiento muscular respiratorio',
+    evidence:'A',
+    mechanism:'El umbral de carga inspiratoria genera resistencia solo cuando la presión inspiratoria supera el umbral ajustado. Esto produce sobrecarga selectiva de los músculos inspiratorios (principalmente diafragma e intercostales externos), generando adaptación: hipertrofia de fibras tipo I y IIa, aumento de la fuerza y resistencia inspiratoria.',
+    phases:[
+      'Medición de la Presión Inspiratoria Máxima basal — esfuerzo máximo desde el volumen residual',
+      'Prescripción: 30% de la Presión Inspiratoria Máxima inicial (semanas 1–2), progresión del 5–10% cada 2 semanas',
+      'Sesión: 30 respiraciones × 2 series diarias (o 20–30 min continuo)',
+      'Reevaluar Presión Inspiratoria Máxima cada 2–4 semanas para ajustar carga',
+    ],
+    indications:['EPOC con Presión Inspiratoria Máxima < 60% del predicho','Destete difícil de ventilación mecánica','Insuficiencia cardíaca crónica con disnea','Guillain-Barré en recuperación','Post-cirugía cardíaca'],
+    contraindications:['Fase aguda inestable (SpO₂ < 88% en reposo)','Guillain-Barré progresivo activo (contraindicado — agravaría la fatiga)','Exacerbación severa de EPOC (esperar estabilización)','Enfermedad neuromuscular en fase de deterioro activo'],
+    precautions:['Nunca en fase progresiva de enfermedad neuromuscular','Ventilación no invasiva: compatible — hacer entrenamiento en periodos sin ventilación','Monitorizar Presión Inspiratoria Máxima mensual para evitar sobreentrenamiento'],
+    params:[
+      ['Presión Inspiratoria Máxima objetivo basal','< 60 cmH₂O en EPOC (normal > 80 cmH₂O)'],
+      ['Carga inicial','30% de la Presión Inspiratoria Máxima'],
+      ['Progresión','5–10% de la Presión Inspiratoria Máxima cada 2 semanas'],
+      ['Frecuencia','2 × /día, 5–7 días/semana'],
+      ['Duración del programa','8–12 semanas mínimo'],
+    ],
+    animation:'imt',
+    color:'#2dd4bf',
+    mcid:'Presión Inspiratoria Máxima ↑ ≥ 10 cmH₂O + mejoría en test de marcha ≥ 25 m',
+  },
+];
+
+/* ====================================================
+   SELECTOR CASES — siglas expandidas
+====================================================*/
+const SELECTOR_CASES = [
+  {
+    title:'Fibrosis quística severa — exacerbación activa',
+    context:'Mujer 22 años. VEF₁ 38%. Esputo 45 mL/día, muy viscoso. Proteína C reactiva 48. SpO₂ 89% en reposo (O₂ 2 L/min). P. aeruginosa. Tobramicina inhalada prescrita 2 × /día.',
+    vitals:['SpO₂ 89% (O₂)', 'FC 96 lpm', 'FR 24 rpm', 'Esputo 45 mL/día'],
+    vitalStatus:['alert', '', '', 'warn'],
+    correctIds:['dab','flutter','tos'],
+    partialIds:['acbt','percusion'],
+    wrongIds:['drenaje','imt','pep'],
+    correctLabel:'Drenaje Autógeno + Flutter/Acapella + Técnica de Espiración Forzada / tos asistida',
+    feedback:`<strong style="color:var(--green)">Técnicas óptimas:</strong><br>
+    • <strong>Drenaje Autógeno</strong>: estándar de oro en fibrosis quística — evidencia A, autoadministrable, menor fatiga que percusión<br>
+    • <strong>Flutter/Acapella</strong>: combina presión espiratoria positiva con oscilaciones, rompe la viscoelasticidad del moco espeso, bien tolerado con SpO₂ 89%<br>
+    • <strong>Técnica de Espiración Forzada / tos asistida</strong>: siempre al final para evacuar lo movilizado<br><br>
+    <strong>Orden crítico con tobramicina:</strong> Aclaramiento PRIMERO → tobramicina inhalada DESPUÉS (el antibiótico llega mejor a vía aérea limpia).<br><br>
+    <strong>Evitar drenaje postural</strong> en Trendelenburg con SpO₂ 89% y reflujo frecuente en fibrosis quística. <strong>Entrenamiento muscular inspiratorio contraindicado</strong> en exacerbación activa.`,
+    explanation_partial:`Ciclo Activo de Técnicas Respiratorias y percusión son aceptables pero subóptimos: el CATR requiere más colaboración activa en exacerbación y la percusión tiene menor evidencia que el Drenaje Autógeno en fibrosis quística adulta.`
+  },
+  {
+    title:'EPOC grado III — estable con producción de esputo',
+    context:'Varón 68 años. VEF₁ 32%. Esputo 30 mL/día. SpO₂ 92% con aire ambiente. Hiperinflación severa. Presión Inspiratoria Máxima 45 cmH₂O (57% predicho). Sin exacerbación activa.',
+    vitals:['SpO₂ 92%', 'VEF₁ 32%', 'Esputo 30 mL/día', 'PIM 45 cmH₂O'],
+    vitalStatus:['warn', 'warn', '', ''],
+    correctIds:['acbt','pep','tos','imt'],
+    partialIds:['flutter'],
+    wrongIds:['drenaje','percusion','dab'],
+    correctLabel:'Ciclo Activo de Técnicas Respiratorias + Presión Espiratoria Positiva + Técnica de Espiración Forzada + Entrenamiento Muscular Inspiratorio',
+    feedback:`<strong style="color:var(--green)">Plan óptimo en EPOC estable con hipersecreción:</strong><br>
+    • <strong>Ciclo Activo de Técnicas Respiratorias</strong>: evidencia A para EPOC con esputo — ciclos de Control Respiratorio + Expansión Torácica + Técnica de Espiración Forzada<br>
+    • <strong>Presión Espiratoria Positiva</strong>: previene colapso espiratorio dinámico (hiperinflación), mantiene la vía aérea abierta durante la espiración<br>
+    • <strong>Entrenamiento Muscular Inspiratorio</strong>: Presión Inspiratoria Máxima 45 cmH₂O = < 60% → indicación clara. Programa 30% → 8–12 semanas<br>
+    • <strong>Técnica de Espiración Forzada</strong>: siempre al final para evacuar<br><br>
+    <strong>Drenaje postural en EPOC severo:</strong> Trendelenburg contraindicado por hiperinflación (el diafragma ya está aplanado). Solo drenaje lateral neutro.<br>
+    <strong>Percusión como monoterapia</strong>: menor evidencia en adultos con EPOC — solo como complemento.`,
+    explanation_partial:`Flutter: aceptable pero la presión espiratoria positiva sin oscilación es preferida en hiperinflación severa por EPOC (la oscilación puede no ser bien tolerada con atrapamiento aéreo avanzado).`
+  },
+  {
+    title:'Post-lobectomía lóbulo inferior derecho — día 2',
+    context:'Varón 61 años. Lobectomía inferior derecha. Día 2 post-op. Dolor escala visual analógica 4 (controlado). SpO₂ 93% con O₂ 2 L. Crepitantes base derecha, expansión asimétrica. Drenaje torácico 40 mL/h seroso. Capacidad vital forzada pre-op 80%.',
+    vitals:['SpO₂ 93% (O₂)', 'Dolor EVA 4', 'Drenaje 40 mL/h', 'Día 2 post-op'],
+    vitalStatus:['warn', 'warn', '', ''],
+    correctIds:['acbt','tos'],
+    partialIds:['percusion','pep'],
+    wrongIds:['drenaje','flutter','dab','imt'],
+    correctLabel:'Ciclo Activo de Técnicas Respiratorias con contención + Técnica de Espiración Forzada / tos asistida',
+    feedback:`<strong style="color:var(--green)">Estrategia post-lobectomía día 2:</strong><br>
+    • <strong>Ciclo Activo de Técnicas Respiratorias</strong>: expansión torácica con inspiraciones segmentarias en lóbulo inferior derecho + Control Respiratorio + Técnica de Espiración Forzada suave<br>
+    • <strong>Contención de herida</strong>: paciente o terapeuta apoya la incisión durante el huffing/tos — reduce dolor y permite esfuerzo efectivo<br>
+    • <strong>Tos asistida</strong>: con contención torácica, sincronizada con el dolor controlado<br>
+    • <strong>Espirometría de incentivo</strong>: complemento para expansión del lóbulo remanente<br><br>
+    <strong>Drenaje postural Trendelenburg: CONTRAINDICADO</strong> con drenaje torácico activo.<br>
+    <strong>Flutter/Drenaje Autógeno</strong>: no indicados en post-operatorio inmediato — excesiva presión espiratoria sobre sutura.<br>
+    <strong>Entrenamiento Muscular Inspiratorio</strong>: iniciar en semana 2–4, no en día 2.`,
+    explanation_partial:`Percusión y Presión Espiratoria Positiva: aceptables con precaución, pero la evidencia en post-op inmediato es menor que con el Ciclo Activo de Técnicas Respiratorias. La presión espiratoria positiva puede aumentar presión sobre la sutura.`
+  },
+  {
+    title:'Síndrome de Guillain-Barré en UCI — capacidad vital forzada 1.9 L, sin intubación',
+    context:'Varón 45 años. Síndrome de Guillain-Barré progresivo. Capacidad vital forzada 1.9 L (30% predicho). Flujo pico de tos 210 L/min (por debajo del umbral eficaz). SpO₂ 93% con aire ambiente. No puede toser eficazmente. FR 26 rpm. Riesgo de intubación inminente.',
+    vitals:['CVF 1.9 L (30%)', 'Flujo pico tos 210 L/min', 'SpO₂ 93%', 'No puede toser'],
+    vitalStatus:['alert', 'alert', 'warn', 'alert'],
+    correctIds:['tos'],
+    partialIds:['acbt'],
+    wrongIds:['dab','flutter','pep','drenaje','percusion','imt'],
+    correctLabel:'Asistente Mecánico de Tos (Cough Assist) + tos asistida manual',
+    feedback:`<strong style="color:var(--green)">URGENCIA: Flujo pico de tos 210 < 270 L/min = tos ineficaz</strong><br>
+    • <strong>Asistente Mecánico de Tos</strong>: INDICACIÓN PRIMARIA. Flujo pico < 270 L/min contraindica la tos espontánea eficaz. El asistente genera flujo > 270 L/min mecánicamente. Parámetros: +35/−35 cmH₂O, Ti 2 s / Te 2 s, 5 ciclos / pausa 30 s / 3–5 series<br>
+    • <strong>Tos asistida manual</strong>: complemento — compresión abdominal sincronizada con el esfuerzo tosedor residual<br>
+    • <strong>Ventilación no invasiva profiláctica</strong>: entre sesiones de aclaramiento<br><br>
+    <strong>Entrenamiento Muscular Inspiratorio CONTRAINDICADO</strong> en Guillain-Barré progresivo — agrava la fatiga neuromuscular.<br>
+    <strong>Drenaje Autógeno, Flutter, Presión Espiratoria Positiva</strong>: requieren musculatura respiratoria activa que este paciente ya no tiene.<br>
+    <strong>Percusión</strong>: no tiene utilidad sin una evacuación efectiva posterior — el flujo pico insuficiente impide la evacuación.`,
+    explanation_partial:`Ciclo Activo de Técnicas Respiratorias con componentes pasivos podría contribuir marginalmente, pero sin Técnica de Espiración Forzada efectiva (flujo pico < 270 L/min) el moco no se evacua. El Asistente Mecánico de Tos es la única técnica que puede sustituir la tos en este contexto.`
+  },
+  {
+    title:'Hemoptisis activa moderada — diagnóstico en estudio',
+    context:'Varón 55 años. Hemoptisis 60 mL en 4 h. SpO₂ 93% con O₂ 3 L. FC 104 lpm. Sin diagnóstico causal definido aún. Médico prescribe "fisioterapia respiratoria". El fisioterapeuta evalúa.',
+    vitals:['Hemoptisis 60 mL/4h', 'SpO₂ 93% (O₂)', 'FC 104 lpm', 'Sin diagnóstico'],
+    vitalStatus:['alert', 'warn', 'warn', 'alert'],
+    correctIds:[],
+    partialIds:[],
+    wrongIds:['dab','acbt','flutter','pep','drenaje','percusion','tos','imt'],
+    correctLabel:'NINGUNA TÉCNICA DE ACLARAMIENTO — solo posicionamiento + O₂',
+    feedback:`<strong style="color:var(--red)">⚠ CONTRAINDICACIÓN ABSOLUTA a todas las técnicas de aclaramiento activo</strong><br><br>
+    La hemoptisis activa moderada (> 30 mL/4 h) contraindica absolutamente:<br>
+    • Drenaje Autógeno, Ciclo Activo de Técnicas Respiratorias, Técnica de Espiración Forzada, tos asistida, Asistente Mecánico de Tos — aumentan presión intratorácica y flujo → agravan la hemorragia<br>
+    • Flutter, Presión Espiratoria Positiva — generan presión espiratoria → riesgo de extensión del sangrado<br>
+    • Percusión/vibración — traumatismo directo sobre zona sangrante<br>
+    • Drenaje postural — cambios de posición pueden movilizar el coágulo<br>
+    • Solución salina hipertónica — irritante de mucosa sangrante<br>
+    • Entrenamiento Muscular Inspiratorio — aumenta presión negativa inspiratoria<br><br>
+    <strong style="color:var(--green)">Intervenciones seguras:</strong><br>
+    • Posicionamiento: decúbito lateral sobre el lado sangrante (protege el pulmón sano)<br>
+    • O₂ para SpO₂ objetivo 93–95%<br>
+    • Monitorización continua SpO₂ y frecuencia cardíaca<br>
+    • Comunicar al médico — la prescripción genérica no puede ejecutarse sin evaluación`,
+    explanation_partial:''
+  },
+];
+
+/* ====================================================
+   SEQUENCER DATA — siglas expandidas
+====================================================*/
+const SEQUENCES = [
+  {
+    title:'Sesión de aclaramiento en fibrosis quística — orden correcto',
+    context:'Paciente con fibrosis quística, esputo 35 mL/día. Tobramicina inhalada prescrita. Sin exacerbación activa.',
+    items:[
+      {id:'s1', label:'1. Broncodilatador de acción corta (salbutamol) inhalado', correct:1,
+       rationale:'Primero: el broncodilatador abre la vía aérea → aumenta la efectividad de todas las técnicas posteriores. Esperar 15–20 min antes de continuar.'},
+      {id:'s2', label:'2. Solución salina hipertónica al 7% nebulizada', correct:2,
+       rationale:'Segundo: hidrata y disminuye la viscosidad del moco. Debe hacerse DESPUÉS del broncodilatador (la salina hipertónica puede provocar broncoespasmo sin broncodilatación previa).'},
+      {id:'s3', label:'3. Drenaje Autógeno o Flutter (aclaramiento activo)', correct:3,
+       rationale:'Tercero: con la vía aérea dilatada y el moco hidratado, el aclaramiento es más efectivo y menos esforzado.'},
+      {id:'s4', label:'4. Técnica de Espiración Forzada / tos asistida (evacuación)', correct:4,
+       rationale:'Cuarto: evacuar el moco ya movilizado hacia las vías centrales por las técnicas anteriores.'},
+      {id:'s5', label:'5. Tobramicina inhalada', correct:5,
+       rationale:'Quinto (CRÍTICO): el antibiótico inhalado se administra SIEMPRE DESPUÉS del aclaramiento. La vía aérea limpia permite que el antibiótico llegue a zonas más distales. El orden inverso reduce la biodisponibilidad hasta un 40%.'},
+      {id:'s6', label:'6. Espirometría de incentivo (opcional)', correct:6,
+       rationale:'Último: expansión alveolar de mantenimiento post-sesión. Es más efectiva al final cuando la vía aérea ya está limpia.'},
+    ]
+  },
+  {
+    title:'Sesión post-lobectomía — día 3',
+    context:'Post-cirugía torácica. Dolor en escala visual analógica 3 (controlado con analgesia). Drenaje torácico 20 mL/h.',
+    items:[
+      {id:'p1', label:'1. Verificar analgesia activa (dolor ≤ 4 en escala visual analógica)', correct:1,
+       rationale:'Primero: sin analgesia efectiva el paciente no podrá toser ni hacer expansión. Coordinar con enfermería/médico antes de la sesión.'},
+      {id:'p2', label:'2. Posicionamiento y movilización precoz (sentado al borde de la cama)', correct:2,
+       rationale:'Segundo: la sedestación expande la base pulmonar, reduce la hiperinflación y mejora la mecánica diafragmática antes de iniciar técnicas activas.'},
+      {id:'p3', label:'3. Expansión Torácica — ejercicios de expansión segmentaria', correct:3,
+       rationale:'Tercero: respiraciones profundas dirigidas al segmento afectado para reclutar alvéolos colapsados. Base de la prevención de atelectasias post-operatorias.'},
+      {id:'p4', label:'4. Técnica de Espiración Forzada / tos asistida con contención de herida', correct:4,
+       rationale:'Cuarto: con la herida contenida (mano del paciente o terapeuta sobre la incisión), huffing suave y tos dirigida para evacuar secreciones movilizadas.'},
+      {id:'p5', label:'5. Espirometría de incentivo', correct:5,
+       rationale:'Quinto: mantenimiento de la expansión lograda. El paciente practica entre sesiones de fisioterapia.'},
+    ]
+  }
+];
+
+/* ====================================================
+   SVG ANIMATIONS — mejoradas con anatomía y español
+====================================================*/
+function getAnimation(id, color){
+  const c = color || '#38bdf8';
+  const animations = {
+
+    /* ── DRENAJE AUTÓGENO ── */
+    dab:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="lg-dab-l" cx="50%" cy="45%">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".04"/>
+        </radialGradient>
+        <radialGradient id="lg-dab-r" cx="50%" cy="45%">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".04"/>
+        </radialGradient>
+      </defs>
+      <!-- Tráquea -->
+      <rect x="264" y="10" width="32" height="50" rx="16" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-width="1.5" stroke-opacity=".5"/>
+      <text x="280" y="22" fill="${c}" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">Tráquea</text>
+      <!-- Bronquio principal izquierdo -->
+      <path d="M280,60 Q240,72 200,85" stroke="${c}" stroke-width="3" fill="none" stroke-opacity=".6"/>
+      <!-- Bronquio principal derecho -->
+      <path d="M280,60 Q320,72 360,85" stroke="${c}" stroke-width="3" fill="none" stroke-opacity=".6"/>
+      <!-- Pulmón izquierdo -->
+      <path d="M200,85 Q150,95 130,130 Q115,165 125,200 Q135,230 165,240 Q195,248 210,235 Q230,220 230,195 Q238,160 225,130 Q215,105 200,85Z"
+        fill="url(#lg-dab-l)" stroke="${c}" stroke-width="1.5" stroke-opacity=".45"/>
+      <!-- Pulmón derecho -->
+      <path d="M360,85 Q410,95 430,130 Q445,165 435,200 Q425,230 395,240 Q365,248 350,235 Q330,220 330,195 Q322,160 335,130 Q345,105 360,85Z"
+        fill="url(#lg-dab-r)" stroke="${c}" stroke-width="1.5" stroke-opacity=".45"/>
+      <!-- Bronquios lobares (izquierdo) -->
+      <path d="M200,85 Q185,115 175,140" stroke="${c}" stroke-width="1.5" fill="none" stroke-opacity=".3"/>
+      <path d="M200,85 Q195,120 190,155" stroke="${c}" stroke-width="1.5" fill="none" stroke-opacity=".3"/>
+      <!-- Bronquios lobares (derecho) -->
+      <path d="M360,85 Q375,115 385,140" stroke="${c}" stroke-width="1.5" fill="none" stroke-opacity=".3"/>
+      <path d="M360,85 Q365,120 370,155" stroke="${c}" stroke-width="1.5" fill="none" stroke-opacity=".3"/>
+
+      <!-- FASE 1: moco periférico (círculos pequeños) -->
+      <circle cx="160" cy="185" r="7" fill="${c}" fill-opacity=".5"/>
+      <circle cx="175" cy="200" r="6" fill="${c}" fill-opacity=".4"/>
+      <circle cx="400" cy="185" r="7" fill="${c}" fill-opacity=".5"/>
+      <circle cx="385" cy="200" r="6" fill="${c}" fill-opacity=".4"/>
+      <!-- Moco animado moviéndose de periférico a central -->
+      <circle r="7" fill="${c}" fill-opacity=".8">
+        <animateMotion dur="3.5s" repeatCount="indefinite"
+          path="M160,190 C170,165 185,140 200,120 C215,100 245,80 280,65"/>
+      </circle>
+      <circle r="6" fill="${c}" fill-opacity=".65">
+        <animateMotion dur="3.5s" repeatCount="indefinite" begin="1s"
+          path="M400,190 C390,165 375,140 360,120 C345,100 315,80 280,65"/>
+      </circle>
+      <circle r="5" fill="${c}" fill-opacity=".5">
+        <animateMotion dur="3.5s" repeatCount="indefinite" begin="1.8s"
+          path="M175,205 C180,175 190,150 205,130 C220,110 250,85 280,65"/>
+      </circle>
+
+      <!-- Etiquetas de fases en el fondo -->
+      <rect x="10" y="255" width="160" height="38" rx="5" fill="${c}" fill-opacity=".07" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="90" y="271" fill="${c}" fill-opacity=".85" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Fase 1 — Despegamiento</text>
+      <text x="90" y="284" fill="${c}" fill-opacity=".6" font-size="9" font-family="sans-serif" text-anchor="middle">Vol. reserva espiratorio bajo</text>
+
+      <rect x="195" y="255" width="170" height="38" rx="5" fill="${c}" fill-opacity=".07" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="280" y="271" fill="${c}" fill-opacity=".85" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Fase 2 — Acumulación</text>
+      <text x="280" y="284" fill="${c}" fill-opacity=".6" font-size="9" font-family="sans-serif" text-anchor="middle">Volumen corriente</text>
+
+      <rect x="385" y="255" width="165" height="38" rx="5" fill="${c}" fill-opacity=".07" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="467" y="271" fill="${c}" fill-opacity=".85" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Fase 3 — Evacuación</text>
+      <text x="467" y="284" fill="${c}" fill-opacity=".6" font-size="9" font-family="sans-serif" text-anchor="middle">Huffing con glotis abierta</text>
+
+      <!-- Flecha de flujo ascendente -->
+      <line x1="280" y1="240" x2="280" y2="75" stroke="${c}" stroke-width="1" stroke-dasharray="4,3" stroke-opacity=".3"/>
+      <polygon points="280,62 274,76 286,76" fill="${c}" fill-opacity=".5"/>
+      <text x="295" y="155" fill="${c}" fill-opacity=".5" font-size="9" font-family="sans-serif">Flujo ↑</text>
+    </svg>`,
+
+    /* ── CICLO ACTIVO (CATR) ── */
+    acbt:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="cr-grad" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".05"/>
+        </radialGradient>
+      </defs>
+      <!-- Círculo guía del ciclo -->
+      <circle cx="280" cy="148" r="105" fill="none" stroke="${c}" stroke-width="1" stroke-opacity=".15" stroke-dasharray="5,4"/>
+
+      <!-- Nodo CR -->
+      <circle cx="280" cy="43" r="38" fill="url(#cr-grad)" stroke="${c}" stroke-width="2"/>
+      <text x="280" y="38" fill="${c}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Control</text>
+      <text x="280" y="52" fill="${c}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Respiratorio</text>
+      <text x="280" y="64" fill="${c}" fill-opacity=".6" font-size="9" font-family="sans-serif" text-anchor="middle">Reposo · 3–5 ciclos</text>
+
+      <!-- Nodo EET -->
+      <circle cx="430" cy="220" r="38" fill="rgba(74,222,128,.1)" stroke="#4ade80" stroke-width="2"/>
+      <text x="430" y="213" fill="#4ade80" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Expansión</text>
+      <text x="430" y="226" fill="#4ade80" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Torácica</text>
+      <text x="430" y="238" fill="#4ade80" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">Insp. profunda · apnea 3 s</text>
+
+      <!-- Nodo TEF -->
+      <circle cx="130" cy="220" r="38" fill="rgba(248,113,113,.1)" stroke="#f87171" stroke-width="2"/>
+      <text x="130" y="213" fill="#f87171" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Técnica Esp.</text>
+      <text x="130" y="226" fill="#f87171" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Forzada</text>
+      <text x="130" y="238" fill="#f87171" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">Huffing · glotis abierta</text>
+
+      <!-- Flechas del ciclo -->
+      <path d="M305,75 Q390,100 415,188" stroke="${c}" stroke-width="2" fill="none" stroke-opacity=".5" marker-end="url(#arr)"/>
+      <path d="M395,240 Q280,290 165,240" stroke="#4ade80" stroke-width="2" fill="none" stroke-opacity=".5" marker-end="url(#arr2)"/>
+      <path d="M105,188 Q120,100 248,75" stroke="#f87171" stroke-width="2" fill="none" stroke-opacity=".5" marker-end="url(#arr3)"/>
+
+      <!-- Punto animado recorriendo el ciclo -->
+      <circle r="9" fill="${c}" fill-opacity=".9">
+        <animateMotion dur="5s" repeatCount="indefinite" calcMode="linear">
+          <mpath xlink:href="#catr-path"/>
+        </animateMotion>
+      </circle>
+      <path id="catr-path" d="M280,43 Q390,100 430,220 Q280,290 130,220 Q130,100 280,43" fill="none"/>
+
+      <!-- Centro -->
+      <text x="280" y="142" fill="${c}" font-size="13" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".7">CICLO</text>
+      <text x="280" y="158" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" fill-opacity=".5">Repetir 3–6 veces</text>
+
+      <!-- Leyenda bottom -->
+      <text x="280" y="292" fill="${c}" fill-opacity=".45" font-size="10" font-family="sans-serif" text-anchor="middle">Control Respiratorio → Expansión Torácica → Técnica de Espiración Forzada → repetir</text>
+    </svg>`,
+
+    /* ── FLUTTER / ACAPELLA ── */
+    flutter:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fl-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#a78bfa" stop-opacity=".0"/>
+          <stop offset="40%" stop-color="#a78bfa" stop-opacity=".15"/>
+          <stop offset="100%" stop-color="#a78bfa" stop-opacity=".3"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Bocal / mouthpiece -->
+      <rect x="290" y="115" width="100" height="30" rx="15" fill="rgba(167,139,250,.15)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="340" y="134" fill="#a78bfa" font-size="10" font-family="sans-serif" text-anchor="middle">Boquilla</text>
+
+      <!-- Cuerpo del dispositivo -->
+      <ellipse cx="238" cy="130" rx="55" ry="32" fill="rgba(167,139,250,.12)" stroke="#a78bfa" stroke-width="2.5"/>
+      <text x="238" y="127" fill="#a78bfa" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">FLUTTER</text>
+      <text x="238" y="141" fill="#a78bfa" font-size="9" font-family="sans-serif" text-anchor="middle">Acapella</text>
+
+      <!-- Ondas oscilatorias hacia pulmones (izq) -->
+      <g>
+        <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite"/>
+        <path d="M40,110 Q60,88 80,110 Q100,132 120,110 Q140,88 160,110 Q180,132 185,125" stroke="#a78bfa" stroke-width="2.5" fill="none"/>
+      </g>
+      <g>
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="0.8s" repeatCount="indefinite"/>
+        <path d="M40,145 Q60,123 80,145 Q100,167 120,145 Q140,123 160,145 Q180,167 185,158" stroke="#a78bfa" stroke-width="2" fill="none" opacity=".6"/>
+      </g>
+
+      <!-- Presión positiva — manómetro -->
+      <circle cx="238" cy="48" r="36" fill="var(--bg3)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="238" y="41" fill="#a78bfa" font-size="9" font-family="sans-serif" text-anchor="middle">Presión</text>
+      <text x="238" y="53" fill="#a78bfa" font-size="9" font-family="sans-serif" text-anchor="middle">espiratoria</text>
+      <text x="238" y="65" fill="#a78bfa" font-size="8" font-family="sans-serif" text-anchor="middle">10–20 cmH₂O</text>
+      <!-- Aguja del manómetro oscilando -->
+      <line x1="238" y1="48" x2="238" y2="20" stroke="#a78bfa" stroke-width="2" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate"
+          values="-40 238 48; 40 238 48; -40 238 48" dur="0.9s" repeatCount="indefinite"/>
+      </line>
+      <circle cx="238" cy="48" r="4" fill="#a78bfa"/>
+
+      <!-- Moco movilizándose hacia boquilla -->
+      <circle r="9" fill="#a78bfa" fill-opacity=".6">
+        <animateMotion dur="2.2s" repeatCount="indefinite" path="M80,165 C120,155 160,148 183,140"/>
+      </circle>
+      <circle r="7" fill="#a78bfa" fill-opacity=".4">
+        <animateMotion dur="2.2s" repeatCount="indefinite" begin=".7s" path="M50,155 C90,143 140,138 183,135"/>
+      </circle>
+
+      <!-- Etiqueta frecuencia -->
+      <rect x="30" y="195" width="175" height="45" rx="6" fill="#a78bfa" fill-opacity=".07" stroke="#a78bfa" stroke-opacity=".2" stroke-width="1"/>
+      <text x="118" y="213" fill="#a78bfa" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Oscilaciones</text>
+      <text x="118" y="227" fill="#a78bfa" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">6–26 Hz — rompen viscoelasticidad</text>
+      <text x="118" y="236" fill="#a78bfa" fill-opacity=".55" font-size="8" font-family="sans-serif" text-anchor="middle">del moco</text>
+
+      <!-- Etiqueta PEP -->
+      <rect x="350" y="195" width="180" height="45" rx="6" fill="#a78bfa" fill-opacity=".07" stroke="#a78bfa" stroke-opacity=".2" stroke-width="1"/>
+      <text x="440" y="213" fill="#a78bfa" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Presión espiratoria positiva</text>
+      <text x="440" y="227" fill="#a78bfa" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">Mantiene vía aérea abierta</text>
+      <text x="440" y="236" fill="#a78bfa" fill-opacity=".55" font-size="8" font-family="sans-serif" text-anchor="middle">durante espiración</text>
+
+      <text x="280" y="285" fill="#a78bfa" fill-opacity=".45" font-size="10" font-family="sans-serif" text-anchor="middle">Oscilación + presión positiva → moco hacia vías centrales → huffing</text>
+    </svg>`,
+
+    /* ── PRESIÓN ESPIRATORIA POSITIVA ── */
+    pep:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- Título -->
+      <text x="280" y="20" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".8">Mecanismo de la Presión Espiratoria Positiva</text>
+
+      <!-- SIN PEP — vía aérea colapsada -->
+      <rect x="20" y="30" width="230" height="220" rx="8" fill="${c}" fill-opacity=".03" stroke="${c}" stroke-opacity=".1" stroke-width="1"/>
+      <text x="135" y="50" fill="#f87171" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">SIN Presión Espiratoria Positiva</text>
+
+      <!-- Vía aérea colapsada -->
+      <path d="M80,75 Q135,85 190,75" stroke="#f87171" stroke-width="2" fill="none"/>
+      <path d="M80,115 Q135,105 190,115" stroke="#f87171" stroke-width="2" fill="none"/>
+      <!-- Colapso en el centro -->
+      <path d="M115,75 Q135,95 155,75" stroke="#f87171" stroke-width="2.5" fill="rgba(248,113,113,.1)"/>
+      <path d="M115,115 Q135,95 155,115" stroke="#f87171" stroke-width="2.5" fill="rgba(248,113,113,.1)"/>
+      <text x="135" y="100" fill="#f87171" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Colapso</text>
+      <!-- Moco atrapado -->
+      <ellipse cx="135" cy="155" rx="28" ry="12" fill="${c}" fill-opacity=".3"/>
+      <text x="135" y="159" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">Moco atrapado</text>
+
+      <text x="135" y="195" fill="#f87171" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">El aire no puede pasar</text>
+      <text x="135" y="208" fill="#f87171" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">detrás del moco</text>
+      <text x="135" y="238" fill="#f87171" font-size="22" font-family="sans-serif" text-anchor="middle">✗</text>
+
+      <!-- Flecha intermedia -->
+      <text x="280" y="135" fill="${c}" font-size="24" font-family="sans-serif" text-anchor="middle" fill-opacity=".6">→</text>
+      <text x="280" y="155" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" fill-opacity=".5">Presión</text>
+      <text x="280" y="167" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" fill-opacity=".5">aplicada</text>
+
+      <!-- CON PEP — vía aérea abierta -->
+      <rect x="310" y="30" width="230" height="220" rx="8" fill="rgba(74,222,128,.04)" stroke="rgba(74,222,128,.15)" stroke-width="1"/>
+      <text x="425" y="50" fill="#4ade80" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">CON Presión Espiratoria Positiva</text>
+
+      <!-- Vía aérea abierta -->
+      <path d="M360,75 Q425,65 490,75" stroke="#4ade80" stroke-width="2" fill="none"/>
+      <path d="M360,120 Q425,130 490,120" stroke="#4ade80" stroke-width="2" fill="none"/>
+      <!-- Interior amplio -->
+      <rect x="360" y="75" width="130" height="45" rx="0" fill="rgba(74,222,128,.06)"/>
+
+      <!-- Presión positiva empujando -->
+      <path d="M490,85 L510,85" stroke="#4ade80" stroke-width="2.5" marker-end="url(#g-arr)"/>
+      <path d="M490,97 L510,97" stroke="#4ade80" stroke-width="2.5"/>
+      <path d="M490,109 L510,109" stroke="#4ade80" stroke-width="2.5" marker-end="url(#g-arr)"/>
+      <text x="520" y="100" fill="#4ade80" font-size="9" font-family="sans-serif">P+</text>
+
+      <!-- Moco desplazándose -->
+      <ellipse cx="395" cy="97" rx="22" ry="10" fill="${c}" fill-opacity=".35"/>
+      <circle r="8" fill="${c}" fill-opacity=".7">
+        <animateMotion dur="1.8s" repeatCount="indefinite" path="M415,97 Q440,97 460,97 Q440,97 415,97"/>
+      </circle>
+      <text x="395" y="100" fill="${c}" font-size="8" font-family="sans-serif" text-anchor="middle">Moco</text>
+
+      <!-- Aire pasando por canales colaterales -->
+      <path d="M365,160 Q395,150 420,160 Q445,170 475,158" stroke="#4ade80" stroke-width="1.5" fill="none" stroke-dasharray="4,2">
+        <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1s" repeatCount="indefinite"/>
+      </path>
+      <text x="420" y="180" fill="#4ade80" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">Aire por canales colaterales</text>
+      <text x="420" y="193" fill="#4ade80" fill-opacity=".5" font-size="8" font-family="sans-serif" text-anchor="middle">(poros de Kohn y Lambert)</text>
+
+      <text x="425" y="238" fill="#4ade80" font-size="22" font-family="sans-serif" text-anchor="middle">✓</text>
+
+      <text x="280" y="292" fill="${c}" fill-opacity=".45" font-size="10" font-family="sans-serif" text-anchor="middle">10–20 cmH₂O → vía aérea abierta → moco desplazado hacia vías centrales</text>
+    </svg>`,
+
+    /* ── DRENAJE POSTURAL ── */
+    drenaje:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <text x="280" y="18" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".8">Drenaje Postural — Posiciones según segmento</text>
+
+      <!-- Posición 1: Trendelenburg (lóbulos inferiores) -->
+      <g transform="translate(10,30)">
+        <rect x="10" y="55" width="140" height="30" rx="8" fill="rgba(74,222,128,.12)" stroke="#4ade80" stroke-width="1.5" transform="rotate(-18 80 70)"/>
+        <!-- cabeza (pies elevados = cabeza abajo) -->
+        <circle cx="22" cy="75" r="13" fill="rgba(74,222,128,.12)" stroke="#4ade80" stroke-width="1.5"/>
+        <!-- pulmones marcados -->
+        <ellipse cx="90" cy="52" rx="12" ry="8" fill="#4ade80" fill-opacity=".25" stroke="#4ade80" stroke-width="1" transform="rotate(-18 90 52)"/>
+        <!-- flecha gravedad -->
+        <path d="M80,105 L80,125" stroke="#4ade80" stroke-width="2"/>
+        <polygon points="80,130 75,120 85,120" fill="#4ade80"/>
+        <text x="80" y="145" fill="#4ade80" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="600">Trendelenburg</text>
+        <text x="80" y="157" fill="#4ade80" fill-opacity=".7" font-size="8" font-family="sans-serif" text-anchor="middle">Lóbulos inferiores</text>
+        <!-- badge CI -->
+        <rect x="20" y="163" width="120" height="16" rx="4" fill="rgba(248,113,113,.12)" stroke="#f87171" stroke-opacity=".4" stroke-width="1"/>
+        <text x="80" y="174" fill="#f87171" font-size="8" font-family="sans-serif" text-anchor="middle">CI: reflujo, EPOC, hipertens. intracraneal</text>
+      </g>
+
+      <!-- Posición 2: Decúbito lateral derecho (lóbulo medio) -->
+      <g transform="translate(195,30)">
+        <rect x="10" y="65" width="140" height="28" rx="8" fill="rgba(56,189,248,.12)" stroke="${c}" stroke-width="1.5"/>
+        <circle cx="158" cy="79" r="13" fill="rgba(56,189,248,.12)" stroke="${c}" stroke-width="1.5"/>
+        <ellipse cx="80" cy="58" rx="16" ry="9" fill="${c}" fill-opacity=".2" stroke="${c}" stroke-width="1"/>
+        <path d="M80,105 L80,125" stroke="${c}" stroke-width="2"/>
+        <polygon points="80,130 75,120 85,120" fill="${c}"/>
+        <text x="80" y="145" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="600">Decúbito lateral dcho.</text>
+        <text x="80" y="157" fill="${c}" fill-opacity=".7" font-size="8" font-family="sans-serif" text-anchor="middle">Lóbulo medio</text>
+      </g>
+
+      <!-- Posición 3: Sedestación inclinada (lóbulos superiores) -->
+      <g transform="translate(385,22)">
+        <rect x="50" y="45" width="28" height="80" rx="8" fill="rgba(251,191,36,.12)" stroke="#fbbf24" stroke-width="1.5"/>
+        <circle cx="64" cy="32" r="14" fill="rgba(251,191,36,.12)" stroke="#fbbf24" stroke-width="1.5"/>
+        <ellipse cx="64" cy="62" rx="10" ry="14" fill="#fbbf24" fill-opacity=".2" stroke="#fbbf24" stroke-width="1"/>
+        <path d="M64,140 L64,158" stroke="#fbbf24" stroke-width="2"/>
+        <polygon points="64,163 59,153 69,153" fill="#fbbf24"/>
+        <text x="64" y="178" fill="#fbbf24" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="600">Sedestación</text>
+        <text x="64" y="190" fill="#fbbf24" fill-opacity=".7" font-size="8" font-family="sans-serif" text-anchor="middle">Lóbulos superiores</text>
+      </g>
+
+      <!-- Leyenda común -->
+      <rect x="10" y="248" width="540" height="42" rx="6" fill="${c}" fill-opacity=".04" stroke="${c}" stroke-opacity=".12" stroke-width="1"/>
+      <text x="280" y="264" fill="${c}" fill-opacity=".8" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">La gravedad drena el segmento afectado hacia el bronquio principal</text>
+      <text x="280" y="280" fill="${c}" fill-opacity=".55" font-size="9" font-family="sans-serif" text-anchor="middle">10–20 min por posición · Combinar con percusión/vibración + evacuación final</text>
+    </svg>`,
+
+    /* ── PERCUSIÓN / VIBRACIÓN ── */
+    percusion:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="chest-grad" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".15"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".03"/>
+        </radialGradient>
+      </defs>
+      <text x="280" y="18" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".8">Percusión con Mano en Copa</text>
+
+      <!-- Caja torácica (óvalo) -->
+      <ellipse cx="280" cy="145" rx="145" ry="100" fill="url(#chest-grad)" stroke="${c}" stroke-width="1.5" stroke-opacity=".4"/>
+      <!-- Costillas -->
+      <path d="M155,110 Q280,100 405,110" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".2"/>
+      <path d="M148,130 Q280,118 412,130" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".2"/>
+      <path d="M145,152 Q280,140 415,152" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".2"/>
+      <path d="M148,174 Q280,163 412,174" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".2"/>
+      <path d="M155,194 Q280,184 405,194" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".2"/>
+
+      <!-- Esternón (zona restringida) -->
+      <rect x="258" y="90" width="44" height="110" rx="4" fill="rgba(248,113,113,.08)" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="280" y="208" fill="#f87171" font-size="9" font-family="sans-serif" text-anchor="middle">✗ Esternón</text>
+
+      <!-- Mano en copa (izquierda percutiendo) -->
+      <g>
+        <animate attributeName="transform" values="translate(0,0);translate(0,18);translate(0,0)" dur="0.5s" repeatCount="indefinite"/>
+        <ellipse cx="165" cy="95" rx="32" ry="20" fill="rgba(251,191,36,.2)" stroke="${c}" stroke-width="2"/>
+        <text x="165" y="91" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">Mano</text>
+        <text x="165" y="103" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">en copa</text>
+      </g>
+
+      <!-- Ondas de impacto desde lado izquierdo -->
+      <ellipse cx="185" cy="135" rx="0" ry="0" fill="none" stroke="${c}" stroke-width="2" stroke-opacity=".9">
+        <animate attributeName="rx" values="0;55;90" dur=".5s" repeatCount="indefinite"/>
+        <animate attributeName="ry" values="0;35;60" dur=".5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;0" dur=".5s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="185" cy="135" rx="0" ry="0" fill="none" stroke="${c}" stroke-width="1.5" stroke-opacity=".6">
+        <animate attributeName="rx" values="0;55;90" dur=".5s" repeatCount="indefinite" begin=".15s"/>
+        <animate attributeName="ry" values="0;35;60" dur=".5s" repeatCount="indefinite" begin=".15s"/>
+        <animate attributeName="opacity" values="0.8;0.3;0" dur=".5s" repeatCount="indefinite" begin=".15s"/>
+      </ellipse>
+
+      <!-- Moco siendo despegado y moviéndose hacia centro -->
+      <circle r="7" fill="${c}" fill-opacity=".6">
+        <animateMotion dur="1.2s" repeatCount="indefinite" path="M175,165 C210,155 245,148 270,140"/>
+      </circle>
+      <circle r="5" fill="${c}" fill-opacity=".45">
+        <animateMotion dur="1.2s" repeatCount="indefinite" begin=".4s" path="M180,175 C215,163 248,154 270,145"/>
+      </circle>
+
+      <!-- Zona segura label -->
+      <text x="165" y="242" fill="${c}" fill-opacity=".6" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">✓ Zona segura</text>
+      <text x="165" y="256" fill="${c}" fill-opacity=".45" font-size="9" font-family="sans-serif" text-anchor="middle">Parénquima pulmonar</text>
+
+      <!-- Frecuencia label -->
+      <rect x="350" y="220" width="190" height="50" rx="6" fill="${c}" fill-opacity=".05" stroke="${c}" stroke-opacity=".15" stroke-width="1"/>
+      <text x="445" y="237" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Frecuencia de percusión</text>
+      <text x="445" y="251" fill="${c}" fill-opacity=".7" font-size="9" font-family="sans-serif" text-anchor="middle">2–5 Hz · 3–5 min / segmento</text>
+      <text x="445" y="263" fill="${c}" fill-opacity=".5" font-size="8" font-family="sans-serif" text-anchor="middle">Siempre + técnica de evacuación</text>
+    </svg>`,
+
+    /* ── TOS ASISTIDA / TÉCNICA DE ESPIRACIÓN FORZADA ── */
+    tos:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <text x="280" y="18" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".8">Flujo Pico de Tos y Asistente Mecánico</text>
+
+      <!-- Vía aérea central (tráquea) -->
+      <rect x="240" y="25" width="60" height="70" rx="30" fill="rgba(248,113,113,.1)" stroke="#f87171" stroke-width="1.5"/>
+      <text x="270" y="52" fill="#f87171" font-size="9" font-family="sans-serif" text-anchor="middle">Tráquea</text>
+      <!-- Pulmones esquemáticos -->
+      <ellipse cx="200" cy="140" rx="55" ry="65" fill="rgba(248,113,113,.07)" stroke="#f87171" stroke-width="1" stroke-opacity=".4"/>
+      <ellipse cx="340" cy="140" rx="55" ry="65" fill="rgba(248,113,113,.07)" stroke="#f87171" stroke-width="1" stroke-opacity=".4"/>
+      <!-- Bronquios -->
+      <path d="M260,95 Q230,108 200,118" stroke="#f87171" stroke-width="2" fill="none" stroke-opacity=".5"/>
+      <path d="M280,95 Q315,108 340,118" stroke="#f87171" stroke-width="2" fill="none" stroke-opacity=".5"/>
+
+      <!-- Medidor de flujo pico de tos (izquierda) -->
+      <rect x="15" y="70" width="90" height="140" rx="8" fill="var(--bg3)" stroke="${c}" stroke-width="1.5"/>
+      <text x="60" y="90" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="600">Flujo pico</text>
+      <text x="60" y="102" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">de tos</text>
+      <!-- Barra animada -->
+      <rect x="25" y="115" width="70" height="85" rx="4" fill="var(--card2)"/>
+      <rect x="25" y="115" width="70" rx="4" fill="#f87171">
+        <animate attributeName="height" values="10;85;65;85" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="195;115;150;115" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Línea umbral 270 L/min -->
+      <line x1="25" y1="153" x2="95" y2="153" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="60" y="148" fill="#fbbf24" font-size="8" font-family="sans-serif" text-anchor="middle">270 L/min</text>
+      <text x="60" y="213" fill="${c}" font-size="8" font-family="sans-serif" text-anchor="middle">umbral eficaz</text>
+
+      <!-- Moco evacuándose -->
+      <circle r="9" fill="#f87171" fill-opacity=".75">
+        <animateMotion dur="1.6s" repeatCount="indefinite" path="M270,190 L270,95 L270,30"/>
+      </circle>
+
+      <!-- Asistente mecánico de tos (derecha) -->
+      <rect x="420" y="50" width="125" height="90" rx="8" fill="rgba(248,113,113,.08)" stroke="#f87171" stroke-width="1.5"/>
+      <text x="482" y="75" fill="#f87171" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="700">Asistente</text>
+      <text x="482" y="90" fill="#f87171" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="700">Mecánico de Tos</text>
+      <text x="482" y="106" fill="#f87171" font-size="9" font-family="sans-serif" text-anchor="middle">(Cough Assist)</text>
+      <text x="482" y="124" fill="#f87171" fill-opacity=".7" font-size="8" font-family="sans-serif" text-anchor="middle">Si flujo pico &lt; 270 L/min</text>
+
+      <!-- Flechas presión positiva y negativa -->
+      <path d="M420,80 L310,130" stroke="#f87171" stroke-width="2" marker-end="url(#r-arr)"/>
+      <text x="358" y="98" fill="#f87171" font-size="9" font-family="sans-serif">+35 cmH₂O →</text>
+      <path d="M310,155 L420,110" stroke="${c}" stroke-width="2" marker-end="url(#b-arr)"/>
+      <text x="345" y="168" fill="${c}" font-size="9" font-family="sans-serif">← −35 cmH₂O</text>
+
+      <!-- Leyenda huffing -->
+      <rect x="15" y="240" width="530" height="42" rx="6" fill="${c}" fill-opacity=".04" stroke="${c}" stroke-opacity=".12" stroke-width="1"/>
+      <text x="280" y="257" fill="${c}" fill-opacity=".8" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Técnica de Espiración Forzada (huffing): "haaaaa" con glotis abierta</text>
+      <text x="280" y="273" fill="${c}" fill-opacity=".55" font-size="9" font-family="sans-serif" text-anchor="middle">Flujo pico ≥ 270 L/min → tos eficaz · Asistente mecánico si flujo pico &lt; 270 L/min</text>
+    </svg>`,
+
+    /* ── ENTRENAMIENTO MUSCULAR INSPIRATORIO ── */
+    imt:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="dia-grad" cx="50%" cy="60%">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".04"/>
+        </radialGradient>
+      </defs>
+      <text x="280" y="18" fill="${c}" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".8">Entrenamiento Muscular Inspiratorio — Umbral de Carga</text>
+
+      <!-- Pulmones -->
+      <ellipse cx="185" cy="140" rx="85" ry="95" fill="url(#dia-grad)" stroke="${c}" stroke-width="1.5" stroke-opacity=".4"/>
+      <ellipse cx="350" cy="140" rx="85" ry="95" fill="url(#dia-grad)" stroke="${c}" stroke-width="1.5" stroke-opacity=".4"/>
+      <!-- Tráquea -->
+      <rect x="252" y="22" width="30" height="45" rx="15" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-width="1.5"/>
+      <text x="267" y="38" fill="${c}" fill-opacity=".7" font-size="8" font-family="sans-serif" text-anchor="middle">Tráquea</text>
+
+      <!-- Diafragma animado -->
+      <path d="M95,195 Q185,125 267,195 Q350,125 475,195" stroke="${c}" stroke-width="3.5" fill="rgba(45,212,191,.1)" stroke-linecap="round">
+        <animate attributeName="d"
+          values="M95,195 Q185,125 267,195 Q350,125 475,195;
+                  M95,195 Q185,155 267,195 Q350,155 475,195;
+                  M95,195 Q185,125 267,195 Q350,125 475,195"
+          dur="2s" repeatCount="indefinite" calcMode="ease-in-out"/>
+      </path>
+      <text x="267" y="175" fill="${c}" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="600" fill-opacity=".7">Diafragma</text>
+
+      <!-- Fuerza de contracción -->
+      <path d="M267,195 L267,145" stroke="${c}" stroke-width="3.5" stroke-linecap="round">
+        <animate attributeName="d"
+          values="M267,195 L267,165;M267,195 L267,130;M267,195 L267,165"
+          dur="2s" repeatCount="indefinite" calcMode="ease-in-out"/>
+      </path>
+      <polygon points="267,120 260,138 274,138" fill="${c}">
+        <animate attributeName="points"
+          values="267,150 260,165 274,165;267,112 260,130 274,130;267,150 260,165 274,165"
+          dur="2s" repeatCount="indefinite" calcMode="ease-in-out"/>
+      </polygon>
+
+      <!-- Dispositivo de umbral de carga -->
+      <rect x="215" y="220" width="105" height="50" rx="8" fill="rgba(45,212,191,.1)" stroke="${c}" stroke-width="2"/>
+      <text x="267" y="239" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Umbral de carga</text>
+      <text x="267" y="253" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">30% Pres. Insp. Máx.</text>
+      <text x="267" y="265" fill="${c}" fill-opacity=".6" font-size="8" font-family="sans-serif" text-anchor="middle">(avanzar 5–10% / 2 sem)</text>
+
+      <!-- Manómetro Presión Inspiratoria Máxima -->
+      <circle cx="470" cy="115" r="50" fill="var(--bg3)" stroke="${c}" stroke-width="2"/>
+      <text x="470" y="99" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Pres. Insp.</text>
+      <text x="470" y="113" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Máxima</text>
+      <text x="470" y="127" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle">(cmH₂O)</text>
+      <!-- Arco del manómetro -->
+      <path d="M430,148 A50,50 0 0,1 510,148" stroke="${c}" stroke-width="1" fill="none" stroke-opacity=".3"/>
+      <!-- Zona normal > 80 cmH₂O -->
+      <path d="M470,115 L505,90" stroke="#4ade80" stroke-width="1.5" stroke-opacity=".5"/>
+      <text x="518" y="88" fill="#4ade80" font-size="8" font-family="sans-serif">&gt;80</text>
+      <!-- Zona patológica < 60 cmH₂O -->
+      <path d="M470,115 L440,90" stroke="#f87171" stroke-width="1.5" stroke-opacity=".5"/>
+      <text x="415" y="88" fill="#f87171" font-size="8" font-family="sans-serif">&lt;60</text>
+      <!-- Aguja animada -->
+      <line x1="470" y1="115" x2="470" y2="73" stroke="${c}" stroke-width="2.5" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate"
+          values="-50 470 115; 30 470 115; -50 470 115" dur="3s" repeatCount="indefinite" calcMode="ease-in-out"/>
+      </line>
+      <circle cx="470" cy="115" r="5" fill="${c}"/>
+
+      <!-- Adaptaciones musculares -->
+      <rect x="15" y="248" width="185" height="42" rx="6" fill="${c}" fill-opacity=".05" stroke="${c}" stroke-opacity=".15" stroke-width="1"/>
+      <text x="107" y="265" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Adaptaciones</text>
+      <text x="107" y="279" fill="${c}" fill-opacity=".65" font-size="9" font-family="sans-serif" text-anchor="middle">Hipertrofia fibras tipo I y IIa</text>
+
+      <rect x="210" y="248" width="175" height="42" rx="6" fill="${c}" fill-opacity=".05" stroke="${c}" stroke-opacity=".15" stroke-width="1"/>
+      <text x="297" y="265" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Programa mínimo</text>
+      <text x="297" y="279" fill="${c}" fill-opacity=".65" font-size="9" font-family="sans-serif" text-anchor="middle">8–12 semanas · 2 × /día</text>
+    </svg>`,
+  };
+
+  return animations[id] || `<svg viewBox="0 0 560 300"><text x="280" y="150" fill="${c}" text-anchor="middle" font-family="sans-serif">Animación no disponible</text></svg>`;
+}
+
+/* ====================================================
+   MODE SWITCHER
+====================================================*/
+function setMode(m){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
+  const modes=['biblioteca','comparar','selector','secuencia'];
+  document.querySelectorAll('.mode-btn')[modes.indexOf(m)].classList.add('active');
+  document.getElementById('mode-'+m).classList.add('active');
+  if(m==='selector') buildSelector();
+  if(m==='secuencia') buildSequencer();
+  if(m==='comparar') buildCompareGrid();
+}
+
+/* ====================================================
+   BIBLIOTECA
+====================================================*/
+function buildTechGrid(){
+  const el = document.getElementById('techGrid');
+  TECHNIQUES.forEach(t=>{
+    const d = document.createElement('div');
+    d.className='tech-card';
+    d.id='tc-'+t.id;
+    d.innerHTML=`<span class="tech-icon">${t.icon}</span><div class="tech-name">${t.name}</div><div class="tech-cat">${t.cat}</div><div style="margin-top:.4rem"><span class="ev-pill ev-${t.evidence.toLowerCase()}">Evidencia ${t.evidence}</span></div>`;
+    d.onclick=()=>showDetail(t.id);
+    el.appendChild(d);
+  });
+}
+
+function showDetail(id){
+  const t = TECHNIQUES.find(x=>x.id===id);
+  document.querySelectorAll('.tech-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tc-'+id).classList.add('active');
+  const panel = document.getElementById('detailPanel');
+  panel.classList.add('show');
+  panel.innerHTML=`
+    <div class="card mt-2">
+      <div class="flex-b mb-2">
+        <div>
+          <div style="font-family:var(--fh);font-size:1.4rem;color:${t.color}">${t.icon} ${t.name}</div>
+          <div style="font-size:12.5px;color:var(--text2);margin-top:.2rem">${t.cat} <span class="ev-pill ev-${t.evidence.toLowerCase()}">Evidencia ${t.evidence}</span></div>
+        </div>
+        <button class="btn btn-s btn-sm" onclick="document.getElementById('detailPanel').classList.remove('show');document.querySelectorAll('.tech-card').forEach(c=>c.classList.remove('active'))">✕</button>
+      </div>
+
+      <div class="anim-stage mb-2">${getAnimation(t.id, t.color)}</div>
+
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Principio físico</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1rem">${t.mechanism}</div>
+
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Fases de la técnica</div>
+      <div style="margin-bottom:1rem">
+        ${t.phases.map((p,i)=>`<div style="display:flex;gap:10px;margin-bottom:.5rem;font-size:13px"><span style="width:22px;height:22px;border-radius:50%;background:${t.color};color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span><span style="color:var(--text2)">${p}</span></div>`).join('')}
+      </div>
+
+      <div class="grid g2 mb-2">
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Indicaciones</div>
+          ${t.indications.map(i=>`<span class="tag tag-ind">✓ ${i}</span>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Contraindicaciones</div>
+          ${t.contraindications.map(i=>`<span class="tag tag-ci">✗ ${i}</span>`).join('')}
+          <div style="margin-top:.5rem">${t.precautions.map(i=>`<span class="tag tag-prec">⚠ ${i}</span>`).join('')}</div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Parámetros de prescripción</div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem 1rem;margin-bottom:1rem">
+        ${t.params.map(([l,v])=>`<div class="param-row"><span class="param-label">${l}</span><span class="param-val">${v}</span></div>`).join('')}
+        <div class="param-row"><span class="param-label">Diferencia mínima significativa</span><span class="param-val" style="color:${t.color}">${t.mcid}</span></div>
+      </div>
+    </div>
+  `;
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ====================================================
+   COMPARADOR
+====================================================*/
+let compareSelected = [];
+
+function buildCompareGrid(){
+  const el = document.getElementById('compareGrid');
+  if(el.children.length > 0) return;
+  TECHNIQUES.forEach(t=>{
+    const d = document.createElement('div');
+    d.className='cmp-card';
+    d.id='cmp-'+t.id;
+    d.innerHTML=`<div style="font-size:1.3rem;margin-bottom:.3rem">${t.icon}</div><div style="font-weight:600;font-size:.9rem">${t.name}</div><div style="font-size:11.5px;color:var(--text3);margin-top:.2rem"><span class="ev-pill ev-${t.evidence.toLowerCase()}">Ev. ${t.evidence}</span></div>`;
+    d.onclick=()=>toggleCompare(t.id);
+    el.appendChild(d);
+  });
+}
+
+function toggleCompare(id){
+  const idx = compareSelected.indexOf(id);
+  if(idx>=0){
+    compareSelected.splice(idx,1);
+    document.getElementById('cmp-'+id).classList.remove('selected');
+  } else if(compareSelected.length<2){
+    compareSelected.push(id);
+    document.getElementById('cmp-'+id).classList.add('selected');
+  }
+  if(compareSelected.length===2) renderCompareTable();
+  else document.getElementById('compareTable').style.display='none';
+}
+
+function renderCompareTable(){
+  const [a,b] = compareSelected.map(id=>TECHNIQUES.find(t=>t.id===id));
+  const isAuto = id => ['dab','flutter','pep','imt'].includes(id);
+  const rows = [
+    ['Categoría', a.cat, b.cat],
+    ['Evidencia', `<span class="ev-pill ev-${a.evidence.toLowerCase()}">Nivel ${a.evidence}</span>`, `<span class="ev-pill ev-${b.evidence.toLowerCase()}">Nivel ${b.evidence}</span>`],
+    ['Mecanismo principal', a.mechanism.substring(0,80)+'…', b.mechanism.substring(0,80)+'…'],
+    ['Autonomía del paciente', isAuto(a.id)?'<span class="better">Alta — autoadministrable</span>':'<span class="worse">Requiere terapeuta</span>', isAuto(b.id)?'<span class="better">Alta — autoadministrable</span>':'<span class="worse">Requiere terapeuta</span>'],
+    ['Principal indicación', a.indications[0], b.indications[0]],
+    ['Principal contraindicación', a.contraindications[0], b.contraindications[0]],
+    ['Parámetro clave', a.params[0][0]+': '+a.params[0][1], b.params[0][0]+': '+b.params[0][1]],
+    ['Diferencia mínima significativa', a.mcid, b.mcid],
+  ];
+
+  const el = document.getElementById('compareTable');
+  el.style.display='block';
+  el.innerHTML=`
+    <div class="card mt-2">
+      <div class="flex-b mb-2">
+        <div style="font-family:var(--fh);font-size:1.1rem">Comparación</div>
+        <button class="btn btn-s btn-sm" onclick="compareSelected=[];document.querySelectorAll('.cmp-card').forEach(c=>c.classList.remove('selected'));document.getElementById('compareTable').style.display='none'">✕ Limpiar</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="cmp-table">
+          <thead><tr>
+            <th>Criterio</th>
+            <th style="color:${a.color}">${a.icon} ${a.name}</th>
+            <th style="color:${b.color}">${b.icon} ${b.name}</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(([l,va,vb])=>`<tr><td>${l}</td><td class="neutral">${va}</td><td class="neutral">${vb}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+/* ====================================================
+   SELECTOR CLÍNICO
+====================================================*/
+function buildSelector(){
+  const el = document.getElementById('selectorCases');
+  if(el.children.length>0) return;
+  SELECTOR_CASES.forEach((sc,ci)=>{
+    const d = document.createElement('div');
+    d.innerHTML=`
+      <div class="scenario-box">
+        <div class="sc-title">${sc.title}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem;font-style:italic">${sc.context}</div>
+        <div class="sc-vitals">
+          ${sc.vitals.map((v,i)=>`<span class="sc-vital ${sc.vitalStatus[i]||''}">${v}</span>`).join('')}
+        </div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:.5rem">¿Qué técnica(s) seleccionas para este paciente?</div>
+        <div class="tech-opts" id="sopts-${ci}">
+          ${TECHNIQUES.map(t=>`
+            <button class="tech-opt" onclick="answerSelector(${ci},'${t.id}',this)" id="sopt-${ci}-${t.id}">
+              ${t.icon} ${t.name}
+            </button>`).join('')}
+        </div>
+        ${sc.correctIds.length===0?`<button class="btn btn-p btn-sm mt-1" onclick="revealNoTech(${ci})">⚠ Ninguna es apropiada</button>`:''}
+        <div class="sc-feedback" id="sfb-${ci}"></div>
+      </div>
+    `;
+    el.appendChild(d);
+  });
+}
+
+function answerSelector(ci, techId, btn){
+  const sc = SELECTOR_CASES[ci];
+  const isCorrect = sc.correctIds.includes(techId);
+  const isPartial = sc.partialIds.includes(techId);
+
+  btn.disabled=true;
+  if(isCorrect) btn.classList.add('correct');
+  else if(isPartial) btn.classList.add('partial');
+  else btn.classList.add('wrong');
+
+  const fb = document.getElementById(`sfb-${ci}`);
+  fb.classList.add('show');
+  if(isCorrect){
+    fb.className='sc-feedback show ok';
+    fb.innerHTML=`<strong style="color:var(--green)">✓ Técnica apropiada</strong> — es parte del plan óptimo para este caso.<br><br>${sc.feedback}`;
+    sc.correctIds.forEach(id=>{
+      const b=document.getElementById(`sopt-${ci}-${id}`);
+      if(b&&!b.disabled) b.style.borderColor='rgba(74,222,128,.4)';
+    });
+  } else if(isPartial){
+    fb.className='sc-feedback show warn';
+    fb.innerHTML=`<strong style="color:var(--amber)">⚠ Aceptable pero subóptima</strong><br>${sc.explanation_partial}<br><br><strong>Técnicas óptimas:</strong> ${sc.correctLabel}`;
+  } else {
+    fb.className='sc-feedback show err';
+    fb.innerHTML=`<strong style="color:var(--red)">✗ No apropiada en este contexto</strong><br><br>${sc.feedback}<br><br><strong>Opción correcta:</strong> ${sc.correctLabel}`;
+  }
+}
+
+function revealNoTech(ci){
+  const sc = SELECTOR_CASES[ci];
+  document.querySelectorAll(`#sopts-${ci} .tech-opt`).forEach(b=>b.disabled=true);
+  const fb = document.getElementById(`sfb-${ci}`);
+  fb.className='sc-feedback show ok';
+  fb.innerHTML=`<strong style="color:var(--green)">✓ Correcto — ninguna técnica de aclaramiento está indicada</strong><br><br>${sc.feedback}`;
+}
+
+/* ====================================================
+   SECUENCIADOR
+====================================================*/
+function buildSequencer(){
+  const el = document.getElementById('sequencerContent');
+  if(el.children.length>0) return;
+
+  SEQUENCES.forEach((seq,si)=>{
+    const shuffled = [...seq.items].sort(()=>Math.random()-.5);
+    const d = document.createElement('div');
+    d.className='card mb-2';
+    d.innerHTML=`
+      <div style="font-family:var(--fh);font-size:1.1rem;color:var(--blue);margin-bottom:.3rem">${seq.title}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:1rem;font-style:italic">${seq.context}</div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.4rem">Pasos disponibles — arrastra al orden correcto</div>
+      <div class="seq-pool" id="pool-${si}">
+        ${shuffled.map(item=>`
+          <div class="seq-item" draggable="true" id="sitem-${si}-${item.id}" data-id="${item.id}" data-si="${si}"
+            ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+            ${item.label}
+          </div>`).join('')}
+      </div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.4rem">Tu secuencia (arrastra aquí en orden)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.75rem" id="seqslots-${si}">
+        ${seq.items.map((_,i)=>`
+          <div style="min-width:160px;min-height:50px;flex:1;background:var(--bg3);border:1px dashed var(--border);border-radius:var(--rs);padding:.5rem;font-size:12px;color:var(--text3);display:flex;align-items:center;justify-content:center"
+            id="slot-${si}-${i}" ondragover="event.preventDefault()" ondrop="dropItem(event,${si},${i})">
+            Paso ${i+1}
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-p btn-sm" onclick="checkSequence(${si})">Verificar orden</button>
+        <button class="btn btn-s btn-sm" onclick="resetSequence(${si})">↺ Reiniciar</button>
+      </div>
+      <div id="seqResult-${si}" style="display:none;margin-top:1rem"></div>
+    `;
+    el.appendChild(d);
+  });
+}
+
+let draggedItem=null;
+const slotContents={};
+
+function dragStart(e){
+  draggedItem=e.target;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function dragEnd(e){
+  e.target.classList.remove('dragging');
+}
+function dropItem(e,si,slotIdx){
+  e.preventDefault();
+  if(!draggedItem) return;
+  const slot=document.getElementById(`slot-${si}-${slotIdx}`);
+  draggedItem.remove();
+  if(slotContents[si]&&slotContents[si][slotIdx]){
+    const oldId=slotContents[si][slotIdx];
+    const pool=document.getElementById(`pool-${si}`);
+    const seq=SEQUENCES[si];
+    const oldItem=seq.items.find(x=>x.id===oldId);
+    if(oldItem){
+      const el2=document.createElement('div');
+      el2.className='seq-item';
+      el2.id=`sitem-${si}-${oldId}`;
+      el2.draggable=true;
+      el2.dataset.id=oldId;
+      el2.dataset.si=si;
+      el2.innerHTML=oldItem.label;
+      el2.ondragstart=dragStart;
+      el2.ondragend=dragEnd;
+      pool.appendChild(el2);
+    }
+  }
+  if(!slotContents[si]) slotContents[si]={};
+  slotContents[si][slotIdx]=draggedItem.dataset.id;
+  slot.innerHTML='';
+  slot.style.borderStyle='solid';
+  slot.style.borderColor='var(--border2)';
+  slot.appendChild(draggedItem);
+  draggedItem=null;
+}
+
+function checkSequence(si){
+  const seq=SEQUENCES[si];
+  const contents=slotContents[si]||{};
+  if(Object.keys(contents).length<seq.items.length){
+    alert('Coloca todos los pasos antes de verificar.');
+    return;
+  }
+  let correct=0;
+  seq.items.forEach((_,i)=>{
+    const placedId=contents[i];
+    const expectedItem=seq.items.find(x=>x.correct===i+1);
+    const slotEl=document.getElementById(`slot-${si}-${i}`);
+    const itemEl=slotEl.querySelector('.seq-item');
+    if(itemEl){
+      if(placedId===expectedItem?.id){ itemEl.classList.add('correct-pos'); correct++; }
+      else { itemEl.classList.add('wrong-pos'); }
+    }
+  });
+  const pct=Math.round(correct/seq.items.length*100);
+  const res=document.getElementById(`seqResult-${si}`);
+  res.style.display='block';
+  res.innerHTML=`
+    <div style="background:var(--bg3);border-radius:var(--rs);padding:1rem">
+      <div style="font-family:var(--fh);font-size:1.3rem;color:${pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)'}">${pct}% correcto (${correct}/${seq.items.length})</div>
+      <div class="divider"></div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--text3);margin-bottom:.5rem">Orden correcto y justificación</div>
+      ${seq.items.sort((a,b)=>a.correct-b.correct).map(item=>`
+        <div style="display:flex;gap:10px;margin-bottom:.6rem;font-size:12.5px">
+          <span style="width:22px;height:22px;border-radius:50%;background:var(--blue);color:#07090f;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${item.correct}</span>
+          <div><div style="color:var(--text);font-weight:500">${item.label}</div><div style="color:var(--text2);font-size:12px;margin-top:2px">${item.rationale}</div></div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function resetSequence(si){
+  slotContents[si]={};
+  const seq=SEQUENCES[si];
+  const pool=document.getElementById(`pool-${si}`);
+  pool.innerHTML='';
+  const shuffled=[...seq.items].sort(()=>Math.random()-.5);
+  shuffled.forEach(item=>{
+    const el2=document.createElement('div');
+    el2.className='seq-item';
+    el2.id=`sitem-${si}-${item.id}`;
+    el2.draggable=true;
+    el2.dataset.id=item.id;
+    el2.dataset.si=si;
+    el2.innerHTML=item.label;
+    el2.ondragstart=dragStart;
+    el2.ondragend=dragEnd;
+    pool.appendChild(el2);
+  });
+  seq.items.forEach((_,i)=>{
+    const slot=document.getElementById(`slot-${si}-${i}`);
+    slot.innerHTML=`Paso ${i+1}`;
+    slot.style.borderStyle='dashed';
+    slot.style.borderColor='var(--border)';
+  });
+  document.getElementById(`seqResult-${si}`).style.display='none';
+}
+
+buildTechGrid();
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>

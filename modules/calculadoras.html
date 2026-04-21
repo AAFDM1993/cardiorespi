@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadoras Clínicas — FisioResp</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+/* NAV */
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:200}
+.logo span{color:var(--teal)}
+/* LAYOUT */
+.container{max-width:1100px;margin:0 auto;padding:1.5rem}
+.hero h1{font-family:var(--fh);font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.1;margin-bottom:.5rem}
+.hero h1 em{color:var(--amber);font-style:normal}
+.hero p{color:var(--text2);max-width:520px;margin:0 auto}
+/* TABS */
+.tabs{display:flex;gap:6px;padding:1rem 0;flex-wrap:wrap}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+/* FORM ELEMENTS */
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;letter-spacing:.3px;text-transform:uppercase}
+/* RANGE */
+input[type=range]{width:100%;accent-color:var(--amber);cursor:pointer}
+/* RESULT PANELS */
+.result-panel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-top:1.25rem}
+.result-panel.show{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.score-big{font-family:var(--fh);font-size:2.8rem;line-height:1;margin:.5rem 0}
+.score-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text2)}
+/* COLOR CLASSES */
+.c-green{color:var(--green)}
+/* BADGE */
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.3px}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--fb)}
+/* DIVIDER */
+hr{border:none;border-top:1px solid var(--border);margin:1rem 0}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+/* PROGRESS BAR */
+.prog-wrap{background:var(--bg3);border-radius:100px;height:8px;overflow:hidden;margin:.5rem 0}
+/* INFO BOX */
+.info{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--text2)}
+/* OPTION CARD */
+.opt-card{border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;cursor:pointer;transition:all .2s;background:var(--card)}
+.opt-card:hover{border-color:var(--border2)}
+.opt-card.selected{border-color:var(--amber);background:rgba(251,191,36,.06)}
+.opt-label{font-size:13px;font-weight:600;margin-bottom:2px}
+.opt-desc{font-size:11.5px;color:var(--text2)}
+.opts-grid{display:grid;gap:.5rem}
+/* SECTION HEADER */
+.sec-h{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
+.sec-h h2{font-family:var(--fh);font-size:1.1rem}
+/* SURVIVAL CHART */
+.chart-wrap{position:relative;height:220px;margin-top:.75rem}
+/* STEP INDICATOR */
+.steps{display:flex;gap:0;margin-bottom:1.5rem;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.step{flex:1;padding:10px;text-align:center;font-size:11.5px;font-weight:600;color:var(--text3);border-right:1px solid var(--border);cursor:pointer;transition:all .2s;background:var(--card)}
+.step:last-child{border-right:none}
+.step.done{color:var(--green);background:rgba(74,222,128,.06)}
+.step.active{color:var(--amber);background:rgba(251,191,36,.08)}
+/* CAT ITEM */
+.cat-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;margin-bottom:.75rem}
+.cat-q{font-size:13px;font-weight:600;margin-bottom:.75rem}
+.cat-extremes{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:.25rem}
+.cat-slider-wrap{padding:0 4px}
+.cat-val{text-align:center;font-family:var(--fm);color:var(--amber);font-size:.9rem;margin-top:.25rem}
+/* GLI RESULT */
+.gli-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)}
+.gli-row:last-child{border-bottom:none}
+.gli-name{font-size:12.5px;color:var(--text2)}
+.gli-vals{display:flex;gap:1rem;align-items:center}
+.gli-num{font-family:var(--fm);font-size:13px}
+.gli-z{font-size:11px;padding:2px 8px;border-radius:100px}
+/* GOLD QUADRANT */
+.gold-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem}
+.gold-cell{border:2px solid var(--border);border-radius:var(--rs);padding:1rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.gold-cell:hover{border-color:var(--border2)}
+.gold-cell.active{border-width:2px}
+.gold-cell.A.active{border-color:var(--green);background:rgba(74,222,128,.08)}
+.gold-cell.B.active{border-color:var(--amber);background:rgba(251,191,36,.08)}
+.gold-cell.E.active{border-color:var(--red);background:rgba(248,113,113,.08)}
+.gold-letter{font-family:var(--fh);font-size:2rem;font-weight:800}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FisioResp <span>·</span> Calc</div>
+  <div class="ntab active" onclick="showTab('bode',this)">Índice BODE</div>
+  <div class="ntab" onclick="showTab('gold',this)">GOLD 2024</div>
+  <div class="ntab" onclick="showTab('cat',this)">Puntaje CAT</div>
+  <div class="ntab" onclick="showTab('mrc',this)">Escala MRC</div>
+  <div class="ntab" onclick="showTab('gli',this)">GLI 2012</div>
+  <div class="ntab" onclick="showTab('ref',this)">Referencia</div>
+  <div class="phase-badge">Fase 4</div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>Calculadoras <em>Clínicas</em> Integradas</h1>
+    <p>BODE · GOLD 2024 · CAT · MRC · GLI 2012 — herramientas de evaluación funcional para fisioterapia respiratoria</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 1: ÍNDICE BODE
+  ══════════════════════════════════════════ -->
+  <div class="panel active" id="tab-bode">
+    <div class="sec-h"><span class="sec-icon">📊</span><h2>Índice BODE</h2><span class="badge badge-amber">EPOC</span></div>
+
+    <div class="info" style="margin-bottom:1rem">
+      El índice BODE (IMC, Obstrucción, Disnea, Ejercicio) predice mortalidad a 52 meses en EPOC mejor que el VEF₁ aislado. Puntaje 0–10: mayor puntaje = mayor mortalidad.
+    </div>
+
+    <div class="grid2">
+      <!-- LEFT: INPUT -->
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-h" style="margin-bottom:1rem">Datos del paciente</div>
+
+          <!-- B: BMI -->
+          <div class="field">
+            <label>B — Índice de Masa Corporal (IMC)</label>
+            <div class="field-row">
+              <div>
+                <input type="number" id="b-peso" placeholder="Peso (kg)" min="30" max="200" oninput="calcBode()">
+                <div class="unit">kg</div>
+              </div>
+              <div>
+                <input type="number" id="b-talla" placeholder="Talla (cm)" min="140" max="210" oninput="calcBode()">
+                <div class="unit">cm</div>
+              </div>
+            </div>
+            <div id="b-imc-disp" style="font-family:var(--fm);font-size:12px;color:var(--text2);margin-top:4px"></div>
+          </div>
+
+          <!-- O: FEV1 -->
+          <div class="field">
+            <label>O — VEF₁ % predicho</label>
+            <div class="range-row">
+              <input type="range" id="b-fev1" min="0" max="100" value="45" oninput="calcBode()">
+              <span class="range-val" id="b-fev1-v">45%</span>
+            </div>
+          </div>
+
+          <!-- D: MRC -->
+          <div class="field">
+            <label>D — Disnea (escala MRC)</label>
+            <div class="opts-grid" style="grid-template-columns:1fr 1fr;gap:.4rem">
+              <div class="opt-card" data-bode-mrc="0" onclick="selBodeMrc(0)">
+                <div class="opt-label">Grado 0–1</div>
+                <div class="opt-desc">Disnea solo al ejercicio intenso</div>
+              </div>
+              <div class="opt-card" data-bode-mrc="1" onclick="selBodeMrc(1)">
+                <div class="opt-label">Grado 2</div>
+                <div class="opt-desc">Al andar rápido o en subida</div>
+              </div>
+              <div class="opt-card" data-bode-mrc="2" onclick="selBodeMrc(2)">
+                <div class="opt-label">Grado 3</div>
+                <div class="opt-desc">Más lento que personas de su edad</div>
+              </div>
+              <div class="opt-card" data-bode-mrc="3" onclick="selBodeMrc(3)">
+                <div class="opt-label">Grado 4</div>
+                <div class="opt-desc">Dysnea en actividades básicas</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- E: 6MWT -->
+          <div class="field">
+            <label>E — Distancia en 6MWT</label>
+            <div class="range-row">
+              <input type="range" id="b-smwt" min="0" max="600" value="280" step="10" oninput="calcBode()">
+              <span class="range-val" id="b-smwt-v">280 m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCORE BREAKDOWN TABLE -->
+        <div class="card">
+          <div class="card-h" style="margin-bottom:.75rem;font-size:.9rem">Puntuación por variable</div>
+          <table>
+            <tr>
+              <th>Variable</th><th>Valor</th><th>Puntos</th>
+            </tr>
+            <tr>
+              <td>IMC</td>
+              <td id="bode-b-val">—</td>
+              <td id="bode-b-pts" style="font-family:var(--fm)">—</td>
+            </tr>
+            <tr>
+              <td>VEF₁ %</td>
+              <td id="bode-o-val">—</td>
+              <td id="bode-o-pts" style="font-family:var(--fm)">—</td>
+            </tr>
+            <tr>
+              <td>Disnea MRC</td>
+              <td id="bode-d-val">—</td>
+              <td id="bode-d-pts" style="font-family:var(--fm)">—</td>
+            </tr>
+            <tr>
+              <td>6MWT</td>
+              <td id="bode-e-val">—</td>
+              <td id="bode-e-pts" style="font-family:var(--fm)">—</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <div>
+        <div class="card result-panel" id="bode-result" style="text-align:center">
+          <div class="score-label">Índice BODE</div>
+          <div class="score-big" id="bode-score">—</div>
+          <div id="bode-quartil" class="badge badge-amber" style="margin:.5rem auto;display:inline-block">—</div>
+          <div id="bode-survival" style="margin:.75rem 0;font-size:13px;color:var(--text2)"></div>
+          <hr>
+          <div id="bode-interp" style="font-size:13px;text-align:left;color:var(--text2)"></div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="font-size:.9rem;margin-bottom:.75rem">Curva de supervivencia BODE</div>
+          <div class="chart-wrap">
+            <canvas id="bodeChart"></canvas>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:.5rem;text-align:center">Basado en Celli et al. NEJM 2004 (N=625)</div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="font-size:.9rem;margin-bottom:.75rem">Implicaciones para rehabilitación</div>
+          <div id="bode-rehab" style="font-size:12.5px;color:var(--text2)">Ingresa los datos para ver las recomendaciones.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 2: GOLD 2024
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="tab-gold">
+    <div class="sec-h"><span class="sec-icon">🏅</span><h2>Clasificación GOLD 2024</h2><span class="badge badge-orange">EPOC</span></div>
+
+    <div class="info" style="margin-bottom:1rem">
+      GOLD 2024 combina la severidad espirométrica (grados 1-4 por VEF₁) con la carga sintomática y el riesgo de exacerbaciones para clasificar al paciente en los grupos A, B o E.
+    </div>
+
+    <!-- PASO 1: Espirometría -->
+    <div class="card" style="margin-bottom:1rem">
+      <div class="steps">
+        <div class="step active" id="gold-step1">① Espirometría</div>
+        <div class="step" id="gold-step2">② Síntomas</div>
+        <div class="step" id="gold-step3">③ Exacerbaciones</div>
+        <div class="step done" id="gold-step4">④ Resultado</div>
+      </div>
+
+      <div class="grid2" style="gap:1.5rem;align-items:start">
+        <div>
+          <div style="margin-bottom:1rem">
+            <label>VEF₁/CVF Post-BD</label>
+            <div class="range-row">
+              <input type="range" id="g-ratio" min="30" max="85" value="60" oninput="calcGold()">
+              <span class="range-val" id="g-ratio-v">60%</span>
+            </div>
+            <div id="g-obst-msg" class="info" style="margin-top:.5rem;font-size:12px"></div>
+          </div>
+
+          <div id="g-fev1-section">
+            <label>VEF₁ % predicho (si obstrucción confirmada)</label>
+            <div class="range-row">
+              <input type="range" id="g-fev1" min="15" max="100" value="55" oninput="calcGold()">
+              <span class="range-val" id="g-fev1-v">55%</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12.5px;color:var(--text2);margin-bottom:.5rem;font-weight:600">Grado espirométrico GOLD</div>
+          <table>
+            <tr><th>Grado</th><th>VEF₁ % predicho</th><th>Clasificación</th></tr>
+            <tr id="gr1"><td>GOLD 1</td><td>≥ 80%</td><td><span class="badge badge-green">Leve</span></td></tr>
+            <tr id="gr2"><td>GOLD 2</td><td>50–79%</td><td><span class="badge badge-amber">Moderado</span></td></tr>
+            <tr id="gr3"><td>GOLD 3</td><td>30–49%</td><td><span class="badge badge-orange">Severo</span></td></tr>
+            <tr id="gr4"><td>GOLD 4</td><td>&lt; 30%</td><td><span class="badge badge-red">Muy severo</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2: Síntomas -->
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-h" style="margin-bottom:.75rem">② Carga Sintomática</div>
+      <div class="grid2">
+        <div>
+          <label style="margin-bottom:.5rem">Escala CAT (0–40 puntos)</label>
+          <div class="range-row">
+            <input type="range" id="g-cat" min="0" max="40" value="15" oninput="calcGold()">
+            <span class="range-val" id="g-cat-v">15</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Umbral de síntomas elevados: CAT ≥ 10</div>
+        </div>
+        <div>
+          <label style="margin-bottom:.5rem">Escala mMRC (0–4)</label>
+          <div class="opts-grid">
+            <div class="opt-card" style="padding:.5rem .75rem" data-mmrc="0" onclick="selMmrc(0)">
+              <b>mMRC 0</b> <span style="color:var(--text2);font-size:11.5px">— Solo al ejercicio intenso</span>
+            </div>
+            <div class="opt-card" style="padding:.5rem .75rem" data-mmrc="1" onclick="selMmrc(1)">
+              <b>mMRC 1</b> <span style="color:var(--text2);font-size:11.5px">— Al apurarse o en pendiente</span>
+            </div>
+            <div class="opt-card" style="padding:.5rem .75rem" data-mmrc="2" onclick="selMmrc(2)">
+              <b>mMRC 2</b> <span style="color:var(--text2);font-size:11.5px">— Más lento que pares</span>
+            </div>
+            <div class="opt-card" style="padding:.5rem .75rem" data-mmrc="3" onclick="selMmrc(3)">
+              <b>mMRC 3</b> <span style="color:var(--text2);font-size:11.5px">— Para al caminar 100 m</span>
+            </div>
+            <div class="opt-card" style="padding:.5rem .75rem" data-mmrc="4" onclick="selMmrc(4)">
+              <b>mMRC 4</b> <span style="color:var(--text2);font-size:11.5px">— Disnea al vestirse</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3: Exacerbaciones -->
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-h" style="margin-bottom:.75rem">③ Historial de Exacerbaciones (último año)</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Exacerbaciones moderadas (ATB ± corticoides)</label>
+          <div class="range-row">
+            <input type="range" id="g-exac-mod" min="0" max="6" value="1" oninput="calcGold()">
+            <span class="range-val" id="g-exac-mod-v">1</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Exacerbaciones severas (hospitalización)</label>
+          <div class="range-row">
+            <input type="range" id="g-exac-hosp" min="0" max="4" value="0" oninput="calcGold()">
+            <span class="range-val" id="g-exac-hosp-v">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADO GOLD -->
+    <div class="grid2">
+      <div class="card">
+        <div class="card-h" style="margin-bottom:.75rem">④ Grupo GOLD 2024</div>
+        <div class="gold-grid">
+          <div class="gold-cell A" id="gold-A">
+            <div class="gold-letter c-green">A</div>
+            <div style="font-size:11px;color:var(--text2)">Pocos síntomas<br>Bajo riesgo</div>
+          </div>
+          <div class="gold-cell B" id="gold-B">
+            <div class="gold-letter c-amber">B</div>
+            <div style="font-size:11px;color:var(--text2)">Más síntomas<br>Bajo riesgo</div>
+          </div>
+          <div class="gold-cell E" id="gold-E" style="grid-column:1/-1">
+            <div class="gold-letter c-red">E</div>
+            <div style="font-size:11px;color:var(--text2)">Alto riesgo de exacerbaciones (≥2 mod. ó ≥1 hosp.)</div>
+          </div>
+        </div>
+        <div id="gold-grupo-desc" style="margin-top:.75rem;font-size:13px;color:var(--text2)"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h" style="margin-bottom:.75rem">Implicaciones terapéuticas</div>
+        <div id="gold-terapia" style="font-size:12.5px;color:var(--text2)">Completa los datos para ver las recomendaciones farmacológicas y de rehabilitación.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 3: CAT SCORE
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="tab-cat">
+    <div class="sec-h"><span class="sec-icon">📋</span><h2>Test de Evaluación de EPOC (CAT)</h2><span class="badge badge-orange">EPOC</span></div>
+
+    <div class="info" style="margin-bottom:1.25rem">
+      El CAT es un cuestionario de 8 ítems que mide el impacto de la EPOC en la calidad de vida. Cada ítem se puntúa de 0 a 5. Puntuación total: 0–40 puntos.
+    </div>
+
+    <div id="cat-items"></div>
+
+    <div class="card" style="margin-top:1rem">
+      <div class="grid2" style="align-items:center">
+        <div style="text-align:center">
+          <div class="score-label">Puntuación CAT Total</div>
+          <div class="score-big" id="cat-total">0</div>
+          <div id="cat-badge" class="badge badge-green" style="margin:.5rem auto;display:inline-block">Impacto muy bajo</div>
+        </div>
+        <div>
+          <div class="prog-wrap" style="height:12px;margin:.5rem 0">
+            <div class="prog-fill" id="cat-prog" style="width:0%;background:var(--green)"></div>
+          </div>
+          <div id="cat-interp" style="font-size:13px;color:var(--text2)"></div>
+          <hr>
+          <div style="font-size:12px;color:var(--text3)">
+            <b style="color:var(--text2)">Umbrales:</b><br>
+            0–9: Impacto bajo · 10–20: Medio · 21–30: Alto · 31–40: Muy alto
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 4: ESCALA MRC
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="tab-mrc">
+    <div class="sec-h"><span class="sec-icon">🫁</span><h2>Escala MRC de Disnea</h2><span class="badge badge-blue">Multipatología</span></div>
+
+    <div class="info" style="margin-bottom:1.25rem">
+      La escala MRC (Consejo de Investigación Médica) gradúa la disnea en 5 niveles según la limitación de actividad. La versión modificada (mMRC) es la más usada en EPOC y se integra en GOLD y BODE.
+    </div>
+
+    <div class="grid2" style="gap:1.25rem;align-items:start">
+      <div>
+        <div style="margin-bottom:.75rem;font-size:13px;font-weight:600;color:var(--text2)">Selecciona el grado del paciente:</div>
+        <div class="opts-grid">
+          <div class="opt-card" data-mrc="0" onclick="selMrc(0)" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <div style="font-family:var(--fh);font-size:1.8rem;color:var(--green);min-width:2rem;text-align:center">0</div>
+              <div>
+                <div class="opt-label">Sin disnea al ejercicio</div>
+                <div class="opt-desc">Solo con esfuerzos muy intensos</div>
+              </div>
+            </div>
+          </div>
+          <div class="opt-card" data-mrc="1" onclick="selMrc(1)" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <div style="font-family:var(--fh);font-size:1.8rem;color:var(--teal);min-width:2rem;text-align:center">1</div>
+              <div>
+                <div class="opt-label">Disnea al apresurarse o subir pendientes</div>
+                <div class="opt-desc">No al caminar en llano</div>
+              </div>
+            </div>
+          </div>
+          <div class="opt-card" data-mrc="2" onclick="selMrc(2)" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <div style="font-family:var(--fh);font-size:1.8rem;color:var(--amber);min-width:2rem;text-align:center">2</div>
+              <div>
+                <div class="opt-label">Más lento que personas de su edad</div>
+                <div class="opt-desc">O para a descansar al caminar en llano</div>
+              </div>
+            </div>
+          </div>
+          <div class="opt-card" data-mrc="3" onclick="selMrc(3)" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <div style="font-family:var(--fh);font-size:1.8rem;color:var(--orange);min-width:2rem;text-align:center">3</div>
+              <div>
+                <div class="opt-label">Para a descansar al caminar 100 m</div>
+                <div class="opt-desc">O a los pocos minutos en llano</div>
+              </div>
+            </div>
+          </div>
+          <div class="opt-card" data-mrc="4" onclick="selMrc(4)" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <div style="font-family:var(--fh);font-size:1.8rem;color:var(--red);min-width:2rem;text-align:center">4</div>
+              <div>
+                <div class="opt-label">Disnea en actividades cotidianas</div>
+                <div class="opt-desc">Al vestirse, salir de casa — no puede salir</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card result-panel" id="mrc-result">
+          <div class="score-label">Grado MRC seleccionado</div>
+          <div class="score-big" id="mrc-score" style="color:var(--text3)">—</div>
+          <div id="mrc-badge" style="margin:.5rem 0"></div>
+          <div id="mrc-interp" style="font-size:13px;color:var(--text2)"></div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="margin-bottom:.75rem;font-size:.9rem">Equivalencias y uso clínico</div>
+          <table>
+            <tr><th>MRC</th><th>Impacto funcional</th><th>Indicaciones</th></tr>
+            <tr><td>0–1</td><td>Mínimo</td><td>Educación, ejercicio preventivo</td></tr>
+            <tr><td>2</td><td>Moderado</td><td>Inicio de rehabilitación pulmonar si VEF₁ &lt; 60%</td></tr>
+            <tr><td>3</td><td>Alto</td><td>Rehabilitación pulmonar indicada, evaluar O₂ en esfuerzo</td></tr>
+            <tr><td>4</td><td>Muy alto</td><td>Rehabilitación pulmonar domiciliaria, O₂ crónico si aplica</td></tr>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="margin-bottom:.75rem;font-size:.9rem">MRC en otras patologías</div>
+          <div style="font-size:12.5px;color:var(--text2)">
+            La escala MRC no es exclusiva de EPOC. Se usa también en:<br><br>
+            <b style="color:var(--text)">Fibrosis pulmonar:</b> MRC 3-4 predice necesidad de trasplante<br><br>
+            <b style="color:var(--text)">Cáncer de pulmón:</b> Base funcional pre-cirugía<br><br>
+            <b style="color:var(--text)">Insuficiencia cardiaca:</b> Equivale aproximadamente a la escala NYHA (Asociación del Corazón de Nueva York)<br><br>
+            <b style="color:var(--text)">Post-COVID:</b> Evaluar persistencia de disnea a los 3, 6 y 12 meses
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 5: GLI 2012
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="tab-gli">
+    <div class="sec-h"><span class="sec-icon">🧮</span><h2>Calculadora GLI 2012</h2><span class="badge badge-purple">Espirometría</span></div>
+
+    <div class="info" style="margin-bottom:1rem">
+      Las ecuaciones GLI 2012 (Iniciativa Global del Pulmón) son el estándar actual para predichos espirométricos. Incluyen puntajes z y límite inferior de normalidad (LIN), más precisos que el porcentaje del predicho aislado.
+    </div>
+
+    <div class="grid2" style="align-items:start">
+      <div class="card">
+        <div class="card-h" style="margin-bottom:1rem">Datos del paciente</div>
+
+        <div class="field-row" style="margin-bottom:1rem">
+          <div class="field" style="margin-bottom:0">
+            <label>Edad</label>
+            <input type="number" id="gli-age" min="3" max="95" value="55" placeholder="años" oninput="calcGli()">
+            <div class="unit">años (3–95)</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Talla</label>
+            <input type="number" id="gli-ht" min="100" max="210" value="170" placeholder="cm" oninput="calcGli()">
+            <div class="unit">cm</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Sexo</label>
+          <div style="display:flex;gap:.5rem">
+            <div class="opt-card" data-sex="m" onclick="selSex('m')" style="flex:1;text-align:center;padding:.75rem">
+              <div style="font-size:1.2rem">♂</div><div style="font-size:12px">Masculino</div>
+            </div>
+            <div class="opt-card" data-sex="f" onclick="selSex('f')" style="flex:1;text-align:center;padding:.75rem">
+              <div style="font-size:1.2rem">♀</div><div style="font-size:12px">Femenino</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Etnia</label>
+          <select id="gli-eth" onchange="calcGli()">
+            <option value="NE">Caucásica / Norteeuropea</option>
+            <option value="AF">Afroamericana</option>
+            <option value="NEAsia">Noreste Asiática</option>
+            <option value="SEAsia">Sudeste Asiático</option>
+            <option value="OT">Otro / No especificado</option>
+          </select>
+        </div>
+
+        <hr>
+        <div class="card-h" style="margin-bottom:.75rem;font-size:.9rem">Valores medidos</div>
+        <div class="field-row">
+          <div class="field" style="margin-bottom:0">
+            <label>FVC medida</label>
+            <input type="number" id="gli-fvc-m" min="0.5" max="10" step="0.01" value="2.80" oninput="calcGli()">
+            <div class="unit">litros</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>VEF₁ medido</label>
+            <input type="number" id="gli-fev1-m" min="0.3" max="8" step="0.01" value="1.68" oninput="calcGli()">
+            <div class="unit">litros</div>
+          </div>
+        </div>
+
+        <div class="field-row" style="margin-top:.75rem">
+          <div class="field" style="margin-bottom:0">
+            <label>FEF25-75 medido</label>
+            <input type="number" id="gli-fef-m" min="0.1" max="8" step="0.01" value="1.40" oninput="calcGli()">
+            <div class="unit">L/s</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>FEV1/FVC medido</label>
+            <input type="number" id="gli-ratio-m" min="20" max="100" step="0.1" value="60" oninput="calcGli()">
+            <div class="unit">%</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-h" style="margin-bottom:.75rem">Resultados GLI 2012</div>
+          <div id="gli-results">
+            <div style="color:var(--text3);font-size:13px">Completa los datos para calcular.</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="font-size:.9rem;margin-bottom:.75rem">Interpretación del puntaje z</div>
+          <table>
+            <tr><th>Puntaje z</th><th>Interpretación</th></tr>
+            <tr><td>&gt; -1.64</td><td><span class="badge badge-green">Normal</span> (por encima del LIN)</td></tr>
+            <tr><td>-1.64 a -2.5</td><td><span class="badge badge-amber">Levemente bajo</span></td></tr>
+            <tr><td>-2.5 a -4.0</td><td><span class="badge badge-orange">Moderadamente bajo</span></td></tr>
+            <tr><td>&lt; -4.0</td><td><span class="badge badge-red">Muy por debajo del LIN</span></td></tr>
+          </table>
+          <div class="warn" style="margin-top:.75rem;font-size:12px">
+            ⚠️ Un VEF₁ de 80% puede estar por debajo del LIN en personas mayores o de baja talla — el puntaje z es más preciso.
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-h" style="font-size:.9rem;margin-bottom:.5rem">Ventaja del puntaje z</div>
+          <div style="font-size:12.5px;color:var(--text2)">
+            El LIN (percentil 5) equivale a un puntaje z de <b style="color:var(--amber)">-1.64</b>. 
+            Usar el 80% como umbral puede:<br><br>
+            • <b style="color:var(--red)">Sobrediagnosticar</b> obstrucción en jóvenes sanos<br>
+            • <b style="color:var(--red)">Infradiagnosticar</b> en mayores de 70 años<br><br>
+            GLI 2012 corrige esto con modelos de spline para toda la vida.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 6: REFERENCIA
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="tab-ref">
+    <div class="sec-h"><span class="sec-icon">📖</span><h2>Referencia Rápida</h2></div>
+
+    <div class="grid2" style="gap:1rem;align-items:start">
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-h" style="margin-bottom:.75rem">Índice BODE — Puntuación</div>
+          <table>
+            <tr><th>Variable</th><th>0 pts</th><th>1 pt</th><th>2 pts</th><th>3 pts</th></tr>
+            <tr><td>IMC (kg/m²)</td><td>&gt; 21</td><td>≤ 21</td><td>—</td><td>—</td></tr>
+            <tr><td>VEF₁ (%)</td><td>≥ 65</td><td>50–64</td><td>36–49</td><td>≤ 35</td></tr>
+            <tr><td>MRC</td><td>0–1</td><td>2</td><td>3</td><td>4</td></tr>
+            <tr><td>6MWT (m)</td><td>≥ 350</td><td>250–349</td><td>150–249</td><td>≤ 149</td></tr>
+          </table>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-h" style="margin-bottom:.75rem">BODE — Cuartiles y supervivencia</div>
+          <table>
+            <tr><th>Cuartil</th><th>Puntaje</th><th>Supervivencia 52m</th></tr>
+            <tr><td><span class="badge badge-green">Q1</span></td><td>0–2</td><td>~80%</td></tr>
+            <tr><td><span class="badge badge-amber">Q2</span></td><td>3–4</td><td>~67%</td></tr>
+            <tr><td><span class="badge badge-orange">Q3</span></td><td>5–6</td><td>~57%</td></tr>
+            <tr><td><span class="badge badge-red">Q4</span></td><td>7–10</td><td>~18%</td></tr>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-h" style="margin-bottom:.75rem">GOLD 2024 — Grupos</div>
+          <table>
+            <tr><th>Grupo</th><th>Síntomas</th><th>Exacerbaciones</th><th>Tratamiento inicial</th></tr>
+            <tr><td><span class="badge badge-green">A</span></td><td>CAT&lt;10 / mMRC&lt;2</td><td>&lt; 2 mod, 0 hosp</td><td>Broncodilatador corta acción</td></tr>
+            <tr><td><span class="badge badge-amber">B</span></td><td>CAT≥10 / mMRC≥2</td><td>&lt; 2 mod, 0 hosp</td><td>LAMA o LABA</td></tr>
+            <tr><td><span class="badge badge-red">E</span></td><td>Cualquiera</td><td>≥2 mod, ó ≥1 hosp</td><td>LAMA+LABA ±ICS</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-h" style="margin-bottom:.75rem">CAT — Interpretación</div>
+          <table>
+            <tr><th>Puntuación</th><th>Impacto</th><th>Descripción</th></tr>
+            <tr><td>0–9</td><td><span class="badge badge-green">Muy bajo</span></td><td>Poco efecto sobre vida diaria</td></tr>
+            <tr><td>10–20</td><td><span class="badge badge-amber">Medio</span></td><td>Impacto moderado</td></tr>
+            <tr><td>21–30</td><td><span class="badge badge-orange">Alto</span></td><td>Gran impacto en vida diaria</td></tr>
+            <tr><td>31–40</td><td><span class="badge badge-red">Muy alto</span></td><td>Impacto máximo</td></tr>
+          </table>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-h" style="margin-bottom:.75rem">Indicación de Rehabilitación Pulmonar</div>
+          <div style="font-size:12.5px;color:var(--text2)">
+            Según GOLD 2024 y ACCP/AACVPR:<br><br>
+            <b style="color:var(--text)">Indicada:</b> MRC ≥ 2, BODE ≥ 3, GOLD B o E, post-exacerbación (dentro de 4 semanas)<br><br>
+            <b style="color:var(--text)">Contraindicaciones absolutas:</b> Angina inestable, IAM reciente (&lt;4 sem), hipertensión pulmonar severa no controlada, trastornos musculoesqueléticos que impidan el ejercicio<br><br>
+            <b style="color:var(--text)">Mínimo:</b> 8 semanas, 2-3 sesiones/semana. Mayor beneficio con ≥ 12 semanas.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h" style="margin-bottom:.75rem">Fuentes y evidencia</div>
+          <div style="font-size:12px;color:var(--text2)">
+            • <b style="color:var(--text)">BODE:</b> Celli BR et al. N Engl J Med. 2004;350:1005-12<br>
+            • <b style="color:var(--text)">GOLD:</b> Estrategia Global para EPOC, Informe 2024. goldcopd.org<br>
+            • <b style="color:var(--text)">CAT:</b> Jones PW et al. Eur Respir J. 2009;34:648-654<br>
+            • <b style="color:var(--text)">GLI 2012:</b> Quanjer PH et al. Eur Respir J. 2012;40:1324-1343<br>
+            • <b style="color:var(--text)">MRC:</b> Fletcher CM. BMJ. 1952;1:257-258<br>
+            • <b style="color:var(--text)">PR:</b> Spruit MA et al. Am J Respir Crit Care Med. 2013;188:e13-e64
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ══════════════════════════════════
+// NAV
+// ══════════════════════════════════
+function showTab(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════
+// BODE
+// ══════════════════════════════════
+let bodeMrc = null;
+
+function selBodeMrc(val){
+  bodeMrc = val;
+  document.querySelectorAll('[data-bode-mrc]').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.bodeMrc)===val);
+  });
+  calcBode();
+}
+
+document.getElementById('b-fev1').addEventListener('input',function(){
+  document.getElementById('b-fev1-v').textContent=this.value+'%';
+});
+document.getElementById('b-smwt').addEventListener('input',function(){
+  document.getElementById('b-smwt-v').textContent=this.value+' m';
+});
+
+function calcBode(){
+  const peso = parseFloat(document.getElementById('b-peso').value)||0;
+  const talla = parseFloat(document.getElementById('b-talla').value)||0;
+  const fev1 = parseInt(document.getElementById('b-fev1').value);
+  const smwt = parseInt(document.getElementById('b-smwt').value);
+
+  // IMC
+  let imc = 0, ptsB = 0;
+  if(peso>0 && talla>0){
+    imc = peso/((talla/100)**2);
+    document.getElementById('b-imc-disp').textContent = `IMC = ${imc.toFixed(1)} kg/m²`;
+    ptsB = imc<=21 ? 1 : 0;
+  }
+
+  // VEF1
+  let ptsO = fev1>=65 ? 0 : fev1>=50 ? 1 : fev1>=36 ? 2 : 3;
+
+  // MRC
+  let ptsD = bodeMrc===null ? null : bodeMrc;
+
+  // 6MWT
+  let ptsE = smwt>=350 ? 0 : smwt>=250 ? 1 : smwt>=150 ? 2 : 3;
+
+  // Table
+  document.getElementById('bode-b-val').textContent = imc>0 ? imc.toFixed(1) : '—';
+  document.getElementById('bode-b-pts').textContent = imc>0 ? ptsB : '—';
+  document.getElementById('bode-o-val').textContent = fev1+'%';
+  document.getElementById('bode-o-pts').textContent = ptsO;
+  document.getElementById('bode-d-val').textContent = bodeMrc!==null ? 'Grado '+bodeMrc : '—';
+  document.getElementById('bode-d-pts').textContent = bodeMrc!==null ? bodeMrc : '—';
+  document.getElementById('bode-e-val').textContent = smwt+' m';
+  document.getElementById('bode-e-pts').textContent = ptsE;
+
+  if(ptsD===null || imc===0) return;
+
+  const total = ptsB+ptsO+ptsD+ptsE;
+  document.getElementById('bode-score').textContent = total;
+
+  // Quartile
+  let q,qBadge,surv,interpHtml,rehabHtml;
+  if(total<=2){ q='Q1 (0-2)'; qBadge='badge-green'; surv='~80% a 52 meses';
+    interpHtml='Bajo riesgo de mortalidad. EPOC con función relativamente preservada y buena capacidad de ejercicio.';
+    rehabHtml='<b style="color:var(--green)">Mantenimiento activo:</b> rehabilitación pulmonar preventiva, ejercicio aeróbico regular (≥30 min/día), educación sobre manejo de exacerbaciones. Reevaluar BODE anualmente.';
+  } else if(total<=4){ q='Q2 (3-4)'; qBadge='badge-amber'; surv='~67% a 52 meses';
+    interpHtml='Riesgo moderado. Se recomienda inicio o intensificación de rehabilitación pulmonar.';
+    rehabHtml='<b style="color:var(--amber)">Rehabilitación indicada:</b> programa formal mínimo 8 semanas (idealmente 12+). Entrenamiento de miembros inferiores + superiores + musculatura respiratoria. Evaluar O₂ en esfuerzo si SpO₂ baja &lt;88%.';
+  } else if(total<=6){ q='Q3 (5-6)'; qBadge='badge-orange'; surv='~57% a 52 meses';
+    interpHtml='Riesgo elevado. Impacto significativo en mortalidad y calidad de vida. Rehabilitación pulmonar con supervisión estrecha.';
+    rehabHtml='<b style="color:var(--orange)">Rehabilitación intensiva:</b> 3 sesiones/semana, incluyendo entrenamiento muscular inspiratorio si presión inspiratoria máxima &lt;60 cmH₂O. Considerar entrenamiento interválico si intolerancia al continuo. Valorar O₂ crónico, ventilación no invasiva domiciliaria.';
+  } else { q='Q4 (7-10)'; qBadge='badge-red'; surv='~18% a 52 meses';
+    interpHtml='Riesgo muy alto. Mortalidad a 52 meses ~82%. Evaluar derivación a unidad avanzada de EPOC.';
+    rehabHtml='<b style="color:var(--red)">Rehabilitación domiciliaria / baja intensidad:</b> ejercicio supervisado a nivel de síntomas, técnicas de ahorro energético, posiciones de alivio de disnea, discutir directivas anticipadas. Evaluar trasplante pulmonar si candidato.';
+  }
+
+  document.getElementById('bode-quartil').textContent=q;
+  document.getElementById('bode-quartil').className='badge '+qBadge;
+  document.getElementById('bode-survival').textContent='Supervivencia estimada a 52 meses: '+surv;
+  document.getElementById('bode-interp').innerHTML='<b style="color:var(--text)">Interpretación:</b> '+interpHtml;
+  document.getElementById('bode-rehab').innerHTML=rehabHtml;
+
+  drawBodeChart(total);
+}
+
+function drawBodeChart(patientScore){
+  const ctx = document.getElementById('bodeChart').getContext('2d');
+  if(window._bodeChart) window._bodeChart.destroy();
+
+  const months = [0,6,12,18,24,30,36,42,48,52];
+  // Approximate survival curves from Celli 2004
+  const curves = {
+    q1: [100,97,95,92,89,87,85,83,80,80],
+    q2: [100,95,90,85,80,77,73,70,67,67],
+    q3: [100,92,85,78,72,68,63,59,57,57],
+    q4: [100,80,65,52,40,33,26,21,18,18],
+  };
+  const highlight = patientScore<=2?'q1':patientScore<=4?'q2':patientScore<=6?'q3':'q4';
+
+  window._bodeChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:months,
+      datasets:[
+        {label:'Q1 (0-2)',data:curves.q1,borderColor:'rgba(74,222,128,'+(highlight==='q1'?'1':'.25')+')',borderWidth:highlight==='q1'?3:1.5,pointRadius:0,tension:.4},
+        {label:'Q2 (3-4)',data:curves.q2,borderColor:'rgba(251,191,36,'+(highlight==='q2'?'1':'.25')+')',borderWidth:highlight==='q2'?3:1.5,pointRadius:0,tension:.4},
+        {label:'Q3 (5-6)',data:curves.q3,borderColor:'rgba(251,146,60,'+(highlight==='q3'?'1':'.25')+')',borderWidth:highlight==='q3'?3:1.5,pointRadius:0,tension:.4},
+        {label:'Q4 (7-10)',data:curves.q4,borderColor:'rgba(248,113,113,'+(highlight==='q4'?'1':'.25')+')',borderWidth:highlight==='q4'?3:1.5,pointRadius:0,tension:.4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:12}}},
+      scales:{
+        x:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'Meses',color:'#475569',font:{size:10}}},
+        y:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},min:0,max:100,title:{display:true,text:'Supervivencia (%)',color:'#475569',font:{size:10}}}
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════
+// GOLD
+// ══════════════════════════════════
+let goldMmrc = null;
+
+document.getElementById('g-ratio').addEventListener('input',function(){
+  document.getElementById('g-ratio-v').textContent=this.value+'%';
+  calcGold();
+});
+document.getElementById('g-fev1').addEventListener('input',function(){
+  document.getElementById('g-fev1-v').textContent=this.value+'%';
+  calcGold();
+});
+document.getElementById('g-cat').addEventListener('input',function(){
+  document.getElementById('g-cat-v').textContent=this.value;
+  calcGold();
+});
+document.getElementById('g-exac-mod').addEventListener('input',function(){
+  document.getElementById('g-exac-mod-v').textContent=this.value;
+  calcGold();
+});
+document.getElementById('g-exac-hosp').addEventListener('input',function(){
+  document.getElementById('g-exac-hosp-v').textContent=this.value;
+  calcGold();
+});
+
+function selMmrc(val){
+  goldMmrc=val;
+  document.querySelectorAll('[data-mmrc]').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.mmrc)===val);
+  });
+  calcGold();
+}
+
+function calcGold(){
+  const ratio = parseInt(document.getElementById('g-ratio').value);
+  const fev1 = parseInt(document.getElementById('g-fev1').value);
+  const cat = parseInt(document.getElementById('g-cat').value);
+  const exMod = parseInt(document.getElementById('g-exac-mod').value);
+  const exHosp = parseInt(document.getElementById('g-exac-hosp').value);
+
+  // Obstruction check
+  const isObst = ratio < 70;
+  document.getElementById('g-obst-msg').textContent = isObst
+    ? '✓ Obstrucción confirmada (VEF₁/CVF < 70%) — clasificación GOLD aplica'
+    : '⚠ Sin obstrucción (VEF₁/CVF ≥ 70%) — no aplica clasificación espirométrica GOLD';
+
+  // GOLD grade
+  let grade, gradeLabel;
+  if(!isObst){ grade=null; gradeLabel='No aplica'; }
+  else if(fev1>=80){ grade=1; gradeLabel='GOLD 1 — Leve'; }
+  else if(fev1>=50){ grade=2; gradeLabel='GOLD 2 — Moderado'; }
+  else if(fev1>=30){ grade=3; gradeLabel='GOLD 3 — Severo'; }
+  else { grade=4; gradeLabel='GOLD 4 — Muy severo'; }
+
+  // Highlight grade row
+  ['gr1','gr2','gr3','gr4'].forEach((id,i)=>{
+    document.getElementById(id).style.background = (grade===i+1)?'rgba(251,191,36,.08)':'';
+  });
+
+  // Symptoms
+  const highSymp = cat>=10 || (goldMmrc!==null && goldMmrc>=2);
+
+  // Exacerbation risk
+  const highExac = exMod>=2 || exHosp>=1;
+
+  // Group
+  let grupo, grupoColor, grupoDesc, terapia;
+  if(highExac){
+    grupo='E'; grupoColor='red';
+    grupoDesc='Grupo E: alto riesgo de exacerbaciones. La carga sintomática es secundaria a la prevención de exacerbaciones como objetivo prioritario.';
+    terapia='<b style="color:var(--red)">Farmacológico:</b> LAMA + LABA (doble broncodilatación de acción prolongada). Añadir corticoide inhalado (CI) si ≥2 exacerbaciones moderadas/año con eosinófilos ≥300.<br><br><b style="color:var(--amber)">Fisioterapia:</b> Rehabilitación pulmonar post-exacerbación (iniciar dentro de las 4 semanas). Técnicas de aclaramiento si hipersecreción. Entrenamiento de miembros inferiores + superiores + musculatura respiratoria.';
+  } else if(highSymp){
+    grupo='B'; grupoColor='amber';
+    grupoDesc='Grupo B: síntomas elevados (CAT ≥10 o mMRC ≥2) con bajo riesgo de exacerbaciones. Prioridad: alivio de síntomas.';
+    terapia='<b style="color:var(--amber)">Farmacológico:</b> Iniciar con antimuscarínico de acción prolongada (LAMA) o beta-2 de acción prolongada (LABA). Considerar LAMA+LABA si síntomas persisten. No corticoide inhalado de entrada.<br><br><b style="color:var(--teal)">Fisioterapia:</b> Rehabilitación pulmonar indicada (MRC ≥2 es criterio suficiente). Ejercicio aeróbico regular. Educación en técnicas de control respiratorio.';
+  } else {
+    grupo='A'; grupoColor='green';
+    grupoDesc='Grupo A: pocos síntomas y bajo riesgo de exacerbaciones. Tratamiento mínimo para alivio sintomático a demanda.';
+    terapia='<b style="color:var(--green)">Farmacológico:</b> Broncodilatador de corta acción a demanda (beta-2 agonista o antimuscarínico de corta acción). Reevaluar a los 3-6 meses.<br><br><b style="color:var(--blue)">Fisioterapia:</b> Educación sobre tabaquismo y actividad física. Rehabilitación pulmonar si el paciente tiene capacidad funcional reducida por comorbilidades. Actividad física regular ≥30 min/día.';
+  }
+
+  // Update group cells
+  ['gold-A','gold-B','gold-E'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('gold-'+grupo).classList.add('active');
+  document.getElementById('gold-grupo-desc').innerHTML=`<b>Resultado: <span class="badge badge-${grupoColor==='red'?'red':grupoColor==='amber'?'amber':'green'}">Grupo ${grupo}</span></b><br><br><span style="color:var(--text2);font-size:12.5px">${grupoDesc}</span>`;
+  document.getElementById('gold-terapia').innerHTML=terapia;
+}
+
+// ══════════════════════════════════
+// CAT
+// ══════════════════════════════════
+const catData = [
+  {q:'Nunca toso', alt:'Toso continuamente', id:'cat0'},
+  {q:'No tengo flemas en el pecho', alt:'Tengo el pecho completamente lleno de flemas', id:'cat1'},
+  {q:'No siento ningún aprieto en el pecho', alt:'Siento el pecho muy apretado', id:'cat2'},
+  {q:'No me falta el aliento al subir una cuesta o un piso de escaleras', alt:'Me falta mucho el aliento al subir una cuesta o un piso de escaleras', id:'cat3'},
+  {q:'No tengo ninguna limitación para realizar actividades en casa', alt:'Tengo muchas limitaciones para realizar actividades en casa', id:'cat4'},
+  {q:'Me siento seguro/a de salir de casa a pesar de mi afección pulmonar', alt:'No me siento seguro/a de salir de casa debido a mi afección pulmonar', id:'cat5'},
+  {q:'Duermo bien', alt:'No duermo bien debido a mi afección pulmonar', id:'cat6'},
+  {q:'Tengo mucha energía', alt:'No tengo ninguna energía', id:'cat7'},
+];
+
+function buildCat(){
+  const container = document.getElementById('cat-items');
+  container.innerHTML = '';
+  catData.forEach((item,i)=>{
+    container.innerHTML += `
+      <div class="cat-item">
+        <div class="cat-q">${i+1}. ${item.q}</div>
+        <div class="cat-extremes"><span>${item.q}</span><span>${item.alt}</span></div>
+        <div class="cat-slider-wrap">
+          <input type="range" min="0" max="5" value="0" id="${item.id}" oninput="calcCat()">
+        </div>
+        <div class="cat-val" id="${item.id}-v">0</div>
+      </div>`;
+  });
+}
+buildCat();
+
+function calcCat(){
+  let total=0;
+  catData.forEach(item=>{
+    const v=parseInt(document.getElementById(item.id).value);
+    document.getElementById(item.id+'-v').textContent=v;
+    total+=v;
+  });
+  document.getElementById('cat-total').textContent=total;
+  const pct=(total/40)*100;
+  const prog=document.getElementById('cat-prog');
+  prog.style.width=pct+'%';
+  let badgeClass, interp, color;
+  if(total<=9){badgeClass='badge-green';color='var(--green)';interp='Impacto muy bajo o bajo en la vida diaria. El paciente maneja bien su condición. Monitorear y reforzar adherencia a tratamiento.';}
+  else if(total<=20){badgeClass='badge-amber';color='var(--amber)';interp='Impacto moderado. Síntomas afectan actividades cotidianas. Revisar tratamiento farmacológico y considerar rehabilitación pulmonar.';}
+  else if(total<=30){badgeClass='badge-orange';color='var(--orange)';interp='Impacto elevado. La EPOC interfiere significativamente con calidad de vida. PR formal indicada + revisión de plan terapéutico integral.';}
+  else{badgeClass='badge-red';color='var(--red)';interp='Impacto máximo. La EPOC limita prácticamente todas las actividades. Requiere evaluación multidisciplinar urgente y PR intensiva.';}
+  prog.style.background=color;
+  const badge=document.getElementById('cat-badge');
+  badge.textContent=total<=9?'Impacto muy bajo':total<=20?'Impacto moderado':total<=30?'Impacto alto':'Impacto muy alto';
+  badge.className='badge '+badgeClass;
+  document.getElementById('cat-interp').innerHTML='<b style="color:var(--text)">Interpretación:</b> '+interp;
+}
+calcCat();
+
+// ══════════════════════════════════
+// MRC
+// ══════════════════════════════════
+function selMrc(val){
+  document.querySelectorAll('[data-mrc]').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.mrc)===val);
+  });
+  const colors=['green','teal','amber','orange','red'];
+  const interps=[
+    'Sin limitación significativa. El paciente puede realizar actividades físicas sin restricción importante por disnea.',
+    'Limitación leve. Actividades físicas moderadas toleradas. Evaluar programa de actividad física supervisada.',
+    'Limitación moderada. Indicación de rehabilitación pulmonar si VEF₁ &lt; 60% o deterioro funcional significativo.',
+    'Limitación severa. Rehabilitación pulmonar domiciliaria o ambulatoria indicada. Evaluar necesidad de O₂ en ejercicio.',
+    'Limitación muy severa. El paciente requiere ayuda para actividades básicas. Enfoque paliativo + rehabilitación de baja intensidad + técnicas de conservación de energía.'
+  ];
+  document.getElementById('mrc-score').textContent=val;
+  document.getElementById('mrc-score').style.color=`var(--${colors[val]})`;
+  const badges=['badge-green','badge-green','badge-amber','badge-orange','badge-red'];
+  const labels=['Sin limitación','Leve','Moderada','Severa','Muy severa'];
+  document.getElementById('mrc-badge').innerHTML=`<span class="badge ${badges[val]}">${labels[val]}</span>`;
+  document.getElementById('mrc-interp').innerHTML='<b style="color:var(--text)">Impacto:</b> '+interps[val];
+}
+
+// ══════════════════════════════════
+// GLI 2012
+// ══════════════════════════════════
+let gliSex = 'm';
+document.querySelector('[data-sex="m"]').classList.add('selected');
+
+function selSex(s){
+  gliSex=s;
+  document.querySelectorAll('[data-sex]').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.sex===s);
+  });
+  calcGli();
+}
+
+// GLI 2012 — simplified spline approximation for NE caucasian
+// Reference: Quanjer PH et al. Eur Respir J 2012;40:1324-1343
+function gliPredict(param, age, ht_m, sex){
+  // Log(predicted) = a + b*ln(age) + c*ln(ht)
+  // Simplified coefficients for NE caucasian
+  const coefs = {
+    // [a, b_age_ln, c_ht_ln, lnsd] for FVC, FEV1, FEF2575, FEV1FVC
+    m:{
+      fvc:  [-9.6987,  0.8639, 2.5386, 0.1275],
+      fev1: [-10.3428, 0.7734, 2.6425, 0.1340],
+      fef:  [-11.2135, 0.4730, 2.9002, 0.2427],
+      ratio:[ 84.404, -2.7170,-0.9001, 5.2200], // linear for ratio
+    },
+    f:{
+      fvc:  [-9.1222,  0.6116, 2.5058, 0.1306],
+      fev1: [-9.9262,  0.5948, 2.5704, 0.1362],
+      fef:  [-10.8371, 0.2857, 2.8459, 0.2559],
+      ratio:[ 89.742, -2.6596,-1.2131, 5.5160],
+    }
+  };
+  const c = coefs[sex][param];
+  const ln_age = Math.log(age);
+  const ln_ht = Math.log(ht_m);
+  if(param==='ratio'){
+    return c[0] + c[1]*ln_age + c[2]*ln_ht;
+  }
+  return Math.exp(c[0] + c[1]*ln_age + c[2]*ln_ht);
+}
+
+function calcGli(){
+  const age = parseFloat(document.getElementById('gli-age').value)||0;
+  const ht = parseFloat(document.getElementById('gli-ht').value)||0;
+  const fvcM = parseFloat(document.getElementById('gli-fvc-m').value)||0;
+  const fev1M = parseFloat(document.getElementById('gli-fev1-m').value)||0;
+  const fefM = parseFloat(document.getElementById('gli-fef-m').value)||0;
+  const ratioM = parseFloat(document.getElementById('gli-ratio-m').value)||0;
+
+  if(!age||!ht||!fvcM||!fev1M) return;
+
+  const ht_m = ht/100;
+  const coefs = {
+    m:{fvc:[0.1275],fev1:[0.1340],fef:[0.2427],ratio:[5.22]},
+    f:{fvc:[0.1306],fev1:[0.1362],fef:[0.2559],ratio:[5.516]}
+  };
+
+  const fvcP = gliPredict('fvc',age,ht_m,gliSex);
+  const fev1P = gliPredict('fev1',age,ht_m,gliSex);
+  const fefP = gliPredict('fef',age,ht_m,gliSex);
+  const ratioP = gliPredict('ratio',age,ht_m,gliSex);
+
+  const lnSdFvc = coefs[gliSex].fvc[0];
+  const lnSdFev1 = coefs[gliSex].fev1[0];
+  const lnSdFef = coefs[gliSex].fef[0];
+  const sdRatio = coefs[gliSex].ratio[0];
+
+  const zFvc = (Math.log(fvcM) - Math.log(fvcP)) / lnSdFvc;
+  const zFev1 = (Math.log(fev1M) - Math.log(fev1P)) / lnSdFev1;
+  const zFef = fefM>0 ? (Math.log(fefM) - Math.log(fefP)) / lnSdFef : null;
+  const zRatio = (ratioM - ratioP) / sdRatio;
+
+  const llnFvc = Math.exp(Math.log(fvcP) - 1.644*lnSdFvc);
+  const llnFev1 = Math.exp(Math.log(fev1P) - 1.644*lnSdFev1);
+  const llnRatio = ratioP - 1.644*sdRatio;
+
+  function zClass(z){
+    if(z > -1.64) return {cls:'badge-green',txt:'Normal'};
+    if(z > -2.5)  return {cls:'badge-amber',txt:'Levemente bajo'};
+    if(z > -4.0)  return {cls:'badge-orange',txt:'Moderado'};
+    return {cls:'badge-red',txt:'Muy bajo'};
+  }
+  function pctPred(meas,pred){ return ((meas/pred)*100).toFixed(1)+'%'; }
+
+  const rows = [
+    {n:'FVC',pred:fvcP.toFixed(2),meas:fvcM.toFixed(2),pct:pctPred(fvcM,fvcP),lln:llnFvc.toFixed(2),z:zFvc,unit:'L'},
+    {n:'VEF₁',pred:fev1P.toFixed(2),meas:fev1M.toFixed(2),pct:pctPred(fev1M,fev1P),lln:llnFev1.toFixed(2),z:zFev1,unit:'L'},
+    {n:'FEV₁/FVC',pred:ratioP.toFixed(1),meas:ratioM.toFixed(1),pct:((ratioM/ratioP)*100).toFixed(1)+'%',lln:llnRatio.toFixed(1),z:zRatio,unit:'%'},
+  ];
+  if(fefM>0) rows.push({n:'FEF 25-75',pred:fefP.toFixed(2),meas:fefM.toFixed(2),pct:pctPred(fefM,fefP),lln:null,z:zFef,unit:'L/s'});
+
+  let html='';
+  rows.forEach(r=>{
+    const zc = zClass(r.z);
+    html+=`<div class="gli-row">
+      <div class="gli-name"><b style="color:var(--text)">${r.n}</b></div>
+      <div class="gli-vals">
+        <span class="gli-num" style="color:var(--text2)">Pred: ${r.pred}</span>
+        <span class="gli-num">${r.meas}</span>
+        <span style="font-size:11.5px;color:var(--text2)">${r.pct}</span>
+        ${r.lln ? `<span style="font-size:11px;color:var(--text3)">LIN: ${r.lln}</span>` : ''}
+        <span class="gli-z badge ${zc.cls}">z ${r.z.toFixed(2)}</span>
+      </div>
+    </div>`;
+  });
+
+  // Overall interpretation
+  const belowLIN = rows.filter(r=>r.z<-1.64);
+  let interp='';
+  if(belowLIN.length===0){ interp='<span class="badge badge-green">Normal</span> Todos los parámetros dentro del rango normal GLI 2012.'; }
+  else if(zRatio<-1.64 && zFev1<-1.64 && zFvc>=-1.64){ interp='<span class="badge badge-amber">Patrón Obstructivo</span> VEF₁/CVF y VEF₁ por debajo del límite inferior de normalidad con CVF preservada.'; }
+  else if(zFvc<-1.64 && zFev1<-1.64 && zRatio>=-1.64){ interp='<span class="badge badge-amber">Patrón Restrictivo</span> CVF y VEF₁ reducidos con relación VEF₁/CVF normal.'; }
+  else if(zRatio<-1.64 && zFvc<-1.64){ interp='<span class="badge badge-orange">Patrón Mixto</span> Obstrucción con CVF reducida — confirmar con volumen residual y capacidad pulmonar total para descartar restricción concomitante.'; }
+  else { interp='<span class="badge badge-blue">Resultado parcial</span> '+belowLIN.map(r=>r.n).join(', ')+' por debajo del límite inferior de normalidad. Correlacionar con clínica.'; }
+
+  document.getElementById('gli-results').innerHTML=html+`<hr style="margin:.75rem 0"><div style="font-size:12.5px">${interp}</div>`;
+}
+calcGli();
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  calcBode();
+  calcGold();
+});
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>

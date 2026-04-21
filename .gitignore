@@ -1,0 +1,15 @@
+# Archivos originales (respaldo local)
+/6mwt_modulo.html
+/aclaramiento_modulo.html
+/calculadoras_modulo.html
+/casos_cardiovascular.html
+/fisioterapia_respiratoria_v7.html
+/gsa_modulo.html
+/historial_modulo.html
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.tmp
+.claude/
+.vscode/

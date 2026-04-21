@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FisioResp — Casos Cardiovasculares</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="../data/cases-cardiovascular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/fisioresp.css">
+  <style>
+/* NAV */
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:300;height:52px}
+.logo span{color:var(--teal)}
+.nav-sep{width:1px;height:28px;background:var(--border)}
+.nav-badge{font-size:11px;font-weight:600;color:var(--text2)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.timer-display{font-family:var(--fm);font-size:13px;color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:var(--rs);padding:3px 12px}
+.score-display{font-family:var(--fm);font-size:13px;color:var(--green);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:var(--rs);padding:3px 12px}
+/* LAYOUT */
+.wrap{max-width:1160px;margin:0 auto;padding:1.5rem}
+/* CASE SELECTOR */
+.hero{text-align:center;padding:2.5rem 1rem 1.5rem}
+.hero h1{font-family:var(--fh);font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.1;margin-bottom:.5rem}
+.hero h1 em{color:var(--blue);font-style:normal}
+.hero p{color:var(--text2);max-width:500px;margin:0 auto}
+.case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin:2rem 0}
+.case-sel-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.case-sel-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
+.case-sel-card:hover{transform:translateY(-3px);border-color:var(--border2)}
+.case-sel-card:hover::before{opacity:1}
+.case-sel-card.epoc::before{background:linear-gradient(135deg,rgba(248,113,113,.06),transparent)}
+.case-sel-card.fpi::before{background:linear-gradient(135deg,rgba(167,139,250,.06),transparent)}
+.case-sel-card.asma::before{background:linear-gradient(135deg,rgba(248,113,113,.05),transparent)}
+.case-sel-card.covid::before{background:linear-gradient(135deg,rgba(167,139,250,.05),transparent)}
+.case-sel-card .icon{font-size:2.2rem;margin-bottom:.75rem;display:block}
+.case-sel-card .cname{font-family:var(--fh);font-size:1.05rem;margin-bottom:.25rem}
+.case-sel-card .cinfo{font-size:12px;color:var(--text2);margin-bottom:.75rem}
+.case-sel-card .cdiff{display:inline-flex;gap:3px}
+.diff-dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:var(--amber)}
+/* PHASE PROGRESS */
+.phase-bar{display:flex;gap:2px;margin-bottom:1.25rem;border-radius:var(--r);overflow:hidden;background:var(--bg2);padding:2px;border:1px solid var(--border)}
+.phase-step{flex:1;padding:7px 4px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.3px;color:var(--text3);border-radius:var(--rs);transition:all .2s;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase-step.done{background:rgba(74,222,128,.12);color:var(--green)}
+.phase-step.active{background:rgba(248,113,113,.15);color:var(--red)}
+.phase-step.locked{opacity:.4}
+/* CARDS & LAYOUT */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+.card-title{font-family:var(--fh);font-size:1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+/* MONITOR VITALS */
+.monitors{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.5rem;margin-bottom:1rem}
+.monitor{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem;text-align:center;transition:all .3s}
+.monitor.alert{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.06);animation:pulse-red .8s infinite}
+.monitor.warn{border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.05)}
+.monitor.ok{border-color:rgba(74,222,128,.3)}
+@keyframes pulse-red{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px rgba(248,113,113,.4)}}
+.mon-name{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:2px}
+.mon-delta{font-size:10px;font-weight:600;margin-top:2px}
+/* PATIENT BUBBLE */
+.patient-bubble{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);border-left:3px solid var(--blue);padding:.875rem 1rem;margin-bottom:.75rem;font-size:13px;color:var(--text);line-height:1.6;position:relative}
+.patient-bubble::before{content:'🧑‍⚕️ Paciente';display:block;font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem}
+.patient-bubble.thinking{border-left-color:var(--text3);opacity:.7}
+.patient-bubble.thinking::before{content:'⏳ Pensando...'}
+/* QUESTION BANK */
+.q-domains{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
+.q-domain-btn{padding:5px 12px;border-radius:100px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:all .2s}
+.q-domain-btn:hover{border-color:var(--border2);color:var(--text)}
+.q-domain-btn.active{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.35);color:var(--red)}
+.q-list{display:grid;gap:.4rem;max-height:260px;overflow-y:auto;padding-right:4px}
+.q-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem .875rem;font-size:12.5px;color:var(--text2);cursor:pointer;text-align:left;font-family:var(--fb);transition:all .2s}
+.q-btn:hover:not(:disabled){border-color:var(--red);color:var(--text);background:rgba(248,113,113,.04)}
+.q-btn:disabled{opacity:.4;cursor:default;text-decoration:line-through}
+.q-btn.asked{opacity:.45;cursor:default;color:var(--text3)}
+.asked-log{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem}
+/* EXAM PHYSICAL — TORAX DIAGRAM */
+.torax-wrap{position:relative;width:100%;max-width:420px;margin:0 auto}
+.torax-svg{width:100%;height:auto}
+.torax-zone{cursor:pointer;transition:all .2s}
+.torax-zone:hover .zone-area{fill-opacity:.35}
+.torax-zone.auscultated .zone-area{fill-opacity:.25;stroke-width:2}
+.zone-label{font-size:9px;font-weight:700;fill:rgba(148,163,184,.7);font-family:sans-serif;pointer-events:none}
+.findings-list{display:flex;flex-direction:column;gap:.4rem;max-height:280px;overflow-y:auto}
+.finding-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem .875rem}
+.finding-zone{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.finding-sound{font-size:12.5px;color:var(--text);font-weight:600}
+.finding-desc{font-size:11.5px;color:var(--text2);margin-top:2px}
+/* EXAM MENU */
+.exam-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.5rem}
+.exam-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;cursor:pointer;transition:all .2s;font-size:13px;color:var(--text2)}
+.exam-item:hover:not(.done){border-color:var(--border2);color:var(--text)}
+.exam-item.done{border-color:rgba(74,222,128,.3);color:var(--green);background:rgba(74,222,128,.05)}
+.exam-item .ei-icon{font-size:1.1rem;margin-right:.4rem}
+.exam-result{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.875rem;margin-top:.5rem;font-size:13px;color:var(--text);line-height:1.65;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+/* FUNCTIONAL TESTS */
+.test-card{border:1px solid var(--border);border-radius:var(--rs);padding:1rem;background:var(--bg3);cursor:pointer;transition:all .2s}
+.test-card:hover:not(.done):not(.contraindicated){border-color:var(--border2)}
+.test-card.done{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04)}
+.test-card.contraindicated{border-color:rgba(248,113,113,.3);opacity:.65;cursor:not-allowed}
+.test-running{background:var(--card2);border-radius:var(--rs);padding:1rem;margin-top:.75rem}
+.progress-bar-wrap{background:var(--bg2);border-radius:100px;height:10px;overflow:hidden;margin:.5rem 0}
+.progress-bar-fill{height:100%;border-radius:100px;transition:width .5s linear}
+.chart-mini{height:160px;position:relative}
+/* DIAGNOSIS BUILDER */
+.diag-section{margin-bottom:1rem}
+.diag-section label{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:.4rem}
+.diag-options{display:flex;flex-wrap:wrap;gap:.4rem}
+.diag-opt{border:1px solid var(--border);border-radius:var(--rs);padding:5px 12px;font-size:12.5px;cursor:pointer;background:var(--card);color:var(--text2);transition:all .2s;font-family:var(--fb)}
+.diag-opt:hover{border-color:var(--border2);color:var(--text)}
+.diag-opt.selected{border-color:var(--blue);background:rgba(56,189,248,.08);color:var(--blue)}
+.diag-feedback{border-radius:var(--rs);padding:.875rem 1rem;margin-top:.75rem;font-size:13px;line-height:1.65}
+.diag-feedback.ok{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.25);color:var(--green)}
+.diag-feedback.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+.diag-feedback.err{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+/* TECHNIQUE BUILDER */
+.tech-builder{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:.75rem}
+.tech-header{background:var(--bg3);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--border)}
+.tech-header:hover{background:var(--bg2)}
+.tech-name-big{font-weight:600;font-size:13.5px}
+.tech-params{padding:1rem;display:none;background:var(--card2)}
+.tech-params.open{display:block}
+.param-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;margin-bottom:.75rem}
+.param-item label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.param-item input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-family:var(--fm);font-size:13px;transition:border .2s}
+.param-item input:focus{outline:none;border-color:var(--border2)}
+.param-item select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--text);font-family:var(--fb);font-size:13px}
+.param-item .unit{font-size:10px;color:var(--text3);margin-top:2px}
+.param-warning{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--rs);padding:.5rem .75rem;font-size:12px;color:var(--red);margin-top:.5rem;display:none}
+/* SEQUENCE AREA */
+.seq-order{display:flex;flex-direction:column;gap:.4rem;min-height:60px;padding:.75rem;background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--rs)}
+.seq-item-ord{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:.5rem .875rem;font-size:12.5px;display:flex;align-items:center;gap:.5rem;cursor:grab}
+.seq-item-ord:hover{border-color:var(--border2)}
+.seq-num{width:20px;height:20px;border-radius:50%;background:var(--blue);color:#07090f;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seq-remove{margin-left:auto;color:var(--text3);cursor:pointer;font-size:12px;background:none;border:none;color:var(--red);padding:0 4px}
+.seq-remove:hover{color:var(--red)}
+/* EXERCISE PRESCRIPTION */
+.ex-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem;margin-bottom:1rem}
+.ex-field label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px}
+.ex-field input,.ex-field select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;color:var(--text);font-family:var(--fm);font-size:14px;font-weight:600;transition:border .2s}
+.ex-field input:focus,.ex-field select:focus{outline:none;border-color:var(--blue)}
+.ex-field .unit{font-size:10px;color:var(--text3);margin-top:2px}
+.ex-monitor{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.5rem;margin-bottom:.75rem}
+.ex-mon-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem;text-align:center;transition:all .3s}
+.ex-mon-card.alert{border-color:var(--red);background:rgba(248,113,113,.07);animation:pulse-red .8s infinite}
+.ex-mon-card.warn{border-color:var(--amber);background:rgba(251,191,36,.06)}
+.ex-mon-val{font-family:var(--fh);font-size:1.6rem;line-height:1}
+.ex-mon-name{font-size:9.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text3)}
+.ex-mon-limit{font-size:10px;color:var(--text3);margin-top:2px}
+.ex-chart-wrap{height:180px;position:relative}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rs);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:var(--fb)}
+/* Cardiac sound badges */
+.sb-s3{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.35)}
+.sb-s4{background:rgba(251,146,60,.15);color:var(--orange);border:1px solid rgba(251,146,60,.3)}
+.sb-soplo{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+.sb-frote{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+.btn-a{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+/* INFO BOXES */
+.info{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--text2)}
+.warn-box{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--amber)}
+.danger-box{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--red)}
+.success-box{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:12.5px;color:var(--green)}
+/* SCORE FINAL */
+.score-section{border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;margin-bottom:.75rem}
+.score-section-header{background:var(--bg3);padding:.6rem 1rem;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text2);display:flex;justify-content:space-between}
+.score-bar{display:flex;gap:2px;height:8px;background:var(--bg2);margin:.5rem 1rem}
+.score-bar-fill{border-radius:100px;transition:width .8s ease}
+.score-detail{padding:.75rem 1rem;font-size:12.5px;color:var(--text2);border-top:1px solid var(--border)}
+/* LOG */
+.session-log{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:.3rem}
+.log-entry{font-size:11.5px;padding:4px 10px;border-radius:var(--rs);display:flex;gap:.5rem;align-items:flex-start}
+.log-err{background:rgba(248,113,113,.07);color:var(--red)}
+.log-time{font-family:var(--fm);font-size:10px;color:var(--text3);flex-shrink:0;margin-top:1px}
+/* AUSCULTATION SOUND BADGE */
+.sound-badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:700;margin:1px}
+.sb-normal{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.sb-sibilancias{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+.sb-crepitantes{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+.sb-roncus{background:rgba(251,146,60,.15);color:var(--orange);border:1px solid rgba(251,146,60,.3)}
+.sb-silencio{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+.sb-disminuido{background:rgba(148,163,184,.1);color:var(--text2);border:1px solid rgba(148,163,184,.2)}
+/* COMPARE TABLE */
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.compare-col{border:1px solid var(--border);border-radius:var(--rs);overflow:hidden}
+.compare-col-header{background:var(--bg3);padding:.5rem .875rem;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text2)}
+.compare-col-body{padding:.75rem .875rem;font-size:12.5px;color:var(--text2);line-height:1.6}
+/* MISC */
+hr{border:none;border-top:1px solid var(--border);margin:1rem 0}
+.hidden{display:none!important}
+.mt{margin-top:.75rem}
+.mt2{margin-top:1.25rem}
+.mb{margin-bottom:.75rem}
+.mb2{margin-bottom:1.25rem}
+.flex{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <div class="logo">FisioResp <span>·</span> ♥ Cardio</div>
+  <div class="nav-sep"></div>
+  <div class="nav-badge" id="navCaseName">Selecciona un caso</div>
+  <div class="nav-right">
+    <div class="timer-display hidden" id="navTimer">20:00</div>
+    <div class="score-display hidden" id="navScore">0 pts</div>
+  </div>
+</nav>
+
+<div class="wrap" id="appRoot">
+  <!-- Content rendered by JS -->
+</div>
+
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   CASE DATA
+═══════════════════════════════════════════════════════════════ */
+ // end CASES
+
+/* ═══════════════════════════════════════════════════════════════
+   SESSION STATE
+═══════════════════════════════════════════════════════════════ */
+let session = null;
+
+function initSession(caseId){
+  const c = CASES.find(x=>x.id===caseId);
+  if(!c) return;
+  session = {
+    case: c,
+    state: JSON.parse(JSON.stringify(c.initialState)),
+    phase: 'anamnesis',   // anamnesis | exam | tests | diagnosis | plan | exercise | reeval | result
+    phasesDone: [],
+    score: { anamnesis:0, exam:0, tests:0, diagnosis:0, plan:0, exercise:0, total:0 },
+    log: [],
+    askedQuestions: new Set(),
+    examDone: new Set(),
+    testsDone: {},
+    auscultationDone: new Set(),
+    diagnosisAnswers: {},
+    planTechniques: [],         // ordered list of {tech, params}
+    appliedTechniques: [],
+    exerciseParams: null,
+    exerciseDone: false,
+    reevalDone: false,
+    startTime: Date.now(),
+    timerInterval: null,
+    remainingSeconds: 20*60,
+    criticalQuestionsAsked: 0,
+    criticalQuestionsTotal: 0,
+    activeQuestionDomain: null,
+    currentExamItem: null,
+    currentTest: null,
+    testInterval: null,
+    exInterval: null,
+    exElapsed: 0,
+    exChart: null,
+    exHistory: {fc:[],spo2:[],borg:[],labels:[]},
+    stateHistory: [JSON.parse(JSON.stringify(c.initialState))],
+  };
+
+  // Count critical questions
+  Object.values(c.questions).forEach(qs=>{
+    qs.forEach(q=>{ if(q.critical) session.criticalQuestionsTotal++; });
+  });
+
+  startTimer();
+  render();
+}
+
+function startTimer(){
+  if(session.timerInterval) clearInterval(session.timerInterval);
+  session.timerInterval = setInterval(()=>{
+    session.remainingSeconds = Math.max(0, session.remainingSeconds-1);
+    updateTimerDisplay();
+    if(session.remainingSeconds===0){ clearInterval(session.timerInterval); }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('navTimer');
+  if(!el) return;
+  const m = Math.floor(session.remainingSeconds/60);
+  const s = session.remainingSeconds%60;
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.style.color = session.remainingSeconds<300 ? 'var(--red)' : 'var(--amber)';
+}
+
+function logAction(msg, type='info'){
+  const elapsed = Math.round((Date.now()-session.startTime)/1000);
+  const m=Math.floor(elapsed/60), s=elapsed%60;
+  session.log.push({msg, type, time:`${m}:${s.toString().padStart(2,'0')}`});
+}
+
+function addScore(phase, pts, reason=''){
+  session.score[phase] = Math.max(0, (session.score[phase]||0) + pts);
+  session.score.total = Math.max(0, (session.score.total||0) + pts);
+  document.getElementById('navScore').textContent = session.score.total + ' pts';
+  if(reason) logAction(reason, pts>0?'ok':pts<0?'err':'info');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER ENGINE
+═══════════════════════════════════════════════════════════════ */
+function render(){
+  if(!session){ renderHome(); return; }
+  const root = document.getElementById('appRoot');
+  root.innerHTML = '';
+
+  // Nav update
+  document.getElementById('navCaseName').textContent = session.case.name;
+  document.getElementById('navTimer').classList.remove('hidden');
+  document.getElementById('navScore').classList.remove('hidden');
+  updateTimerDisplay();
+  document.getElementById('navScore').textContent = session.score.total + ' pts';
+
+  // Phase bar
+  const phases = ['anamnesis','exam','tests','diagnosis','plan','exercise','reeval','result'];
+  const phaseLabels = ['1.Anamnesis','2.Examen','3.Pruebas','4.Diagnóstico','5.Plan','6.Ejercicio','7.Reevaluación','8.Resultado'];
+  const phaseBarHTML = `<div class="phase-bar" id="phaseBar">
+    ${phases.map((p,i)=>{
+      const isDone = session.phasesDone.includes(p);
+      const isActive = session.phase===p;
+      const cls = isDone?'done':isActive?'active':'locked';
+      return `<div class="phase-step ${cls}">${phaseLabels[i]}</div>`;
+    }).join('')}
+  </div>`;
+
+  // Monitors
+  const monitorsHTML = renderMonitors();
+
+  let phaseHTML = '';
+  if(session.phase==='anamnesis') phaseHTML = renderAnamnesis();
+  else if(session.phase==='exam') phaseHTML = renderExam();
+  else if(session.phase==='tests') phaseHTML = renderTests();
+  else if(session.phase==='diagnosis') phaseHTML = renderDiagnosis();
+  else if(session.phase==='plan') phaseHTML = renderPlan();
+  else if(session.phase==='exercise') phaseHTML = renderExercise();
+  else if(session.phase==='reeval') phaseHTML = renderReeval();
+  else if(session.phase==='result') phaseHTML = renderResult();
+
+  root.innerHTML = `
+    ${phaseBarHTML}
+    <div class="grid2" style="gap:.75rem;margin-bottom:.75rem">
+      <div>
+        ${monitorsHTML}
+        ${renderLog()}
+      </div>
+      <div id="phaseContent">${phaseHTML}</div>
+    </div>
+  `;
+
+  // Post-render hooks
+  if(session.phase==='exam') initAuscultation();
+  if(session.phase==='exercise' && session.exerciseParams) continueExerciseChart();
+}
+
+/* ─── MONITORS ─── */
+function renderMonitors(){
+  const s=session.state;
+  const mons=[
+    {name:'SpO₂',val:s.spo2+'%',cls:s.spo2<88?'alert':s.spo2<92?'warn':'ok'},
+    {name:'FC',val:s.fc+' lpm',cls:s.fc>115?'alert':s.fc>100?'warn':'ok'},
+    {name:'PAS',val:s.pas+' mmHg',cls:s.pas>170?'alert':s.pas>150?'warn':s.pas<90?'alert':'ok'},
+    {name:'PAD',val:s.pad+' mmHg',cls:s.pad>100?'warn':'ok'},
+    {name:'FR',val:s.fr+' rpm',cls:s.fr>25?'warn':'ok'},
+    {name:'Borg',val:(s.borg||0)+'/10',cls:(s.borg||0)>=7?'alert':(s.borg||0)>=5?'warn':'ok'},
+    {name:'Borg Ang.',val:(s.borg_angina||0)+'/4',cls:(s.borg_angina||0)>=2?'alert':(s.borg_angina||0)>=1?'warn':'ok'},
+    {name:'Edema',val:(s.edema||0)+'+',cls:(s.edema||0)>=3?'alert':(s.edema||0)>=2?'warn':'ok'},
+    {name:'Δ Peso',val:'+'+(s.peso_ganancia||0)+' kg',cls:(s.peso_ganancia||0)>=3?'alert':(s.peso_ganancia||0)>=2?'warn':'ok'},
+    {name:'IY',val:s.ingurgitacion_yugular?'Sí':'No',cls:s.ingurgitacion_yugular?'warn':'ok'},
+  ];
+  return `<div class="card mb" style="padding:.875rem">
+    <div class="card-title" style="font-size:.85rem;margin-bottom:.5rem">📊 Monitor Cardiovascular</div>
+    <div class="monitors">${mons.map(m=>`<div class="monitor ${m.cls}">
+      <div class="mon-name">${m.name}</div>
+      <div class="mon-val" style="font-size:1.1rem">${m.val}</div>
+    </div>`).join('')}</div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.55">
+      <b style="color:var(--text2)">Ritmo:</b> ${s.ritmo||'—'}<br>
+      <b style="color:var(--text2)">NYHA:</b> ${s.nyha||'—'} · <b style="color:var(--text2)">FEVI:</b> ${s.fevi||'—'}% · <b style="color:var(--text2)">Killip:</b> ${s.killip!==undefined?s.killip:'—'}
+    </div>
+  </div>`;
+}
+
+/* ─── LOG ─── */
+function renderLog(){
+  if(!session.log.length) return '<div class="card" style="padding:.75rem"><div style="font-size:11.5px;color:var(--text3);text-align:center">El registro de sesión aparecerá aquí.</div></div>';
+  return `<div class="card" style="padding:.875rem">
+    <div class="card-title" style="font-size:.85rem;margin-bottom:.5rem">📋 Registro de sesión</div>
+    <div class="session-log">${session.log.slice(-12).reverse().map(e=>`
+      <div class="log-entry log-${e.type}">
+        <span class="log-time">${e.time}</span>
+        <span>${e.msg}</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: ANAMNESIS
+═══════════════════════════════════════════════════════════════ */
+function renderAnamnesis(){
+  const c = session.case;
+  const asked = session.askedQuestions;
+  const activeDomain = session.activeQuestionDomain || Object.keys(c.questions)[0];
+
+  // Build conversation log
+  const convoHTML = session.anamnesisConvo ? session.anamnesisConvo.map(entry=>`
+    <div style="margin-bottom:.5rem">
+      <div style="font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">
+        ${entry.isQ ? '🎓 Tú preguntaste:' : '🧑‍⚕️ '+c.patient.name+':'}
+      </div>
+      <div style="${entry.isQ?'color:var(--blue);font-size:13px;font-style:italic':'color:var(--text);font-size:13px;background:var(--card2);border-left:2px solid var(--blue);padding:.4rem .75rem;border-radius:0 var(--rs) var(--rs) 0'}">${entry.text}</div>
+    </div>`).join('') : '';
+
+  const domains = Object.keys(c.questions);
+  const domainHTML = domains.map(d=>{
+    const done = c.questions[d].filter(q=>asked.has(q.key)).length;
+    const total = c.questions[d].length;
+    return `<button class="q-domain-btn ${d===activeDomain?'active':''}" onclick="setAnamDomain('${d}')">${d} <span style="font-size:10px;opacity:.7">${done}/${total}</span></button>`;
+  }).join('');
+
+  const currentQuestions = c.questions[activeDomain]||[];
+  const qListHTML = currentQuestions.map((q,i)=>`
+    <button class="q-btn ${asked.has(q.key)?'asked':''}"
+      onclick="${asked.has(q.key)?'':' askQuestion(\''+activeDomain+'\','+i+')'}"
+      ${asked.has(q.key)?'disabled':''}>
+      ${q.q}
+    </button>`).join('');
+
+  const critDone = [...asked].filter(k=>{
+    for(const qs of Object.values(c.questions)){
+      const found = qs.find(q=>q.key===k&&q.critical);
+      if(found) return true;
+    }
+    return false;
+  }).length;
+
+  return `
+  <div class="card">
+    <div class="flex-b mb" style="flex-wrap:wrap;gap:.5rem">
+      <div>
+        <div class="card-title">💬 Anamnesis — Entrevista al Paciente</div>
+        <div style="font-size:11.5px;color:var(--text2)">
+          Preguntas realizadas: <b>${asked.size}</b> &nbsp;·&nbsp; Máx. recomendado: <b>12</b>
+          ${asked.size>12?'<span style="color:var(--amber);margin-left:.5rem">⚠ Superaste el límite recomendado</span>':''}
+        </div>
+      </div>
+      <button class="btn btn-p btn-sm" onclick="advancePhase('exam')" ${asked.size<3?'disabled title="Realiza al menos 3 preguntas"':''}>
+        Avanzar al Examen Físico →
+      </button>
+    </div>
+
+    <!-- Patient card -->
+    <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem 1rem;margin-bottom:.75rem;font-size:12.5px;border:1px solid var(--border)">
+      <b style="color:var(--text);font-family:var(--fh)">${c.patient.name}</b> — ${c.patient.age} años · ${c.patient.sex==='f'?'Femenino':'Masculino'} · ${c.patient.weight} kg · ${c.patient.height} cm<br>
+      <span style="color:var(--text2)">${c.patient.admission}</span><br>
+      <span style="color:var(--blue);font-size:11.5px">📋 Orden médica: ${c.patient.medOrder}</span>
+    </div>
+
+    <!-- Conversation -->
+    ${convoHTML ? `<div style="max-height:200px;overflow-y:auto;padding:.5rem;background:var(--bg3);border-radius:var(--rs);margin-bottom:.75rem;border:1px solid var(--border)">${convoHTML}</div>` : `<div class="info mb">Selecciona un dominio y haz clic en una pregunta para iniciar la entrevista.</div>`}
+
+    <!-- Domain tabs -->
+    <div class="q-domains">${domainHTML}</div>
+
+    <!-- Questions -->
+    <div class="q-list">${qListHTML}</div>
+  </div>`;
+}
+
+function setAnamDomain(domain){
+  session.activeQuestionDomain = domain;
+  document.getElementById('phaseContent').innerHTML = renderAnamnesis();
+}
+
+function askQuestion(domain, idx){
+  const c = session.case;
+  const q = c.questions[domain][idx];
+  if(!q || session.askedQuestions.has(q.key)) return;
+  session.askedQuestions.add(q.key);
+
+  // Pick random answer
+  const answer = q.answers[Math.floor(Math.random()*q.answers.length)];
+
+  if(!session.anamnesisConvo) session.anamnesisConvo = [];
+  session.anamnesisConvo.push({isQ:true, text:q.q});
+  session.anamnesisConvo.push({isQ:false, text:answer});
+
+  // Score
+  const pts = q.critical ? 4 : 2;
+  addScore('anamnesis', pts, `Pregunta: "${q.q.substring(0,45)}…"`);
+  if(session.askedQuestions.size>12) addScore('anamnesis',-1,'Exceso de preguntas (>12): -1 pt');
+
+  document.getElementById('phaseContent').innerHTML = renderAnamnesis();
+  // Scroll convo to bottom
+  setTimeout(()=>{
+    const convEl = document.querySelector('#phaseContent [style*="max-height:200px"]');
+    if(convEl) convEl.scrollTop = convEl.scrollHeight;
+  },50);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: PHYSICAL EXAM
+═══════════════════════════════════════════════════════════════ */
+function renderExam(){
+  const c = session.case;
+  const done = session.examDone;
+
+  const examItems = Object.keys(c.examFindings);
+  const menuHTML = examItems.map(item=>`
+    <div class="exam-item ${done.has(item)?'done':''}" onclick="${done.has(item)?'':' doExam(\''+item.replace(/'/g,"\\'")+'\')'}" >
+      <span class="ei-icon">${done.has(item)?'✓':examIcon(item)}</span>${item}
+    </div>`).join('');
+
+  const aucZones = Object.keys(c.auscultation);
+  const aucDone = session.auscultationDone;
+
+  // Results panel
+  const resultsHTML = [...done].map(item=>`
+    <div class="exam-result" style="margin-bottom:.4rem">
+      <div style="font-size:10.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">${item}</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.6">${c.examFindings[item]}</div>
+    </div>`).join('');
+
+  const aucResultsHTML = [...aucDone].map(zone=>{
+    const f = c.auscultation[zone];
+    return `<div class="finding-item">
+      <div class="finding-zone">${zone}</div>
+      <div class="finding-sound"><span class="sound-badge ${f.cls}">${f.sound}</span></div>
+      <div class="finding-desc">${f.desc}</div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">🔍 Examen Físico</div>
+      <button class="btn btn-p btn-sm" onclick="advancePhase('tests')"
+        ${done.size<3||aucDone.size<4?'disabled title="Examina al menos 3 sistemas y 4 zonas de auscultación"':''}>
+        Avanzar a Pruebas Funcionales →
+      </button>
+    </div>
+    <div class="info mb" style="font-size:12px">Selecciona los sistemas que deseas evaluar. Luego ausculta haciendo clic en las zonas del tórax.</div>
+
+    <!-- Exam menu -->
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.4rem">Sistemas a evaluar (${done.size}/${examItems.length} evaluados)</div>
+    <div class="exam-menu mb">${menuHTML}</div>
+
+    <!-- Results -->
+    ${done.size>0?`<div class="findings-list mb">${resultsHTML}</div>`:''}
+
+    <!-- Auscultation -->
+    <hr>
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.75rem">
+      Auscultación Pulmonar — Haz clic en cada zona (${aucDone.size}/${aucZones.length} zonas)
+    </div>
+    <div class="grid2" style="gap:1rem;align-items:start">
+      <div id="toraxDiagram">${renderToraxSVG(c, aucDone)}</div>
+      <div>
+        ${aucDone.size>0 ? `<div class="findings-list">${aucResultsHTML}</div>` : `<div style="color:var(--text3);font-size:12.5px;text-align:center;padding:1.5rem">Haz clic en una zona del tórax para auscultar.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function examIcon(item){
+  const icons={'Observación general':'👁️','Patrón respiratorio':'🌬️','Signos vitales':'📊','Expansión torácica':'📏','Fuerza muscular respiratoria':'💪','Palpación torácica':'🤲','Estado cognitivo / neurológico':'🧠','Evaluación funcional básica':'🚶'};
+  return icons[item]||'🔍';
+}
+
+function doExam(item){
+  session.examDone.add(item);
+  addScore('exam', 3, `Examen: ${item}`);
+  document.getElementById('phaseContent').innerHTML = renderExam();
+  setTimeout(()=>initAuscultation(),50);
+}
+
+function renderToraxSVG(c, aucDone){
+  const zones = Object.keys(c.auscultation);
+
+  // Zone definitions: clickable polygon areas with realistic thorax anatomy placement
+  const zoneDefs = {
+    'Vértice derecho':         {path:'M145,55 L185,55 L188,90 L148,93 Z',         tx:166, ty:72},
+    'Vértice izquierdo':       {path:'M215,55 L255,55 L252,93 L212,90 Z',         tx:234, ty:72},
+    'Campo medio derecho':     {path:'M140,98 L188,95 L190,148 L140,150 Z',       tx:165, ty:123},
+    'Campo medio izquierdo':   {path:'M212,95 L260,98 L260,150 L210,148 Z',       tx:236, ty:123},
+    'Base derecha':            {path:'M130,155 L190,153 L188,210 L125,205 Z',     tx:158, ty:182},
+    'Base izquierda':          {path:'M210,153 L270,155 L275,205 L212,210 Z',     tx:242, ty:182},
+    'Región axilar derecha':   {path:'M92,108 L138,100 L138,190 L88,185 Z',      tx:113, ty:145},
+    'Región axilar izquierda': {path:'M262,100 L308,108 L312,185 L262,190 Z',    tx:287, ty:145},
+  };
+
+  const soundColor = (zone) => {
+    if(!aucDone.has(zone)) return {fill:'rgba(56,189,248,.07)', stroke:'rgba(56,189,248,.25)'};
+    const s = c.auscultation[zone].sound.toLowerCase();
+    if(s.includes('sibilancias')) return {fill:'rgba(251,191,36,.22)', stroke:'rgba(251,191,36,.8)'};
+    if(s.includes('crepitantes')) return {fill:'rgba(167,139,250,.22)', stroke:'rgba(167,139,250,.8)'};
+    if(s.includes('roncus'))      return {fill:'rgba(251,146,60,.22)',  stroke:'rgba(251,146,60,.8)'};
+    if(s.includes('disminuido')||s.includes('↓')) return {fill:'rgba(148,163,184,.18)', stroke:'rgba(148,163,184,.6)'};
+    if(s.includes('silencio'))    return {fill:'rgba(248,113,113,.2)',   stroke:'rgba(248,113,113,.7)'};
+    return {fill:'rgba(74,222,128,.18)', stroke:'rgba(74,222,128,.7)'};
+  };
+
+  const zonesSVG = zones.filter(z=>zoneDefs[z]).map(z=>{
+    const def = zoneDefs[z];
+    const col = soundColor(z);
+    const done = aucDone.has(z);
+    const zSafe = z.replace(/'/g,"\\'");
+    const shortName = z.replace('Región axilar','Ax.').replace('Campo medio','Medio').replace('Vértice','Vért.').replace(' derecho',' D.').replace(' izquierdo',' I.');
+    return `<g onclick="aucultate('${zSafe}')" style="cursor:pointer">
+      <path d="${def.path}"
+        fill="${col.fill}" stroke="${col.stroke}"
+        stroke-width="${done?2:1.2}" stroke-linejoin="round"
+        style="transition:all .2s"/>
+      <text x="${def.tx}" y="${def.ty}" text-anchor="middle" font-size="${done?8.5:8}"
+        fill="${done?col.stroke:'rgba(148,163,184,.55)'}"
+        font-family="sans-serif" font-weight="${done?700:400}"
+        style="pointer-events:none">${shortName}</text>
+      ${done?`<circle cx="${def.tx+22}" cy="${def.ty-10}" r="5" fill="${col.stroke}" opacity=".9"/>
+        <text x="${def.tx+22}" y="${def.ty-7}" text-anchor="middle" font-size="7" fill="#07090f" font-weight="700" style="pointer-events:none">✓</text>`:''}
+    </g>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 400 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px">
+    <defs>
+      <radialGradient id="toraxGrad" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="rgba(56,189,248,.06)"/>
+        <stop offset="100%" stop-color="rgba(56,189,248,.01)"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Silueta torácica exterior -->
+    <path d="M100,40 Q115,20 160,18 L200,18 Q245,20 300,40
+             Q340,60 345,120 Q350,180 340,230 Q320,270 280,280
+             L120,280 Q80,270 60,230 Q50,180 55,120 Q60,60 100,40 Z"
+      fill="url(#toraxGrad)" stroke="rgba(56,189,248,.18)" stroke-width="1.5"/>
+
+    <!-- Clavículas -->
+    <path d="M108,50 Q140,42 160,46 Q175,48 192,46" stroke="rgba(148,163,184,.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M208,46 Q225,48 240,46 Q260,42 292,50" stroke="rgba(148,163,184,.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Tráquea -->
+    <rect x="191" y="5" width="18" height="48" rx="9" fill="rgba(56,189,248,.12)" stroke="rgba(56,189,248,.4)" stroke-width="1.2"/>
+    <text x="200" y="24" text-anchor="middle" font-size="7" fill="rgba(56,189,248,.7)" font-family="sans-serif" font-weight="700">TRQ</text>
+
+    <!-- Bifurcación bronquial -->
+    <path d="M200,52 L200,68 Q175,72 160,80" stroke="rgba(56,189,248,.35)" stroke-width="2" fill="none"/>
+    <path d="M200,52 L200,68 Q225,72 240,80" stroke="rgba(56,189,248,.35)" stroke-width="2" fill="none"/>
+
+    <!-- Esternón -->
+    <rect x="189" y="52" width="22" height="162" rx="5"
+      fill="rgba(148,163,184,.08)" stroke="rgba(148,163,184,.25)" stroke-width="1"/>
+    <text x="200" y="138" text-anchor="middle" font-size="7" fill="rgba(148,163,184,.5)"
+      font-family="sans-serif" writing-mode="vertical-rl" transform="rotate(180 200 138)">ESTERNÓN</text>
+
+    <!-- Costillas (anterior) -->
+    <path d="M160,78  Q200,70  240,78"  stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+    <path d="M148,102 Q200,93  252,102" stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+    <path d="M138,128 Q200,118 262,128" stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+    <path d="M132,155 Q200,144 268,155" stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+    <path d="M128,182 Q200,170 272,182" stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+    <path d="M130,208 Q200,198 270,208" stroke="rgba(148,163,184,.15)" stroke-width="1.5" fill="none"/>
+
+    <!-- Diafragma -->
+    <path d="M100,228 Q145,240 200,243 Q255,240 300,228"
+      stroke="rgba(45,212,191,.3)" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+    <text x="200" y="258" text-anchor="middle" font-size="8" fill="rgba(45,212,191,.5)"
+      font-family="sans-serif">— Diafragma —</text>
+
+    <!-- Silueta cardíaca -->
+    <path d="M180,115 Q165,108 160,125 Q158,145 180,158 Q200,168 220,158 Q242,145 240,125 Q235,108 220,115 Q210,108 200,118 Q190,108 180,115 Z"
+      fill="rgba(248,113,113,.06)" stroke="rgba(248,113,113,.2)" stroke-width="1"/>
+    <text x="200" y="140" text-anchor="middle" font-size="7.5" fill="rgba(248,113,113,.4)"
+      font-family="sans-serif">♥</text>
+
+    <!-- Zona clickables -->
+    ${zonesSVG}
+
+    <!-- Leyenda lateral -->
+    <text x="200" y="14" text-anchor="middle" font-size="8.5" fill="rgba(56,189,248,.55)"
+      font-family="sans-serif" font-weight="700" letter-spacing="1">VISTA ANTERIOR</text>
+    <text x="72" y="165" text-anchor="middle" font-size="7.5" fill="rgba(148,163,184,.4)"
+      font-family="sans-serif" transform="rotate(-90 72 165)">LATERAL IZQ.</text>
+    <text x="328" y="165" text-anchor="middle" font-size="7.5" fill="rgba(148,163,184,.4)"
+      font-family="sans-serif" transform="rotate(90 328 165)">LATERAL DER.</text>
+
+    <!-- Legend color -->
+    <g transform="translate(5,268)">
+      <rect x="0" y="0" width="7" height="7" rx="2" fill="rgba(251,191,36,.4)" stroke="rgba(251,191,36,.8)" stroke-width="1"/>
+      <text x="10" y="7" font-size="7" fill="rgba(148,163,184,.6)" font-family="sans-serif">Sibilancias</text>
+      <rect x="60" y="0" width="7" height="7" rx="2" fill="rgba(167,139,250,.4)" stroke="rgba(167,139,250,.8)" stroke-width="1"/>
+      <text x="70" y="7" font-size="7" fill="rgba(148,163,184,.6)" font-family="sans-serif">Crepitantes</text>
+      <rect x="125" y="0" width="7" height="7" rx="2" fill="rgba(251,146,60,.4)" stroke="rgba(251,146,60,.8)" stroke-width="1"/>
+      <text x="135" y="7" font-size="7" fill="rgba(148,163,184,.6)" font-family="sans-serif">Roncus</text>
+      <rect x="175" y="0" width="7" height="7" rx="2" fill="rgba(148,163,184,.3)" stroke="rgba(148,163,184,.6)" stroke-width="1"/>
+      <text x="185" y="7" font-size="7" fill="rgba(148,163,184,.6)" font-family="sans-serif">Disminuido</text>
+    </g>
+
+    <!-- Instruction -->
+    <text x="200" y="283" text-anchor="middle" font-size="7" fill="rgba(148,163,184,.3)"
+      font-family="sans-serif">Haz clic en una zona para auscultar</text>
+  </svg>`;
+}
+
+function initAuscultation(){ /* SVG already has onclick, nothing extra needed */ }
+
+function aucultate(zone){
+  const c = session.case;
+  if(!c.auscultation[zone]) return;
+  session.auscultationDone.add(zone);
+  addScore('exam', 2, `Auscultación: ${zone} — ${c.auscultation[zone].sound}`);
+  document.getElementById('phaseContent').innerHTML = renderExam();
+  setTimeout(()=>initAuscultation(),50);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: FUNCTIONAL TESTS
+═══════════════════════════════════════════════════════════════ */
+function renderTests(){
+  const c = session.case;
+  const done = session.testsDone;
+
+  const testsHTML = Object.entries(c.functionalTests).map(([name,test])=>{
+    const isDone = done[name];
+    // No mostramos si está disponible o no — el alumno debe razonar
+    return `<div class="test-card ${isDone?'done':''}">
+      <div class="flex-b">
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">
+            ${isDone?'✓ ':''} ${name}
+          </div>
+          <div style="font-size:11.5px;color:var(--text2)">${test.description||''}</div>
+        </div>
+        ${!isDone?`<button class="btn btn-a btn-sm" onclick="attemptTest('${name.replace(/'/g,"\\'")}')" style="flex-shrink:0">▶ Realizar</button>`:''}
+      </div>
+      ${isDone&&done[name].result?`<div class="mt" style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;border:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.3rem">Resultado</div>
+        <div style="font-size:12.5px;color:var(--text2);line-height:1.65">${done[name].result.interpretation}</div>
+        <div class="mt" style="font-size:11px;color:var(--text3)">SpO₂ mín: <b style="color:var(--text)">${done[name].result.spo2_min||done[name].result.spo2_basal||'—'}%</b>
+          ${done[name].result.fc_peak?` · FC pico: <b style="color:var(--text)">${done[name].result.fc_peak} lpm</b>`:''}
+          ${done[name].result.distance?` · Distancia: <b style="color:var(--text)">${done[name].result.distance} m</b>`:''}
+          ${done[name].result.reps?` · Reps: <b style="color:var(--text)">${done[name].result.reps}</b>`:''}
+        </div>
+      </div>`:''}
+      ${isDone&&done[name].blocked?`<div class="danger-box mt" style="font-size:12.5px">${done[name].blockedMsg}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const availDone = Object.entries(done).filter(([k,v])=>v&&!v.blocked).length;
+
+  return `<div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">🏃 Pruebas Funcionales</div>
+      <button class="btn btn-p btn-sm" onclick="advancePhase('diagnosis')"
+        ${availDone<1?'disabled title="Realiza al menos 1 prueba funcional"':''}>
+        Avanzar al Diagnóstico →
+      </button>
+    </div>
+    <div class="info mb">Selecciona las pruebas que consideres apropiadas para este paciente en su estado actual.</div>
+    <div style="display:flex;flex-direction:column;gap:.75rem">${testsHTML}</div>
+  </div>`;
+}
+
+function attemptTest(name){
+  const c = session.case;
+  const test = c.functionalTests[name];
+  if(!test) return;
+
+  // Si no está disponible, el alumno lo intenta y VE las consecuencias
+  if(!test.available){
+    session.testsDone[name] = {
+      done: true,
+      blocked: true,
+      blockedMsg: `La prueba fue interrumpida: el estado clínico del paciente no permitió completarla. ${test.reason||'Revisar criterios de seguridad.'}`,
+      result: null
+    };
+    addScore('tests', -5, `⚠ Prueba contraindicada intentada: ${name}`);
+    logAction(`${name} — No completable en estado actual del paciente`, 'err');
+    document.getElementById('phaseContent').innerHTML = renderTests();
+    return;
+  }
+
+  const result = test.simulate(session.state);
+  session.testsDone[name] = { result, done:true, blocked:false };
+  session.state.spo2 = Math.max(session.state.spo2-1, result.spo2_min||session.state.spo2-2);
+  addScore('tests', result.scoreContrib||10, `Prueba realizada: ${name}`);
+  logAction(`${name} completada`, 'ok');
+  document.getElementById('phaseContent').innerHTML = renderTests();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: DIAGNOSIS
+═══════════════════════════════════════════════════════════════ */
+function renderDiagnosis(){
+  const c = session.case;
+  const opts = c.diagnosisOptions;
+  const ans = session.diagnosisAnswers;
+  const correct = c.correctDiagnosis;
+
+  // Check if submitted
+  const submitted = session.diagnosisSubmitted;
+
+  const buildSection = (key, label, multi=false)=>{
+    const options = opts[key]||[];
+    const selected = multi ? (ans[key]||[]) : ans[key];
+    return `<div class="diag-section">
+      <label>${label} ${multi?'<span style="color:var(--text3);font-size:10px">(selecciona todas las que apliquen)</span>':''}</label>
+      <div class="diag-options">
+        ${options.map(opt=>{
+          const isSel = multi ? (selected||[]).includes(opt) : selected===opt;
+          const isCorrect = multi ? correct[key].includes(opt) : correct[key]===opt;
+          let extraCls = '';
+          if(submitted && isSel && isCorrect) extraCls='selected';
+          else if(submitted && isSel && !isCorrect) extraCls='selected';
+          else if(isSel) extraCls='selected';
+          return `<div class="diag-opt ${extraCls} ${submitted?isCorrect?'':'':''}"
+            style="${submitted&&isCorrect?'border-color:var(--green);color:var(--green);background:rgba(74,222,128,.08)':
+                    submitted&&isSel&&!isCorrect?'border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08)':''}"
+            onclick="${submitted?'':` selectDiag('${key.replace(/'/g,"\\'")}','${opt.replace(/'/g,"\\'")}'${multi?',true':''})`}">
+            ${opt}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  };
+
+  let feedbackHTML = '';
+  if(submitted){
+    const vpOk = ans.ventilatoryPattern===correct.ventilatoryPattern;
+    const mpOk = ans.mainProblem===correct.mainProblem;
+    const cOk = (ans.contributing||[]).filter(x=>correct.contributing.includes(x)).length;
+    const pOk = ans.prognosis===correct.prognosis;
+    const total = vpOk?1:0 + mpOk?1:0 + (cOk>=2?1:0) + pOk?1:0;
+    const pct = Math.round(total/4*100);
+    feedbackHTML = `<div class="diag-feedback ${pct>=75?'ok':pct>=50?'warn':'err'}">
+      <b>${pct>=75?'✓ Diagnóstico correcto':'⚠ Diagnóstico con errores'}</b> (${pct}% de los componentes correctos)<br>
+      ${!vpOk?`<br>• Patrón ventilatorio: la respuesta correcta era <b>${correct.ventilatoryPattern}</b>`:''}
+      ${!mpOk?`<br>• Problema principal: la respuesta correcta era <b>${correct.mainProblem}</b>`:''}
+      ${cOk<2?`<br>• Factores contribuyentes: seleccionaste pocos correctos. Los principales son: <b>${correct.contributing.slice(0,3).join(', ')}</b>`:''}
+    </div>`;
+  }
+
+  return `<div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">🧬 Diagnóstico Fisioterapéutico</div>
+      ${!submitted?`<div style="display:flex;gap:.5rem">
+        <button class="btn btn-a btn-sm" onclick="submitDiagnosis()">Confirmar diagnóstico</button>
+        ${submitted?`<button class="btn btn-p btn-sm" onclick="advancePhase('plan')">Avanzar al Plan →</button>`:''}
+      </div>`:`<button class="btn btn-p btn-sm" onclick="advancePhase('plan')">Avanzar al Plan →</button>`}
+    </div>
+    <div class="info mb">Construye el diagnóstico fisioterapéutico integrando todos los hallazgos. El diagnóstico incorrecto afectará la efectividad del plan de intervención.</div>
+    ${buildSection('ventilatoryPattern','Patrón ventilatorio')}
+    ${buildSection('mainProblem','Problema principal')}
+    ${buildSection('contributing','Factores contribuyentes',true)}
+    ${buildSection('prognosis','Pronóstico')}
+    ${feedbackHTML}
+  </div>`;
+}
+
+function selectDiag(key, value, multi=false){
+  if(!session.diagnosisAnswers) session.diagnosisAnswers={};
+  if(multi){
+    if(!session.diagnosisAnswers[key]) session.diagnosisAnswers[key]=[];
+    const idx = session.diagnosisAnswers[key].indexOf(value);
+    if(idx>=0) session.diagnosisAnswers[key].splice(idx,1);
+    else session.diagnosisAnswers[key].push(value);
+  } else {
+    session.diagnosisAnswers[key]=value;
+  }
+  document.getElementById('phaseContent').innerHTML=renderDiagnosis();
+}
+
+function submitDiagnosis(){
+  const c=session.case;
+  const ans=session.diagnosisAnswers;
+  const correct=c.correctDiagnosis;
+  session.diagnosisSubmitted=true;
+  let pts=0;
+  if(ans.ventilatoryPattern===correct.ventilatoryPattern) pts+=7;
+  if(ans.mainProblem===correct.mainProblem) pts+=8;
+  const cOk=(ans.contributing||[]).filter(x=>correct.contributing.includes(x)).length;
+  pts+=Math.min(cOk*2,6);
+  if(ans.prognosis===correct.prognosis) pts+=3;
+  addScore('diagnosis',pts,`Diagnóstico evaluado: ${pts}/24 puntos`);
+  document.getElementById('phaseContent').innerHTML=renderDiagnosis();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: PLAN
+═══════════════════════════════════════════════════════════════ */
+function renderPlan(){
+  const c=session.case;
+  const plan=session.planTechniques; // [{techId, params, expanded}]
+
+  const techListHTML=c.availableTechniques.map(tech=>{
+    const inPlan=plan.find(p=>p.techId===tech.id);
+    return `<div class="tech-builder">
+      <div class="tech-header" onclick="toggleTechExpand('${tech.id}')">
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <span>${tech.icon}</span>
+          <span class="tech-name-big">${tech.name}</span>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          ${inPlan?`<span class="badge badge-green">En el plan</span>`:''}
+          <button class="btn btn-sm ${inPlan?'btn-r':'btn-g'}" onclick="event.stopPropagation();toggleTechInPlan('${tech.id}')">
+            ${inPlan?'Quitar':'+ Agregar'}
+          </button>
+        </div>
+      </div>
+      <div class="tech-params ${session.expandedTech===tech.id?'open':''}" id="tp-${tech.id}">
+        ${renderTechParams(tech, inPlan)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Sequence order
+  const seqHTML=plan.map((p,i)=>{
+    const tech=c.availableTechniques.find(t=>t.id===p.techId);
+    return `<div class="seq-item-ord" draggable="true">
+      <span class="seq-num">${i+1}</span>
+      <span>${tech?.icon||''} ${tech?.name||p.techId}</span>
+      <button class="seq-remove" onclick="removeTechFromPlan('${p.techId}')">✕</button>
+    </div>`;
+  }).join('');
+
+  return `<div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">🛠️ Plan de Intervención</div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-a btn-sm" onclick="submitPlan()">Confirmar plan</button>
+        ${session.planSubmitted?`<button class="btn btn-p btn-sm" onclick="advancePhase(${c.exerciseAvailable&&session.state.spo2>=(c.exerciseCondition(session.state)?0:99)?'\'exercise\'':'\'reeval\''})">Continuar →</button>`:''}
+      </div>
+    </div>
+    <div class="info mb">Agrega las técnicas al plan, configura los parámetros y ordénalos de mayor a menor prioridad.</div>
+
+    ${plan.length>0?`<div class="mb">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.4rem">Orden de tu plan (${plan.length} técnicas)</div>
+      <div class="seq-order">${seqHTML||'<div style="color:var(--text3);font-size:12px;text-align:center">Agrega técnicas abajo</div>'}</div>
+    </div>`:''}
+
+    ${techListHTML}
+
+    ${session.planSubmitted?renderPlanFeedback():''}
+  </div>`;
+}
+
+function renderTechParams(tech, inPlan){
+  if(!tech.params||!tech.params.length) return '<div style="font-size:12.5px;color:var(--text2);padding:.5rem 0">Sin parámetros ajustables.</div>';
+  const paramHTML=tech.params.map(p=>{
+    const val = inPlan?.params?.[p.id] || p.default || '';
+    if(p.type==='select'){
+      return `<div class="param-item">
+        <label>${p.label}</label>
+        <select onchange="updateTechParam('${tech.id}','${p.id}',this.value)">
+          ${p.options.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    return `<div class="param-item">
+      <label>${p.label}</label>
+      <input type="number" value="${val}" min="${p.min||0}" max="${p.max||999}" step="${p.step||1}"
+        onchange="updateTechParam('${tech.id}','${p.id}',this.value)"
+        oninput="checkParamWarning('${tech.id}','${p.id}',this.value)">
+      ${p.unit?`<div class="unit">${p.unit}</div>`:''}
+      ${p.warning?`<div class="param-warning" id="pw-${tech.id}-${p.id}">${p.warning}</div>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="param-group">${paramHTML}</div>`;
+}
+
+function toggleTechExpand(techId){
+  session.expandedTech = session.expandedTech===techId ? null : techId;
+  document.getElementById('phaseContent').innerHTML=renderPlan();
+}
+
+function toggleTechInPlan(techId){
+  const idx=session.planTechniques.findIndex(p=>p.techId===techId);
+  if(idx>=0){ session.planTechniques.splice(idx,1); }
+  else {
+    const c=session.case;
+    const tech=c.availableTechniques.find(t=>t.id===techId);
+    const defaultParams={};
+    if(tech?.params) tech.params.forEach(p=>{ defaultParams[p.id]=p.default||''; });
+    session.planTechniques.push({techId, params:defaultParams});
+    logAction(`Técnica agregada al plan: ${tech?.name||techId}`,'info');
+  }
+  document.getElementById('phaseContent').innerHTML=renderPlan();
+}
+
+function removeTechFromPlan(techId){
+  session.planTechniques=session.planTechniques.filter(p=>p.techId!==techId);
+  document.getElementById('phaseContent').innerHTML=renderPlan();
+}
+
+function updateTechParam(techId,paramId,val){
+  const entry=session.planTechniques.find(p=>p.techId===techId);
+  if(entry) entry.params[paramId]=val;
+}
+
+function checkParamWarning(techId,paramId,val){
+  const c=session.case;
+  const tech=c.availableTechniques.find(t=>t.id===techId);
+  const param=tech?.params?.find(p=>p.id===paramId);
+  const el=document.getElementById(`pw-${techId}-${paramId}`);
+  if(el&&param?.safe_max&&parseFloat(val)>param.safe_max){
+    el.style.display='block';
+  } else if(el){ el.style.display='none'; }
+}
+
+function submitPlan(){
+  const c=session.case;
+  session.planSubmitted=true;
+  session.state._interventions=session.planTechniques.map(p=>p.techId);
+
+  let pts=0, warnings=[];
+  const opt=c.optimalSequence;
+  const planIds=session.planTechniques.map(p=>p.techId);
+
+  // Score: correct techniques
+  opt.forEach(id=>{
+    if(planIds.includes(id)) pts+=4;
+    else warnings.push(`Faltó incluir: ${c.availableTechniques.find(t=>t.id===id)?.name||id}`);
+  });
+
+  // Penalize errors
+  session.planTechniques.forEach(p=>{
+    const tech=c.availableTechniques.find(t=>t.id===p.techId);
+    if(tech?.isError){ pts+=tech.weight; warnings.push(`Error: ${tech.name} no indicada.`); }
+    // Apply effects
+    const effects=tech?.effects(p.params, session.state);
+    if(effects){
+      if(effects.spo2) session.state.spo2=Math.max(75,Math.min(99,session.state.spo2+parseFloat(effects.spo2||0)));
+      if(effects.fc) session.state.fc=Math.max(50,session.state.fc+parseFloat(effects.fc||0));
+      if(effects.fr) session.state.fr=Math.max(10,session.state.fr+parseFloat(effects.fr||0));
+      if(effects.borg) session.state.borg=Math.max(0,Math.min(10,session.state.borg+parseFloat(effects.borg||0)));
+      if(effects.pco2) session.state.pco2=Math.max(30,session.state.pco2+parseFloat(effects.pco2||0));
+      if(effects.secretions) session.state.secretions=Math.max(0,session.state.secretions+parseFloat(effects.secretions||0));
+      if(effects.bronchospasm) session.state.bronchospasm=Math.max(0,session.state.bronchospasm+parseFloat(effects.bronchospasm||0));
+      logAction(effects.note||`${tech.name} aplicada`, effects.isWarning?'warn':'ok');
+    }
+  });
+
+  session.stateHistory.push(JSON.parse(JSON.stringify(session.state)));
+  pts=Math.max(0,Math.min(20,pts));
+  addScore('plan',pts,`Plan evaluado: ${pts}/20 pts ${warnings.length?' — '+warnings[0]:''}`);
+  document.getElementById('phaseContent').innerHTML=renderPlan();
+}
+
+function renderPlanFeedback(){
+  const c=session.case;
+  const planIds=session.planTechniques.map(p=>p.techId);
+  const errors=session.planTechniques.filter(p=>c.availableTechniques.find(t=>t.id===p.techId)?.isError);
+  const missing=c.optimalSequence.filter(id=>!planIds.includes(id));
+
+  return `<div class="mt">
+    <hr>
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.75rem">Comparación con el plan experto</div>
+    <div class="compare-wrap">
+      <div class="compare-col">
+        <div class="compare-col-header">Tu plan</div>
+        <div class="compare-col-body">
+          ${session.planTechniques.map((p,i)=>{
+            const tech=c.availableTechniques.find(t=>t.id===p.techId);
+            const isErr=tech?.isError;
+            return `<div style="margin-bottom:.3rem;color:${isErr?'var(--red)':'var(--text2)'}">
+              ${i+1}. ${tech?.icon||''} ${tech?.name||p.techId} ${isErr?'⚠':''}
+            </div>`;
+          }).join('')||'<i>Sin técnicas</i>'}
+          ${errors.length?`<div class="danger-box mt" style="font-size:12px">
+            ⚠ Error: ${errors.map(e=>c.availableTechniques.find(t=>t.id===e.techId)?.name).join(', ')} no indicada(s) en este caso.
+          </div>`:''}
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-header">Plan experto</div>
+        <div class="compare-col-body">
+          ${c.expertPlan.sequence.map((s,i)=>`<div style="margin-bottom:.3rem;color:var(--text2)">${i+1}. ${s}</div>`).join('')}
+          <hr style="border-color:var(--border);margin:.5rem 0">
+          ${c.expertPlan.keyPoints.map(k=>`<div style="font-size:11.5px;color:var(--blue);margin-bottom:.25rem">▸ ${k}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    ${missing.length?`<div class="warn-box mt">Técnicas faltantes en tu plan: ${missing.map(id=>c.availableTechniques.find(t=>t.id===id)?.name).join(', ')}</div>`:''}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: EXERCISE
+═══════════════════════════════════════════════════════════════ */
+function renderExercise(){
+  const c=session.case;
+  const s=session.state;
+  const canExercise=c.exerciseCondition(s);
+
+  if(!canExercise){
+    return `<div class="card">
+      <div class="card-title">🏃 Ejercicio Terapéutico</div>
+      <div class="warn-box">${c.exerciseConditionText}<br><br>Estado actual: SpO₂ ${s.spo2}% — ${c.id==='asma'?`Broncoespasmo: ${s.bronchospasm}%`:''}. Condición no cumplida.</div>
+      <button class="btn btn-s mt" onclick="advancePhase('reeval')">Omitir ejercicio → Reevaluación</button>
+    </div>`;
+  }
+
+  const params=session.exerciseParams||c.exerciseDefaults;
+  const running=session.exRunning;
+  const done=session.exerciseDone;
+
+  const maxFc=220-c.patient.age;
+  const fcRest=s.fc;
+  const hrr=maxFc-fcRest;
+
+  return `<div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">🏃 Ejercicio Terapéutico</div>
+      ${!running&&!done?`<button class="btn btn-s btn-sm" onclick="skipExercise()" style="color:var(--text3)">Omitir ejercicio →</button>`:''}
+    </div>
+    <div class="success-box mb">${c.exerciseConditionText} ✓ Condición cumplida (SpO₂ ${s.spo2}%)</div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.75rem">
+      Prescripción — ingresa los valores numéricos
+    </div>
+
+    <div class="ex-form" id="exForm">
+      <div class="ex-field">
+        <label>Modalidad</label>
+        <select id="ex_modality" ${running||done?'disabled':''}>
+          ${['Caminata supervisada','Cicloergómetro','Cinta ergométrica','Elíptico'].map(o=>`<option ${(params.modality||'').includes(o.split(' ')[0])?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ex-field">
+        <label>FC objetivo</label>
+        <input type="number" id="ex_fc" value="${params.fc_target}" min="60" max="${maxFc}" ${running||done?'disabled':''}
+          oninput="updateExParam('fc_target',this.value)">
+        <div class="unit">lpm &nbsp;·&nbsp; FCmáx: ${maxFc} lpm &nbsp;·&nbsp; Karvonen: ${Math.round(fcRest+hrr*0.6)}–${Math.round(fcRest+hrr*0.7)} lpm (60-70%)</div>
+      </div>
+      <div class="ex-field">
+        <label>Duración</label>
+        <input type="number" id="ex_dur" value="${params.duration}" min="5" max="40" ${running||done?'disabled':''}
+          oninput="updateExParam('duration',this.value)">
+        <div class="unit">min</div>
+      </div>
+      <div class="ex-field">
+        <label>Borg máximo</label>
+        <input type="number" id="ex_borg" value="${params.borg_max}" min="2" max="8" ${running||done?'disabled':''}
+          oninput="updateExParam('borg_max',this.value)">
+        <div class="unit">/10 — parar si mayor</div>
+      </div>
+      <div class="ex-field">
+        <label>SpO₂ mínima</label>
+        <input type="number" id="ex_spo2" value="${params.spo2_min}" min="82" max="96" ${running||done?'disabled':''}
+          oninput="updateExParam('spo2_min',this.value)">
+        <div class="unit">% — parar si menor</div>
+      </div>
+      <div class="ex-field">
+        <label>O₂ suplementario</label>
+        <select id="ex_o2" ${running||done?'disabled':''} onchange="updateExParam('o2',this.value==='Sí')">
+          <option ${params.o2?'selected':''}>Sí</option>
+          <option ${!params.o2?'selected':''}>No</option>
+        </select>
+      </div>
+      ${params.o2?`<div class="ex-field">
+        <label>Flujo O₂</label>
+        <input type="number" id="ex_o2flow" value="${params.o2_flow}" min="1" max="6" ${running||done?'disabled':''}
+          oninput="updateExParam('o2_flow',this.value)">
+        <div class="unit">L/min</div>
+      </div>`:''}
+      <div class="ex-field">
+        <label>Calentamiento</label>
+        <input type="number" id="ex_warmup" value="${params.warmup||5}" min="0" max="15" ${running||done?'disabled':''}
+          oninput="updateExParam('warmup',this.value)">
+        <div class="unit">min</div>
+      </div>
+    </div>
+
+    <!-- Live monitors during exercise -->
+    ${running||done?`<div class="ex-monitor" id="exMonitors">
+      <div class="ex-mon-card" id="exMonFC">
+        <div class="ex-mon-name">FC</div>
+        <div class="ex-mon-val" id="exFCval">${s.fc}</div>
+        <div class="ex-mon-limit">obj: ${params.fc_target} lpm</div>
+      </div>
+      <div class="ex-mon-card" id="exMonSPO2">
+        <div class="ex-mon-name">SpO₂</div>
+        <div class="ex-mon-val" id="exSPO2val">${s.spo2}%</div>
+        <div class="ex-mon-limit">mín: ${params.spo2_min}%</div>
+      </div>
+      <div class="ex-mon-card" id="exMonBorg">
+        <div class="ex-mon-name">Borg</div>
+        <div class="ex-mon-val" id="exBorgval">${s.borg.toFixed(1)}</div>
+        <div class="ex-mon-limit">máx: ${params.borg_max}/10</div>
+      </div>
+      <div class="ex-mon-card" id="exMonTime">
+        <div class="ex-mon-name">Tiempo</div>
+        <div class="ex-mon-val" id="exTimeVal">0:00</div>
+        <div class="ex-mon-limit">de ${params.duration} min</div>
+      </div>
+    </div>
+    <div class="ex-chart-wrap mb"><canvas id="exChart"></canvas></div>
+    <div id="exAdjustPanel"></div>`:''}
+
+    <div class="flex" style="gap:.5rem">
+      ${!running&&!done?`<button class="btn btn-g btn-lg" onclick="startExercise()">▶ Iniciar simulación</button>`:''}
+      ${running?`<button class="btn btn-r" onclick="stopExercise('manual')">⏹ Detener</button>
+        <button class="btn btn-a btn-sm" onclick="adjustExercise()">Ajustar carga</button>`:''}
+      ${done?`<button class="btn btn-p" onclick="advancePhase('reeval')">Reevaluación →</button>`:''}
+    </div>
+    ${done&&session.exerciseResult?`<div class="success-box mt">${session.exerciseResult}</div>`:''}
+    ${done&&session.exerciseError?`<div class="danger-box mt">${session.exerciseError}</div>`:''}
+  </div>`;
+}
+
+function updateExParam(key,val){
+  if(!session.exerciseParams) session.exerciseParams={...session.case.exerciseDefaults};
+  session.exerciseParams[key]=isNaN(+val)?val:+val;
+}
+
+function skipExercise(){
+  clearInterval(session.exInterval);
+  session.exRunning=false;
+  session.exerciseDone=true;
+  session.exerciseSkipped=true;
+  logAction('Ejercicio terapéutico omitido por el evaluador','warn');
+  addScore('exercise',0,'Ejercicio terapéutico no realizado');
+  advancePhase('reeval');
+}
+
+function startExercise(){
+  const c=session.case;
+  if(!session.exerciseParams) session.exerciseParams={...c.exerciseDefaults};
+  const params=session.exerciseParams;
+
+  // Validate FC
+  const maxFc=220-c.patient.age;
+  if(params.fc_target>maxFc*0.95){
+    addScore('exercise',-5,'FC objetivo peligrosamente alta (>95% FCmáx)');
+    logAction(`⚠ FC objetivo ${params.fc_target} supera el 95% de FCmáx (${Math.round(maxFc*0.95)} lpm)!`,'err');
+  }
+  if(c.id==='epoc'&&!params.o2&&session.state.spo2<91){
+    addScore('exercise',-3,'Ejercicio sin O₂ con SpO₂ basal baja en EPOC');
+    logAction('⚠ Ejercicio iniciado sin O₂ suplementario con SpO₂ basal < 91%','warn');
+  }
+
+  session.exRunning=true;
+  session.exElapsed=0;
+  session.exHistory={fc:[],spo2:[],borg:[],labels:[]};
+  logAction(`Ejercicio iniciado: ${params.modality}, FC obj ${params.fc_target} lpm, ${params.duration} min`,'ok');
+
+  document.getElementById('phaseContent').innerHTML=renderExercise();
+
+  // Init chart
+  const ctx=document.getElementById('exChart');
+  if(ctx){
+    if(session.exChart) session.exChart.destroy();
+    session.exChart=new Chart(ctx,{
+      type:'line',
+      data:{labels:[],datasets:[
+        {label:'FC (lpm)',data:[],borderColor:'var(--red)',pointRadius:0,borderWidth:2,tension:.4,yAxisID:'y'},
+        {label:'SpO₂ (%)',data:[],borderColor:'var(--blue)',pointRadius:0,borderWidth:2,tension:.4,yAxisID:'y2'},
+        {label:'Borg×10',data:[],borderColor:'var(--amber)',pointRadius:0,borderWidth:1.5,tension:.4,yAxisID:'y',borderDash:[4,3]},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},
+        plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}},
+        scales:{
+          x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(255,255,255,.03)'}},
+          y:{position:'left',ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},min:50,max:220,title:{display:true,text:'FC (lpm)',color:'#475569',font:{size:9}}},
+          y2:{position:'right',ticks:{color:'#475569',font:{size:9}},grid:{display:false},min:75,max:100,title:{display:true,text:'SpO₂ (%)',color:'#475569',font:{size:9}}}
+        }
+      }
+    });
+  }
+
+  session.exInterval=setInterval(()=>tickExercise(),1000);
+}
+
+function tickExercise(){
+  const c=session.case;
+  const params=session.exerciseParams;
+  session.exElapsed++;
+  const totalSec=params.duration*60;
+
+  const phys=c.exercisePhysiology(params,session.stateHistory[session.stateHistory.length-1],session.exElapsed);
+  const curSpo2=phys.spo2;
+  const curFc=phys.fc;
+  const curBorg=phys.borg;
+
+  // Update monitor displays
+  const fcEl=document.getElementById('exFCval');
+  const spo2El=document.getElementById('exSPO2val');
+  const borgEl=document.getElementById('exBorgval');
+  const timeEl=document.getElementById('exTimeVal');
+  if(fcEl) fcEl.textContent=curFc;
+  if(spo2El) spo2El.textContent=curSpo2.toFixed(1)+'%';
+  if(borgEl) borgEl.textContent=curBorg.toFixed(1);
+  if(timeEl){
+    const m=Math.floor(session.exElapsed/60), s2=session.exElapsed%60;
+    timeEl.textContent=`${m}:${s2.toString().padStart(2,'0')}`;
+  }
+
+  // Color monitors
+  const fcCard=document.getElementById('exMonFC');
+  const spo2Card=document.getElementById('exMonSPO2');
+  const borgCard=document.getElementById('exMonBorg');
+  if(fcCard) fcCard.className=`ex-mon-card ${curFc>params.fc_target+10?'alert':curFc>params.fc_target?'warn':''}`;
+  if(spo2Card) spo2Card.className=`ex-mon-card ${curSpo2<params.spo2_min?'alert':curSpo2<params.spo2_min+3?'warn':''}`;
+  if(borgCard) borgCard.className=`ex-mon-card ${curBorg>params.borg_max?'alert':curBorg>=params.borg_max-1?'warn':''}`;
+
+  // Chart every 5s
+  if(session.exElapsed%5===0){
+    const label=Math.floor(session.exElapsed/60)+':'+(session.exElapsed%60).toString().padStart(2,'0');
+    if(session.exChart){
+      session.exChart.data.labels.push(label);
+      session.exChart.data.datasets[0].data.push(curFc);
+      session.exChart.data.datasets[1].data.push(curSpo2);
+      session.exChart.data.datasets[2].data.push(curBorg*10);
+      session.exChart.update();
+    }
+  }
+
+  // Stop conditions
+  if(curSpo2<params.spo2_min){ stopExercise(`SpO₂ cayó a ${curSpo2.toFixed(1)}% — por debajo del mínimo ${params.spo2_min}%`); return; }
+  if(curBorg>params.borg_max+1){ stopExercise(`Borg ${curBorg.toFixed(1)} — superó el límite de ${params.borg_max}/10`); return; }
+  if(curFc>=(220-c.patient.age)*0.96){ stopExercise(`FC ${curFc} lpm — cerca de la FCmáx`); return; }
+  if(session.exElapsed>=totalSec){ stopExercise(null); return; }
+}
+
+function stopExercise(reason){
+  clearInterval(session.exInterval);
+  session.exRunning=false;
+  session.exerciseDone=true;
+  const completed=!reason;
+  const pctCompleted=Math.round(session.exElapsed/(session.exerciseParams.duration*60)*100);
+  if(completed){
+    session.exerciseResult=`✓ Ejercicio completado (${session.exerciseParams.duration} min). Buena tolerancia. Prescripción adecuada.`;
+    addScore('exercise',10,'Ejercicio terapéutico completado correctamente');
+    logAction(`Ejercicio completado: ${session.exerciseParams.duration} min`,'ok');
+  } else {
+    if(reason&&reason.includes('SpO₂')){
+      session.exerciseError=`⚠ Parada por seguridad: ${reason}. Considera aumentar el O₂ o reducir la intensidad.`;
+      addScore('exercise',4,'Ejercicio detenido por criterio de seguridad (SpO₂)');
+    } else {
+      session.exerciseError=`⏹ Detenido: ${reason||'por evaluador'}. Completado ${pctCompleted}%.`;
+      addScore('exercise',pctCompleted>70?7:3,'Ejercicio detenido antes de completar');
+    }
+    logAction(`Ejercicio detenido: ${reason||'manual'}`,'warn');
+  }
+  document.getElementById('phaseContent').innerHTML=renderExercise();
+}
+
+function adjustExercise(){
+  const panel=document.getElementById('exAdjustPanel');
+  if(!panel) return;
+  panel.innerHTML=`<div class="warn-box mt">
+    <b>Ajuste de carga en tiempo real:</b><br>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+      <div class="ex-field">
+        <label>Nueva FC objetivo (lpm)</label>
+        <input type="number" id="adj_fc" value="${session.exerciseParams.fc_target}" min="60" max="180">
+      </div>
+      <div class="ex-field">
+        <label>Nuevo O₂ (L/min)</label>
+        <input type="number" id="adj_o2" value="${session.exerciseParams.o2_flow||0}" min="0" max="6">
+      </div>
+      <div style="align-self:flex-end">
+        <button class="btn btn-a btn-sm" onclick="applyAdjustment()">Aplicar ajuste</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function applyAdjustment(){
+  const fc=parseFloat(document.getElementById('adj_fc')?.value||session.exerciseParams.fc_target);
+  const o2=parseFloat(document.getElementById('adj_o2')?.value||0);
+  session.exerciseParams.fc_target=fc;
+  session.exerciseParams.o2_flow=o2;
+  session.exerciseParams.o2=o2>0;
+  logAction(`Ajuste: FC objetivo → ${fc} lpm, O₂ → ${o2} L/min`,'info');
+  document.getElementById('exAdjustPanel').innerHTML='<div class="success-box mt">Ajuste aplicado ✓</div>';
+}
+
+function continueExerciseChart(){
+  // Chart re-init happens in startExercise, nothing needed here
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: REEVAL
+═══════════════════════════════════════════════════════════════ */
+function renderReeval(){
+  const c=session.case;
+  const s0=session.stateHistory[0];
+  const sF=session.state;
+
+  const vitalDiff=(key,label,higher=true,unit='')=>{
+    const d=(sF[key]||0)-(s0[key]||0);
+    const good=higher?d>=0:d<=0;
+    const cls=d===0?'':'';
+    return `<tr>
+      <td style="color:var(--text2);font-size:12.5px">${label}</td>
+      <td style="font-family:var(--fm);font-size:13px">${s0[key]}${unit}</td>
+      <td style="font-family:var(--fm);font-size:13px">${sF[key]}${unit}</td>
+      <td style="font-family:var(--fm);font-size:13px;color:${good?'var(--green)':'var(--red)'}">${d>0?'+':''}${d.toFixed?d.toFixed(1):d}${unit}</td>
+    </tr>`;
+  };
+
+  return `<div class="card">
+    <div class="flex-b mb">
+      <div class="card-title">📊 Reevaluación — Comparación Antes / Después</div>
+      <button class="btn btn-p btn-sm" onclick="advancePhase('result')">Ver Resultado Final →</button>
+    </div>
+    <div class="info mb">Compara el estado del paciente al inicio y al final de la sesión. Esta información guía la próxima sesión.</div>
+
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead>
+        <tr>
+          <th style="background:var(--bg3);padding:7px 12px;text-align:left;color:var(--text3);font-size:11px;border-bottom:1px solid var(--border)">Parámetro</th>
+          <th style="background:var(--bg3);padding:7px 12px;color:var(--text3);font-size:11px;border-bottom:1px solid var(--border)">Inicial</th>
+          <th style="background:var(--bg3);padding:7px 12px;color:var(--text3);font-size:11px;border-bottom:1px solid var(--border)">Final</th>
+          <th style="background:var(--bg3);padding:7px 12px;color:var(--text3);font-size:11px;border-bottom:1px solid var(--border)">Δ</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${vitalDiff('spo2','SpO₂',true,'%')}
+        ${vitalDiff('fc','FC',false,' lpm')}
+        ${vitalDiff('fr','FR',false,' rpm')}
+        ${vitalDiff('borg','Borg',false,'/10')}
+        ${vitalDiff('pco2','PaCO₂',false,' mmHg')}
+        ${vitalDiff('secretions','Secreciones',false,'%')}
+        ${vitalDiff('bronchospasm','Broncoespasmo',false,'%')}
+      </tbody>
+    </table>
+
+    <div class="mt success-box">
+      <b>Recomendaciones para próxima sesión:</b><br>
+      ${session.score.total>=60?'Sesión exitosa. Continuar con progresión de carga en próxima sesión.':
+        session.score.total>=40?'Sesión aceptable. Revisar el orden de técnicas y la prescripción de ejercicio.':
+        'Revisar el plan de tratamiento. Consultar bibliografía sobre el caso antes de la próxima sesión.'}
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE: RESULT
+═══════════════════════════════════════════════════════════════ */
+function renderResult(){
+  const c=session.case;
+  const sc=session.score;
+  const sm=c.scoreMap;
+  const total=Math.min(100,sc.total);
+  const grade=total>=85?{l:'Excelente',c:'var(--green)'}:total>=70?{l:'Bueno',c:'var(--blue)'}:total>=55?{l:'Aceptable',c:'var(--amber)'}:{l:'Insuficiente',c:'var(--red)'};
+
+  clearInterval(session.timerInterval);
+  const elapsed=Math.round((Date.now()-session.startTime)/1000);
+  const em=Math.floor(elapsed/60), es=elapsed%60;
+
+  const phases=[
+    {key:'anamnesis',label:'Anamnesis',max:sm.anamnesis},
+    {key:'exam',label:'Examen físico',max:sm.exam},
+    {key:'tests',label:'Pruebas funcionales',max:sm.tests},
+    {key:'diagnosis',label:'Diagnóstico',max:sm.diagnosis},
+    {key:'plan',label:'Plan de intervención',max:sm.plan},
+    {key:'exercise',label:'Ejercicio terapéutico',max:sm.exercise},
+  ];
+
+  return `<div class="card">
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-family:var(--fh);font-size:3.5rem;color:${grade.c};line-height:1">${total}</div>
+      <div style="font-size:.9rem;color:var(--text3);margin:.2rem 0">puntos / 100</div>
+      <div style="font-family:var(--fh);font-size:1.4rem;color:${grade.c}">${grade.l}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:.5rem">Tiempo: ${em}:${es.toString().padStart(2,'0')} min &nbsp;·&nbsp; Caso: ${c.name}</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.25rem">
+      ${phases.map(p=>{
+        const got=Math.min(sc[p.key]||0,p.max);
+        const pct=Math.round(got/p.max*100);
+        const col=pct>=80?'var(--green)':pct>=60?'var(--blue)':pct>=40?'var(--amber)':'var(--red)';
+        return `<div class="score-section">
+          <div class="score-section-header">
+            <span>${p.label}</span>
+            <span style="color:${col}">${got} / ${p.max} pts (${pct}%)</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Expert plan summary -->
+    <div class="card" style="background:var(--bg3);margin-bottom:.75rem">
+      <div style="font-family:var(--fh);font-size:.95rem;margin-bottom:.75rem;color:var(--blue)">Plan del Experto — ${c.name}</div>
+      ${c.expertPlan.keyPoints.map(k=>`<div style="font-size:12.5px;color:var(--text2);margin-bottom:.4rem;padding-left:.5rem;border-left:2px solid var(--blue)">▸ ${k}</div>`).join('')}
+    </div>
+
+    <button class="btn btn-p btn-full btn-lg" onclick="goHome()">← Elegir otro caso</button>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHASE NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+function advancePhase(nextPhase){
+  if(!session.phasesDone.includes(session.phase)){
+    session.phasesDone.push(session.phase);
+  }
+  session.phase=nextPhase;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════════════════════ */
+function renderHome(){
+  document.getElementById('navCaseName').textContent='Selecciona un caso';
+  document.getElementById('navTimer').classList.add('hidden');
+  document.getElementById('navScore').classList.add('hidden');
+
+  const root=document.getElementById('appRoot');
+  root.innerHTML=`
+    <div class="hero">
+      <h1>Casos Clínicos <em>Interactivos</em></h1>
+      <p>Simulación clínica completa con razonamiento real: anamnesis, examen físico, pruebas funcionales, diagnóstico y tratamiento con respuesta fisiológica en tiempo real.</p>
+    </div>
+
+    <div class="card mb" style="background:var(--bg3)">
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start">
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:var(--fh);font-size:.95rem;color:var(--blue);margin-bottom:.5rem">Cómo funciona</div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            1. Lee la <b style="color:var(--text)">orden médica</b> y conoce al paciente<br>
+            2. Realiza la <b style="color:var(--text)">anamnesis</b> — el paciente responde dinámicamente<br>
+            3. Elige qué <b style="color:var(--text)">examinar</b> y ausculta el tórax zona por zona<br>
+            4. Selecciona y ejecuta <b style="color:var(--text)">pruebas funcionales</b><br>
+            5. Construye el <b style="color:var(--text)">diagnóstico fisioterapéutico</b><br>
+            6. Diseña el <b style="color:var(--text)">plan</b> con técnicas y parámetros reales<br>
+            7. <b style="color:var(--text)">Aplica</b> y observa la respuesta fisiológica en tiempo real<br>
+            8. Si aplica: <b style="color:var(--text)">prescribe y simula</b> el ejercicio terapéutico
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:var(--fh);font-size:.95rem;color:var(--amber);margin-bottom:.5rem">Puntuación</div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.7">
+            ⭐ Preguntas críticas realizadas<br>
+            🔍 Examen físico completo<br>
+            🏃 Pruebas funcionales elegidas<br>
+            🧬 Diagnóstico correcto<br>
+            🛠️ Técnicas apropiadas y ordenadas<br>
+            💪 Prescripción de ejercicio correcta<br>
+            <span style="color:var(--amber);font-size:11px">★ Las preguntas y respuestas del paciente cambian cada sesión</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-grid">
+      ${CASES.map(c=>`
+        <div class="case-sel-card ${c.colorClass}" onclick="initSession('${c.id}')">
+          <span class="icon">${c.icon}</span>
+          <div class="cname">${c.name}</div>
+          <div class="cinfo">${c.subtitle}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.75rem">
+            ${c.tags.map(t=>`<span class="badge badge-blue" style="font-size:10px">${t}</span>`).join('')}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="cdiff">
+              ${[1,2,3].map(i=>`<div class="diff-dot ${i<=c.difficulty?'on':''}"></div>`).join('')}
+              <span style="font-size:10px;color:var(--text3);margin-left:4px">${c.difficulty===1?'Básico':c.difficulty===2?'Intermedio':'Avanzado'}</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">~20 min</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function goHome(){
+  if(session?.timerInterval) clearInterval(session.timerInterval);
+  if(session?.exInterval) clearInterval(session.exInterval);
+  session=null;
+  render();
+}
+
+/* ─── INIT ─── */
+render();
+</script>
+  <script src="../assets/js/ui.js"></script>
+</body>
+</html>
