@@ -442,100 +442,114 @@ const DISTRACTORS = {
 };
 
 /* ══════════════════════════════════════════════════════
-   WAVEFORM ENGINE
+   WAVEFORM ENGINE  —  all timing in real SECONDS
+   bt = seconds elapsed since beat start (never normalized)
 ═══════════════════════════════════════════════════════ */
-const SR = 200;       // samples/sec
-const PPS = 0.5;      // px per sample  (100 px/s ÷ 200 Hz)
-const AMP = 80;       // px per mV
+const SR  = 200;   // samples / sec
+const PPS = 0.5;   // px per sample  (100 px/s ÷ 200 Hz)
+const AMP = 80;    // px per mV
 
+// Gaussian building block: amplitude a, center c, sigma s
 const G = (t, c, s, a) => a * Math.exp(-((t - c) ** 2) / (2 * s * s));
 
-/* Returns voltage (mV) at phase t (0..1) within a beat */
-function beatNormal(t, cfg = {}) {
-  const {pr=0.16, qrsW=0.08, stShift=0, tInvert=false, noP=false, qrsAmp=1.0, prLong=false} = cfg;
-  const RR = 1;
-  const prStart = 0.05;
-  const qrsCenter = prStart + (prLong ? 0.26 : pr) + qrsW / 2;
-  const stEnd = qrsCenter + qrsW / 2 + 0.04;
-  const tCenter = stEnd + 0.16;
-
+/*
+ * beatNormal — standard PQRST in seconds from beat start
+ *
+ * Anatomy (seconds from beat start):
+ *   P peak   0.090 s
+ *   PR int.  0.160 s  → QRS onset  0.250 s
+ *   Q trough 0.265 s
+ *   R peak   0.290 s
+ *   S trough 0.320 s
+ *   T peak   0.470 s
+ *
+ * prExtra shifts QRS+T block rightward (AV blocks)
+ */
+function beatNormal(bt, cfg = {}) {
+  const { stShift = 0, tInvert = false, noP = false,
+          qrsAmp = 1.0, prExtra = 0 } = cfg;
+  const o = prExtra;                          // QRS/T offset
   let v = 0;
-  if (!noP) v += G(t, 0.12, 0.025, 0.15);          // P wave
-  v += G(t, qrsCenter - 0.01, 0.007, -0.15);        // Q
-  v += G(t, qrsCenter,        0.012, 1.2 * qrsAmp); // R
-  v += G(t, qrsCenter + 0.01, 0.007, -0.15);        // S
-  if (stShift !== 0) {                               // ST shift
-    const stC = qrsCenter + qrsW / 2 + 0.05;
-    v += G(t, stC, 0.04, stShift);
-  }
-  const tAmp = tInvert ? -0.25 : 0.25;
-  v += G(t, tCenter, 0.035, tAmp);                  // T wave
+  if (!noP)  v += G(bt, 0.090,       0.028,  0.20);           // P
+  v +=        G(bt, 0.265 + o,  0.010, -0.18);                 // Q
+  v +=        G(bt, 0.290 + o,  0.015,  1.10 * qrsAmp);        // R
+  v +=        G(bt, 0.322 + o,  0.011, -0.22);                 // S
+  if (stShift !== 0)
+    v +=      G(bt, 0.385 + o,  0.048,  stShift);              // ST deviation
+  v +=        G(bt, 0.470 + o,  0.042,  tInvert ? -0.28 : 0.28); // T
   return v;
 }
 
-function beatLBBB(t) {
-  const c = 0.3;
-  let v = G(t, 0.12, 0.025, 0.12);        // P
-  v += G(t, c - 0.015, 0.01, -0.1);       // q absent / small
-  v += G(t, c,         0.018, 0.9);       // broad R notch 1
-  v += G(t, c + 0.03, 0.018, 0.7);        // broad R notch 2
-  v += G(t, c + 0.018,0.008, -0.25);      // notch dip
-  v += G(t, c + 0.05, 0.04, -0.3);        // discordant T
+/*
+ * beatLBBB — wide notched R, no Q, discordant T
+ * QRS ≥ 120 ms, two R humps with notch between them
+ */
+function beatLBBB(bt) {
+  let v = G(bt, 0.090, 0.028,  0.18);   // P
+  // No Q (septal depolarisation reversed)
+  v +=    G(bt, 0.310, 0.030,  0.85);   // R upstroke (broad)
+  v +=    G(bt, 0.358, 0.010, -0.30);   // notch dip between humps
+  v +=    G(bt, 0.395, 0.028,  0.72);   // R' second hump
+  v +=    G(bt, 0.510, 0.048, -0.34);   // discordant T (negative)
   return v;
 }
 
-function beatRBBB(t) {
-  const c = 0.28;
-  let v = G(t, 0.12, 0.025, 0.12);       // P
-  v += G(t, c,         0.01, 0.7);        // r (first R)
-  v += G(t, c + 0.02, 0.008, -0.5);       // S
-  v += G(t, c + 0.04, 0.01, 0.6);         // R' (second peak)
-  v += G(t, c + 0.07, 0.035, 0.2);        // T
+/*
+ * beatRBBB — rSR' pattern, deep S, discordant T
+ */
+function beatRBBB(bt) {
+  let v = G(bt, 0.090, 0.028,  0.18);   // P
+  v +=    G(bt, 0.275, 0.012,  0.60);   // r (small initial R)
+  v +=    G(bt, 0.308, 0.012, -0.58);   // deep S
+  v +=    G(bt, 0.362, 0.018,  0.82);   // R' (broad, taller second peak)
+  v +=    G(bt, 0.475, 0.040, -0.24);   // discordant T
   return v;
 }
 
-function beatVentricular(t, wide = true) {
-  const c = wide ? 0.32 : 0.28;
-  const w = wide ? 0.045 : 0.025;
-  let v = G(t, c, w, 1.4);
-  v += G(t, c + w * 2, w * 1.5, -0.7);
-  v += G(t, c + w * 4, 0.04, -0.3);
+/*
+ * beatVentricular — wide bizarre QRS, no P, discordant T
+ * Used for PVC beats and VT
+ */
+function beatVentricular(bt) {
+  let v = G(bt, 0.295, 0.055,  1.45);   // wide positive main deflection
+  v +=    G(bt, 0.400, 0.050, -0.82);   // opposing negative component
+  v +=    G(bt, 0.495, 0.042, -0.32);   // discordant T
   return v;
 }
 
-/* Noise-based chaos for vfib */
+/* Seeded PRNG for reproducible VFib chaos */
 let _rngState = 12345;
 function seededRand() {
   _rngState = (_rngState * 1664525 + 1013904223) & 0xffffffff;
   return (_rngState >>> 0) / 0xffffffff;
 }
 function vfibVoltage(t) {
-  const f1 = Math.sin(2 * Math.PI * 7.3 * t);
-  const f2 = Math.sin(2 * Math.PI * 5.1 * t + 1.2);
-  const f3 = Math.sin(2 * Math.PI * 9.7 * t + 2.4);
-  const n = (seededRand() - 0.5) * 0.3;
-  return 0.35 * f1 + 0.25 * f2 + 0.15 * f3 + n;
+  return (
+    0.38 * Math.sin(2 * Math.PI *  6.5 * t) +
+    0.26 * Math.sin(2 * Math.PI *  9.2 * t + 1.30) +
+    0.18 * Math.sin(2 * Math.PI *  4.7 * t + 2.60) +
+    0.12 * Math.sin(2 * Math.PI * 12.1 * t + 0.85) +
+    (seededRand() - 0.5) * 0.22
+  );
 }
 
 /* ──────────────────────────────────────────
    Engine: stateful rhythm generator
+   All internal timing in real seconds.
 ────────────────────────────────────────── */
 const engine = {
   rhythmId: 'normal',
   hr: 72,
-  t: 0,            // absolute time (seconds)
-  nextBeatT: 0,    // time of next beat start
-  beatT: 0,        // beat phase origin
+  t: 0,            // absolute engine time (s)
+  nextBeatT: 0,    // when next ventricular beat fires
+  beatT: 0,        // start of current ventricular beat
   beatRR: 60/72,
 
-  wenckP: 0,       // Wenckebach PR accumulator
-  wenckCycle: 0,   // beats in current Wenckebach sequence
+  wenckExtra: 0,   // extra PR seconds (Wenckebach: 0, 0.07, 0.14…)
+  wenckCycle: 0,
   wenckDrop: false,
-
-  mobitzCount: 0,  // Mobitz II — beat index; every 3rd is blocked
-  av3AurT: 0,      // AV3 — separate atrial timer
-  pvcPhase: 0,     // PVC — beats since last PVC
-  aflutterAurT: 0, // flutter separate atrial
+  mobitzCount: 0,
+  pvcCycle: 0,
 
   reset(rid, hr) {
     this.rhythmId = rid;
@@ -544,169 +558,135 @@ const engine = {
     this.nextBeatT = 0;
     this.beatT = 0;
     this.beatRR = 60 / hr;
-    this.wenckP = 0.18;
+    this.wenckExtra = 0;
     this.wenckCycle = 0;
     this.wenckDrop = false;
     this.mobitzCount = 0;
-    this.av3AurT = 0;
-    this.pvcPhase = 0;
-    this.aflutterAurT = 0;
+    this.pvcCycle = 0;
     _rngState = 54321;
   },
 
-  voltage(t) {
+  /* Returns voltage (mV) at current engine time — no parameter needed */
+  voltage() {
     const rid = this.rhythmId;
+    const t  = this.t;
+    const bt = t - this.beatT;   // seconds since beat start
 
-    if (rid === 'vfib') return vfibVoltage(t * 8);
+    if (rid === 'vfib') return vfibVoltage(t);
 
-    /* phase within current beat (0..1) */
-    const rr = this.beatRR || 0.6;
-    const phase = (t - this.beatT) / rr;
+    /* ── sinusal ── */
+    if (rid === 'normal' || rid === 'brady' || rid === 'tachy')
+      return beatNormal(bt);
 
-    if (rid === 'normal') return beatNormal(phase);
-    if (rid === 'brady')  return beatNormal(phase);
-    if (rid === 'tachy')  return beatNormal(phase, {pr:0.14});
-    if (rid === 'av1')    return beatNormal(phase, {prLong:true});
-
+    /* ── auricular ── */
     if (rid === 'afib') {
-      const v = beatNormal(phase, {noP:true});
-      const fibs = Math.sin(2*Math.PI*6.5*t)*0.05 + Math.sin(2*Math.PI*8.1*t)*0.03;
-      return v + fibs;
+      const qrs = beatNormal(bt, { noP: true });
+      // Fine fibrillatory baseline (f waves ~350/min)
+      const f = 0.065 * Math.sin(2 * Math.PI * 5.8 * t)
+              + 0.040 * Math.sin(2 * Math.PI * 7.4 * t + 1.1);
+      return qrs + f;
     }
     if (rid === 'aflutter') {
-      const aurP = ((t - this.aflutterAurT) % (60/300)) / (60/300);
-      const sawV = aurP < 0.5 ? -0.18 * (1 - 2*aurP) : 0.18 * (1 - 2*(aurP-0.5));
-      const qrsV = beatNormal(phase, {noP:true});
-      return sawV + qrsV;
+      // Flutter F waves: negative sawtooth at 300/min
+      const fp  = 60 / 300;                   // 0.2 s per F-wave cycle
+      const fn  = (t % fp) / fp;              // 0→1 within cycle
+      const saw = fn < 0.75
+        ? -0.24 * fn / 0.75                    // slow downslope
+        : -0.24 + 0.24 * (fn - 0.75) / 0.25;  // fast return
+      return saw + beatNormal(bt, { noP: true });
     }
+
+    /* ── AV blocks ── */
+    if (rid === 'av1') return beatNormal(bt, { prExtra: 0.12 });
 
     if (rid === 'wenckebach') {
-      const prV = 0.12 + this.wenckP;
-      const v = this.wenckDrop ? 0 : beatNormal(phase, {pr:Math.min(prV,0.36)});
-      return v;
+      if (this.wenckDrop)
+        return G(bt, 0.090, 0.028, 0.20);     // P only, no QRS
+      return beatNormal(bt, { prExtra: this.wenckExtra });
     }
     if (rid === 'mobitz2') {
-      if (this.mobitzCount % 3 === 2) {
-        return G(phase, 0.12, 0.025, 0.13);
-      }
-      return beatNormal(phase, {pr:0.22});
+      if (this.mobitzCount % 4 === 3)
+        return G(bt, 0.090, 0.028, 0.20);     // blocked P only
+      return beatNormal(bt, { prExtra: 0.04 });
     }
     if (rid === 'av3') {
-      const venRR = 60/38;
-      const venPhase = (t - this.beatT) / venRR;
-      const aurRR = 60/75;
-      const aurPhase = ((t - this.av3AurT) % aurRR) / aurRR;
-      const aurV = G(aurPhase, 0.12, 0.025, 0.15);
-      const venV = beatNormal(Math.max(0, venPhase), {noP:true, qrsAmp:0.9});
-      return aurV + venV;
+      // Independent atrial P waves at 75/min using absolute time modulo
+      const aurRR = 60 / 75;
+      const aurV  = G(t % aurRR, 0.090, 0.028, 0.20);
+      // Ventricular escape: wide-ish QRS (no P)
+      return aurV + beatNormal(bt, { noP: true, qrsAmp: 0.85 });
     }
 
-    if (rid === 'lbbb') return beatLBBB(phase);
-    if (rid === 'rbbb') return beatRBBB(phase);
+    /* ── conduction defects ── */
+    if (rid === 'lbbb') return beatLBBB(bt);
+    if (rid === 'rbbb') return beatRBBB(bt);
 
-    if (rid === 'pvc') {
-      if (this.pvcPhase === 1) return beatVentricular(phase);
-      return beatNormal(phase);
-    }
-    if (rid === 'vt') return beatVentricular(phase, true);
+    /* ── ventricular ── */
+    if (rid === 'pvc')
+      return this.pvcCycle === 1 ? beatVentricular(bt) : beatNormal(bt);
+    if (rid === 'vt') return beatVentricular(bt);
 
-    if (rid === 'stemi') return beatNormal(phase, {stShift:0.25, qrsAmp:1.1});
-    if (rid === 'nstemi') return beatNormal(phase, {stShift:-0.18, tInvert:true});
+    /* ── ischaemia ── */
+    if (rid === 'stemi')  return beatNormal(bt, { stShift:  0.30, qrsAmp: 1.05 });
+    if (rid === 'nstemi') return beatNormal(bt, { stShift: -0.22, tInvert: true });
 
-    return beatNormal(phase);
+    return beatNormal(bt);
   },
 
-  /* Advance time and schedule next beat */
+  /* Advance engine by dt seconds; schedule beat transitions */
   advance(dt) {
     this.t += dt;
+    if (this.t < this.nextBeatT) return;
+
+    const rr  = 60 / this.hr;
     const rid = this.rhythmId;
+    this.beatT = this.nextBeatT;
 
-    if (this.t >= this.nextBeatT) {
-      const rr = 60 / this.hr;
-
-      if (rid === 'vfib') {
-        this.beatT = this.nextBeatT;
-        this.beatRR = rr;
-        this.nextBeatT += rr;
-        return;
-      }
-
-      this.beatT = this.nextBeatT;
-
-      if (rid === 'wenckebach') {
+    switch (rid) {
+      case 'wenckebach': {
         if (this.wenckDrop) {
-          this.wenckDrop = false;
-          this.wenckP = 0.02;
+          this.wenckDrop  = false;
+          this.wenckExtra = 0;
           this.wenckCycle = 0;
         }
         this.wenckCycle++;
-        this.wenckP = 0.02 + this.wenckCycle * 0.06;
-        if (this.wenckCycle >= 3) {
+        this.wenckExtra = (this.wenckCycle - 1) * 0.07;
+        if (this.wenckCycle >= 4) {
           this.wenckDrop = true;
-          this.beatRR = rr * 0.5;
-          this.nextBeatT = this.beatT + this.beatRR;
-          return;
+          this.beatRR    = rr * 0.55;   // short window for blocked P
+        } else {
+          this.beatRR = rr;
         }
-        this.beatRR = rr;
-        this.nextBeatT = this.beatT + rr;
-        return;
+        break;
       }
-
-      if (rid === 'mobitz2') {
+      case 'mobitz2': {
         this.mobitzCount++;
-        if (this.mobitzCount % 3 === 2) {
-          this.beatRR = rr * 0.4;
-          this.nextBeatT = this.beatT + this.beatRR;
-          return;
-        }
+        // Every 4th beat is blocked (P only)
+        this.beatRR = (this.mobitzCount % 4 === 3) ? rr * 0.45 : rr;
+        break;
+      }
+      case 'afib': {
+        const j = (Math.random() - 0.5) * rr * 0.50;
+        this.beatRR = Math.max(rr * 0.50, rr + j);
+        break;
+      }
+      case 'aflutter':
+        this.beatRR = (60 / 300) * 4;   // 4:1 → ventricular ~75 bpm
+        break;
+      case 'av3':
+        this.beatRR = 60 / 38;          // ventricular escape rate
+        break;
+      case 'pvc': {
+        this.pvcCycle = (this.pvcCycle + 1) % 5;
+        if      (this.pvcCycle === 1) this.beatRR = rr * 0.72;  // premature
+        else if (this.pvcCycle === 2) this.beatRR = rr * 1.28;  // compensatory
+        else                          this.beatRR = rr;
+        break;
+      }
+      default:
         this.beatRR = rr;
-        this.nextBeatT = this.beatT + rr;
-        return;
-      }
-
-      if (rid === 'av3') {
-        const venRR = 60 / 38;
-        this.beatRR = venRR;
-        this.nextBeatT = this.beatT + venRR;
-        if (this.av3AurT === 0) this.av3AurT = this.beatT;
-        return;
-      }
-
-      if (rid === 'pvc') {
-        this.pvcPhase = (this.pvcPhase + 1) % 4;
-        this.beatRR = rr;
-        if (this.pvcPhase === 1) {
-          this.beatRR = rr * 0.7;
-          this.nextBeatT = this.beatT + this.beatRR;
-          return;
-        }
-        if (this.pvcPhase === 2) {
-          this.beatRR = rr * 1.3;
-          this.nextBeatT = this.beatT + this.beatRR;
-          return;
-        }
-        this.nextBeatT = this.beatT + rr;
-        return;
-      }
-
-      if (rid === 'afib') {
-        const jitter = (Math.random() - 0.5) * rr * 0.4;
-        this.beatRR = Math.max(rr * 0.5, rr + jitter);
-        this.nextBeatT = this.beatT + this.beatRR;
-        return;
-      }
-
-      if (rid === 'aflutter') {
-        const ratio = 4;
-        if (this.aflutterAurT === 0) this.aflutterAurT = this.beatT;
-        this.beatRR = (60 / 300) * ratio;
-        this.nextBeatT = this.beatT + this.beatRR;
-        return;
-      }
-
-      this.beatRR = rr;
-      this.nextBeatT = this.beatT + rr;
     }
+    this.nextBeatT = this.beatT + this.beatRR;
   }
 };
 
@@ -763,7 +743,7 @@ class ECGRenderer {
     const dt1 = 1 / this.SR;
     for (let i = 0; i < nSamples; i++) {
       this.engineRef.advance(dt1);
-      const v = this.engineRef.voltage(this.engineRef.t);
+      const v = this.engineRef.voltage();
       const idx = this.writePos % this.bufLen;
       this.buf[idx] = v;
       this.writePos++;
