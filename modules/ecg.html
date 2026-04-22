@@ -10,202 +10,310 @@
 .mode-section{display:none}
 .mode-section.active{display:block}
 
-/* ── canvas wrap ── */
+/* ════════════════════════════════
+   MONITOR / CANVAS
+════════════════════════════════ */
 .ecg-wrap{
-  background:#0a1628;
-  border-radius:12px;
-  border:1px solid var(--border);
-  padding:1rem;
-  position:relative;
+  background:#05111e;
+  border-radius:14px;
+  border:1px solid rgba(74,158,255,.20);
   overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),
+             inset 0 1px 0 rgba(255,255,255,.04),
+             0 12px 40px rgba(0,0,0,.6);
+  position:relative;
+}
+.ecg-hud{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.45rem 1rem;
+  background:rgba(0,0,0,.35);
+  border-bottom:1px solid rgba(74,158,255,.10);
+}
+.ecg-hud-left{display:flex;flex-direction:column;gap:.05rem}
+.ecg-meta{
+  font-family:var(--fm);
+  font-size:.6rem;
+  color:#4a9eff44;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.ecg-rhythm-name{
+  font-family:var(--fh);
+  font-size:.82rem;
+  color:var(--rc,#4a9eff);
+  text-shadow:0 0 10px var(--rc,#4a9eff);
+  transition:color .3s, text-shadow .3s;
+}
+.ecg-bpm-display{
+  font-family:var(--fm);
+  font-size:1.5rem;
+  line-height:1;
+  color:var(--rc,#4a9eff);
+  text-shadow:0 0 14px var(--rc,#4a9eff);
+  transition:color .3s, text-shadow .3s;
+  letter-spacing:.05em;
+}
+.ecg-bpm-display sub{
+  font-size:.55rem;
+  color:rgba(74,158,255,.45);
+  letter-spacing:.1em;
+  margin-left:.2rem;
+  vertical-align:middle;
 }
 .ecg-wrap canvas{
   display:block;
   width:100%;
-  border-radius:6px;
   image-rendering:crisp-edges;
 }
-.ecg-label{
-  position:absolute;
-  top:.75rem;left:1rem;
-  font-family:var(--fh);
-  font-size:.7rem;
-  color:#4a9eff88;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.ecg-hr-badge{
-  position:absolute;
-  top:.75rem;right:1rem;
-  font-family:var(--fh);
-  font-size:1.1rem;
-  color:#4a9eff;
-  background:#0a1628cc;
-  padding:.1rem .5rem;
-  border-radius:6px;
-}
 
-/* ── rhythm grid ── */
-.rhythm-cat{
-  font-size:.7rem;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:var(--text3);
-  margin:1rem 0 .4rem;
-  font-family:var(--fh);
+/* ════════════════════════════════
+   HR CONTROL
+════════════════════════════════ */
+.hr-control{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:.85rem 1.1rem;
+  margin-top:.75rem;
+}
+.hr-control-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.55rem;
+}
+.hr-control-label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fh)}
+.hr-readout{
+  font-family:var(--fm);
+  font-size:1.15rem;
+  color:var(--rc,var(--blue));
+  transition:color .3s;
+  letter-spacing:.04em;
+}
+.hr-readout sub{font-size:.6rem;color:var(--text3);margin-left:.15rem}
+.hr-slider-row{display:flex;align-items:center;gap:.6rem}
+.hr-lim{font-size:.68rem;color:var(--text3);font-family:var(--fm);min-width:1.8rem}
+.hr-lim:last-child{text-align:right}
+.hr-slider-row input[type=range]{
+  flex:1;
+  -webkit-appearance:none;
+  height:4px;
+  border-radius:2px;
+  background:var(--border);
+  outline:none;
+}
+.hr-slider-row input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--rc,var(--blue));
+  box-shadow:0 0 8px var(--rc,var(--blue));
+  cursor:pointer;
+  transition:background .3s, box-shadow .3s;
+}
+.hr-zones{
+  display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;
+}
+.hr-zone{
+  font-size:.65rem;padding:.15rem .55rem;border-radius:100px;
+  border:1px solid;font-family:var(--fh);
+}
+.hz-brady{color:#64b5f6;border-color:rgba(100,181,246,.25);background:rgba(100,181,246,.06)}
+.hz-normal{color:var(--green);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06)}
+.hz-tachy{color:var(--amber);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.06)}
+
+/* ════════════════════════════════
+   RHYTHM SELECTOR
+════════════════════════════════ */
+.rhythm-group{
+  margin-top:1rem;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+.rhythm-cat-header{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.45rem .85rem;
+  background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);
+}
+.rhythm-cat-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--cat-color,var(--text3));
+  box-shadow:0 0 5px var(--cat-color,var(--text3));
+  flex-shrink:0;
+}
+.rhythm-cat-label{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);font-family:var(--fh);
 }
 .rhythm-grid{
-  display:flex;flex-wrap:wrap;gap:.4rem;
-  margin-bottom:.25rem;
+  display:flex;flex-wrap:wrap;gap:.35rem;
+  padding:.6rem .85rem .7rem;
 }
 .r-btn{
-  padding:.35rem .8rem;
+  padding:.3rem .75rem;
   border-radius:20px;
   border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text2);
-  font-size:.8rem;
+  background:rgba(255,255,255,.03);
+  color:var(--text3);
+  font-size:.78rem;
   cursor:pointer;
   transition:all .18s;
   font-family:var(--fh);
 }
-.r-btn:hover{border-color:var(--blue);color:var(--blue)}
-.r-btn.active{
-  background:var(--blue);
-  border-color:var(--blue);
-  color:#fff;
-  box-shadow:0 0 10px #2196f340;
+.r-btn:hover{
+  border-color:var(--rc,var(--blue));
+  color:var(--rc,var(--blue));
+  background:rgba(255,255,255,.05);
 }
 
-/* ── hr slider ── */
-.hr-row{
-  display:flex;align-items:center;gap:.75rem;
-  margin-top:.75rem;
-}
-.hr-row label{font-size:.8rem;color:var(--text3);white-space:nowrap;min-width:4rem}
-.hr-row input[type=range]{flex:1;accent-color:var(--blue)}
-.hr-val{font-family:var(--fh);font-size:.85rem;color:var(--blue);min-width:4rem;text-align:right}
-
-/* ── info panel (aprendizaje) ── */
+/* ════════════════════════════════
+   INFO PANEL (Aprendizaje)
+════════════════════════════════ */
 .info-panel{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:12px;
-  padding:1.25rem 1.5rem;
+  overflow:hidden;
   margin-top:1rem;
 }
-.info-panel h3{
+.info-panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1.2rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+  border-left:3px solid var(--rc,var(--blue));
+}
+.info-panel-title{
   font-family:var(--fh);
-  font-size:1rem;
+  font-size:.95rem;
   color:var(--text1);
-  margin:0 0 .75rem;
-  display:flex;align-items:center;gap:.5rem;
 }
-.info-rows{display:flex;flex-direction:column;gap:.35rem}
-.info-row{display:flex;gap:.5rem;font-size:.82rem}
-.info-key{color:var(--text3);min-width:7rem;flex-shrink:0}
-.info-val{color:var(--text1)}
-.significance-box{
-  margin-top:.75rem;
-  padding:.6rem .85rem;
+.info-panel-badge{
+  font-size:.65rem;font-family:var(--fh);
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:.15rem .55rem;border-radius:100px;
+  border:1px solid var(--rc,var(--blue));
+  color:var(--rc,var(--blue));
+}
+.info-ecg-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.1rem;
+  padding:.75rem 1.2rem;
+  border-bottom:1px solid var(--border);
+}
+.info-ecg-cell{
+  padding:.35rem .5rem;
+  border-radius:6px;
+}
+.info-ecg-cell:hover{background:rgba(255,255,255,.03)}
+.info-ecg-key{
+  font-size:.62rem;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.06em;
+  margin-bottom:.18rem;font-family:var(--fh);
+}
+.info-ecg-val{font-size:.82rem;color:var(--text1);line-height:1.35}
+.info-section{padding:.6rem 1.2rem}
+.info-section-title{
+  font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text3);font-family:var(--fh);margin-bottom:.35rem;
+}
+.info-sig-box{
+  padding:.55rem .8rem;
   border-radius:8px;
-  background:#1e293b;
-  font-size:.82rem;
-  color:var(--text2);
+  background:rgba(245,158,11,.06);
+  border:1px solid rgba(245,158,11,.18);
   border-left:3px solid var(--amber);
+  font-size:.82rem;color:var(--text2);line-height:1.5;
+  margin-bottom:.5rem;
 }
-.mgmt-box{
-  margin-top:.5rem;
-  padding:.6rem .85rem;
+.info-mgmt-box{
+  padding:.55rem .8rem;
   border-radius:8px;
-  background:#1e293b;
-  font-size:.82rem;
-  color:var(--text2);
-  border-left:3px solid var(--blue);
+  background:rgba(74,158,255,.06);
+  border:1px solid rgba(74,158,255,.18);
+  border-left:3px solid var(--rc,var(--blue));
+  font-size:.82rem;color:var(--text2);line-height:1.5;
 }
 
-/* ── evaluacion ── */
+/* ════════════════════════════════
+   EVALUACIÓN
+════════════════════════════════ */
 .eval-progress{
   display:flex;align-items:center;gap:.75rem;
   margin-bottom:1rem;
 }
-.eval-progress .prog-bar{
-  flex:1;height:6px;
-  background:var(--border);
-  border-radius:3px;
-  overflow:hidden;
+.prog-bar{
+  flex:1;height:5px;
+  background:var(--border);border-radius:3px;overflow:hidden;
 }
-.eval-progress .prog-fill{
-  height:100%;
-  background:var(--blue);
-  border-radius:3px;
-  transition:width .3s;
+.prog-fill{
+  height:100%;background:var(--blue);
+  border-radius:3px;transition:width .3s;
 }
-.eval-q-num{font-size:.8rem;color:var(--text3);font-family:var(--fh);white-space:nowrap}
+.eval-q-num{font-size:.78rem;color:var(--text3);font-family:var(--fh);white-space:nowrap}
 .eval-prompt{
-  font-family:var(--fh);
-  font-size:1rem;
-  color:var(--text1);
-  margin:0 0 .85rem;
+  font-family:var(--fh);font-size:.95rem;
+  color:var(--text2);margin:0 0 .75rem;
 }
-.eval-choices{display:flex;flex-direction:column;gap:.45rem}
+.eval-choices{display:flex;flex-direction:column;gap:.4rem}
 .eval-choice{
-  padding:.65rem 1rem;
-  border-radius:8px;
+  display:flex;align-items:center;gap:.85rem;
+  padding:.7rem 1rem;
+  border-radius:10px;
   border:1px solid var(--border);
   background:var(--card);
-  color:var(--text2);
   cursor:pointer;
-  font-size:.85rem;
   transition:all .18s;
-  text-align:left;
+  text-align:left;width:100%;
 }
-.eval-choice:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
-.eval-choice.correct{background:#16a34a1a;border-color:var(--green);color:var(--green)}
-.eval-choice.wrong{background:#ef44441a;border-color:var(--red);color:var(--red)}
+.eval-choice:hover:not(:disabled){
+  border-color:var(--blue);
+  background:rgba(33,150,243,.06);
+}
+.choice-letter{
+  width:1.7rem;height:1.7rem;border-radius:50%;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:.72rem;font-weight:700;
+  flex-shrink:0;color:var(--text3);
+  transition:all .18s;
+}
+.eval-choice:hover:not(:disabled) .choice-letter{
+  background:var(--blue);border-color:var(--blue);color:#fff;
+}
+.choice-text{font-size:.85rem;color:var(--text2)}
+.eval-choice.correct{background:rgba(52,211,153,.07);border-color:var(--green)}
+.eval-choice.correct .choice-letter{background:var(--green);border-color:var(--green);color:#fff}
+.eval-choice.correct .choice-text{color:var(--green)}
+.eval-choice.wrong{background:rgba(239,68,68,.07);border-color:var(--red)}
+.eval-choice.wrong .choice-letter{background:var(--red);border-color:var(--red);color:#fff}
+.eval-choice.wrong .choice-text{color:var(--red)}
 .eval-choice:disabled{cursor:default}
 .eval-fb{
-  margin-top:.65rem;
-  padding:.55rem .85rem;
-  border-radius:8px;
-  font-size:.82rem;
+  margin-top:.6rem;padding:.6rem .9rem;
+  border-radius:8px;font-size:.82rem;line-height:1.5;
 }
-.eval-fb.ok{background:#16a34a18;color:var(--green);border:1px solid var(--green)}
-.eval-fb.err{background:#ef444418;color:var(--red);border:1px solid var(--red)}
+.eval-fb.ok{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.3)}
+.eval-fb.err{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.3)}
 .eval-next-btn{margin-top:.75rem}
 
-/* ── result card ── */
+/* ── result ── */
+@keyframes scoreIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
 .result-big{
-  text-align:center;
-  padding:2rem;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
+  text-align:center;padding:2.5rem 2rem;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
 }
-.result-big .nota-num{
-  font-family:var(--fh);
-  font-size:3.5rem;
-  line-height:1;
+.nota-num{
+  font-family:var(--fh);font-size:4rem;line-height:1;
+  animation:scoreIn .45s cubic-bezier(.34,1.56,.64,1) both;
 }
-.result-big .nota-label{
-  font-size:.85rem;
-  color:var(--text3);
-  margin-bottom:.5rem;
-}
-.result-big .nota-grade{
-  font-family:var(--fh);
-  font-size:1.1rem;
-  margin:.5rem 0;
-}
-.result-big .nota-sub{
-  font-size:.8rem;
-  color:var(--text3);
-}
-.result-retry{margin-top:1.25rem}
-
-/* ── annotation overlay for aprendizaje ── */
-.anno-wrap{position:relative;display:inline-block;width:100%}
-.anno-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.nota-label{font-size:.82rem;color:var(--text3);margin-bottom:.3rem}
+.nota-grade{font-family:var(--fh);font-size:1.15rem;margin:.4rem 0}
+.nota-sub{font-size:.78rem;color:var(--text3)}
+.result-retry{margin-top:1.5rem}
 </style>
 </head>
 <body>
@@ -226,32 +334,73 @@
      SIMULADOR
 ═══════════════════════════════════════════════════════ -->
 <section id="sec-sim" class="mode-section active">
-  <div class="ecg-wrap" style="height:200px">
-    <span class="ecg-label" id="sim-rhythm-label">Ritmo Sinusal Normal</span>
-    <span class="ecg-hr-badge" id="sim-hr-badge">72 bpm</span>
-    <canvas id="simCanvas" height="200"></canvas>
+
+  <div class="ecg-wrap" id="sim-ecg-wrap">
+    <div class="ecg-hud">
+      <div class="ecg-hud-left">
+        <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+        <div class="ecg-rhythm-name" id="sim-rhythm-label">Ritmo Sinusal Normal</div>
+      </div>
+      <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>BPM</sub></div>
+    </div>
+    <canvas id="simCanvas" height="220"></canvas>
   </div>
 
-  <div class="hr-row">
-    <label>Frec. cardíaca</label>
-    <input type="range" id="hrSlider" min="20" max="240" value="72"
-           oninput="onHrChange(this.value)">
-    <span class="hr-val" id="hrDisplay">72 bpm</span>
+  <div class="hr-control">
+    <div class="hr-control-header">
+      <span class="hr-control-label">Frecuencia cardíaca</span>
+      <span class="hr-readout" id="hrDisplay">72<sub>bpm</sub></span>
+    </div>
+    <div class="hr-slider-row">
+      <span class="hr-lim">20</span>
+      <input type="range" id="hrSlider" min="20" max="240" value="72"
+             oninput="onHrChange(this.value)">
+      <span class="hr-lim">240</span>
+    </div>
+    <div class="hr-zones">
+      <span class="hr-zone hz-brady">Bradicardia &lt; 60</span>
+      <span class="hr-zone hz-normal">Normal 60-100</span>
+      <span class="hr-zone hz-tachy">Taquicardia &gt; 100</span>
+    </div>
   </div>
 
-  <div style="margin-top:1rem">
-    <div class="rhythm-cat">Sinusal</div>
-    <div class="rhythm-grid" id="rg-sinusal"></div>
-    <div class="rhythm-cat">Auricular</div>
-    <div class="rhythm-grid" id="rg-auricular"></div>
-    <div class="rhythm-cat">Bloqueo AV</div>
-    <div class="rhythm-grid" id="rg-bloqueoav"></div>
-    <div class="rhythm-cat">Conducción</div>
-    <div class="rhythm-grid" id="rg-conduccion"></div>
-    <div class="rhythm-cat">Ventricular</div>
-    <div class="rhythm-grid" id="rg-ventricular"></div>
-    <div class="rhythm-cat">Isquemia</div>
-    <div class="rhythm-grid" id="rg-isquemia"></div>
+  <div style="margin-top:.85rem;display:flex;flex-direction:column;gap:.4rem">
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#90caf9">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Sinusal</span>
+      </div>
+      <div class="rhythm-grid" id="rg-sinusal"></div>
+    </div>
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#fbbf24">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Auricular</span>
+      </div>
+      <div class="rhythm-grid" id="rg-auricular"></div>
+    </div>
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#c4b5fd">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Bloqueo AV</span>
+      </div>
+      <div class="rhythm-grid" id="rg-bloqueoav"></div>
+    </div>
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#34d399">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Conducción</span>
+      </div>
+      <div class="rhythm-grid" id="rg-conduccion"></div>
+    </div>
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#f87171">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Ventricular</span>
+      </div>
+      <div class="rhythm-grid" id="rg-ventricular"></div>
+    </div>
+    <div class="rhythm-group">
+      <div class="rhythm-cat-header" style="--cat-color:#fb923c">
+        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Isquemia</span>
+      </div>
+      <div class="rhythm-grid" id="rg-isquemia"></div>
+    </div>
   </div>
 </section>
 
@@ -259,21 +408,38 @@
      APRENDIZAJE
 ═══════════════════════════════════════════════════════ -->
 <section id="sec-learn" class="mode-section">
-  <div class="ecg-wrap" style="height:200px">
-    <span class="ecg-label" id="learn-rhythm-label">Ritmo Sinusal Normal</span>
-    <canvas id="learnCanvas" height="200"></canvas>
+
+  <div class="ecg-wrap" id="learn-ecg-wrap">
+    <div class="ecg-hud">
+      <div class="ecg-hud-left">
+        <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+        <div class="ecg-rhythm-name" id="learn-rhythm-label">Ritmo Sinusal Normal</div>
+      </div>
+      <div class="ecg-meta" style="font-size:.65rem">Modo estudio</div>
+    </div>
+    <canvas id="learnCanvas" height="220"></canvas>
   </div>
 
-  <div style="margin-top:1rem">
-    <div class="rhythm-cat">Seleccionar ritmo para estudiar</div>
+  <div class="rhythm-group" style="margin-top:.85rem">
+    <div class="rhythm-cat-header" style="--cat-color:var(--blue)">
+      <div class="rhythm-cat-dot"></div>
+      <span class="rhythm-cat-label">Seleccionar ritmo</span>
+    </div>
     <div class="rhythm-grid" id="rg-learn"></div>
   </div>
 
   <div class="info-panel" id="learnInfo">
-    <h3 id="learn-info-title">Ritmo Sinusal Normal</h3>
-    <div class="info-rows" id="learn-info-rows"></div>
-    <div class="significance-box" id="learn-sig"></div>
-    <div class="mgmt-box" id="learn-mgmt"></div>
+    <div class="info-panel-header" id="info-panel-header">
+      <span class="info-panel-title" id="learn-info-title">Ritmo Sinusal Normal</span>
+      <span class="info-panel-badge" id="info-panel-badge">Sinusal</span>
+    </div>
+    <div class="info-ecg-grid" id="learn-info-rows"></div>
+    <div class="info-section">
+      <div class="info-section-title">Significado clínico</div>
+      <div class="info-sig-box" id="learn-sig"></div>
+      <div class="info-section-title" style="margin-top:.5rem">Manejo</div>
+      <div class="info-mgmt-box" id="learn-mgmt"></div>
+    </div>
   </div>
 </section>
 
@@ -285,15 +451,20 @@
     <div class="eval-progress">
       <span class="eval-q-num" id="eval-qnum">1 / 16</span>
       <div class="prog-bar"><div class="prog-fill" id="eval-prog-fill" style="width:0%"></div></div>
-      <span class="eval-q-num" id="eval-score-live">0 correctas</span>
+      <span class="eval-q-num" id="eval-score-live">0 ✓</span>
     </div>
 
-    <div class="ecg-wrap" style="height:200px;margin-bottom:1rem">
-      <span class="ecg-label">¿Qué ritmo es este?</span>
-      <canvas id="evalCanvas" height="200"></canvas>
+    <div class="ecg-wrap" id="eval-ecg-wrap" style="margin-bottom:.85rem">
+      <div class="ecg-hud">
+        <div class="ecg-hud-left">
+          <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+          <div class="ecg-meta" style="font-size:.7rem;color:rgba(74,158,255,.5)">¿Qué ritmo es este?</div>
+        </div>
+        <div class="ecg-meta">Evaluación</div>
+      </div>
+      <canvas id="evalCanvas" height="220"></canvas>
     </div>
 
-    <p class="eval-prompt">Identifica el ritmo mostrado:</p>
     <div class="eval-choices" id="eval-choices"></div>
     <div id="eval-fb" class="eval-fb" style="display:none"></div>
     <button class="btn eval-next-btn" id="eval-next-btn" style="display:none" onclick="evalNext()">
@@ -755,22 +926,35 @@ class ECGRenderer {
   draw() {
     const ctx = this.ctx;
     const W = this.canvas.width, H = this.canvas.height;
-    ctx.clearRect(0, 0, W, H);
 
-    /* grid */
-    ctx.strokeStyle = '#1a3a5c';
+    /* background */
+    ctx.fillStyle = '#05111e';
+    ctx.fillRect(0, 0, W, H);
+
+    /* ECG paper grid — 1 mm = 4px, 5 mm = 20px */
+    const mm = 4, box = 20;
     ctx.lineWidth = 0.5;
-    const bigGrid = 100 * 0.2; // 0.2 s = 20px at 100px/s
-    const smallGrid = bigGrid / 5;
-    for (let x = 0; x < W; x += smallGrid) {
-      ctx.globalAlpha = x % bigGrid < 0.5 ? 0.6 : 0.25;
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = 0; y < H; y += smallGrid) {
-      ctx.globalAlpha = y % bigGrid < 0.5 ? 0.6 : 0.25;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.strokeStyle = '#0c2038';
+    for (let x = 0; x < W; x += mm) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+    for (let y = 0; y < H; y += mm) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.strokeStyle = '#163150';
+    for (let x = 0; x < W; x += box) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+    for (let y = 0; y < H; y += box) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+
+    /* 0 mV baseline */
+    ctx.strokeStyle = '#1e4070';
+    ctx.lineWidth = 0.8;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(0, this.baseline); ctx.lineTo(W, this.baseline);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
     /* waveform — compute how many samples fit on screen */
     const samplesOnScreen = Math.ceil(W / PPS);
@@ -809,9 +993,9 @@ let simRenderer, learnRenderer, evalRenderer;
 let activeMode = 'sim';
 
 function initRenderers() {
-  simRenderer   = new ECGRenderer('simCanvas',   200);
-  learnRenderer = new ECGRenderer('learnCanvas', 200);
-  evalRenderer  = new ECGRenderer('evalCanvas',  200);
+  simRenderer   = new ECGRenderer('simCanvas',   220);
+  learnRenderer = new ECGRenderer('learnCanvas', 220);
+  evalRenderer  = new ECGRenderer('evalCanvas',  220);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -866,22 +1050,42 @@ function buildRhythmGrid(containerId, filter, onClick) {
   });
 }
 
+function setRhythmColor(color) {
+  /* propagate rhythm color to HUD elements via CSS var */
+  document.getElementById('sim-ecg-wrap').style.setProperty('--rc', color);
+  document.getElementById('sim-hr-badge').closest('.ecg-wrap').style.setProperty('--rc', color);
+  document.getElementById('hrDisplay').style.color = color;
+  document.querySelector('.hr-slider-row input').style.setProperty('accent-color', color);
+}
+
 function selectSimRhythm(r, btn, gridId) {
-  document.querySelectorAll('#sec-sim .r-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#sec-sim .r-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = '';
+    b.style.color = '';
+    b.style.background = '';
+    b.style.boxShadow = '';
+  });
   btn.classList.add('active');
+  btn.style.borderColor = r.color;
+  btn.style.color = r.color;
+  btn.style.background = r.color + '18';
+  btn.style.boxShadow = `0 0 10px ${r.color}28`;
+
   simRhythmId = r.id;
   simHR = r.hrDefault;
   document.getElementById('hrSlider').value = simHR;
-  document.getElementById('hrDisplay').textContent = simHR + ' bpm';
-  document.getElementById('sim-hr-badge').textContent = simHR + ' bpm';
+  document.getElementById('hrDisplay').innerHTML = `${simHR}<sub>bpm</sub>`;
+  document.getElementById('sim-hr-badge').innerHTML = `${simHR}<sub>BPM</sub>`;
   document.getElementById('sim-rhythm-label').textContent = r.name;
+  setRhythmColor(r.color);
   engine.reset(r.id, simHR);
 }
 
 function onHrChange(val) {
   simHR = +val;
-  document.getElementById('hrDisplay').textContent = val + ' bpm';
-  document.getElementById('sim-hr-badge').textContent = val + ' bpm';
+  document.getElementById('hrDisplay').innerHTML = `${val}<sub>bpm</sub>`;
+  document.getElementById('sim-hr-badge').innerHTML = `${val}<sub>BPM</sub>`;
   engine.hr = simHR;
   engine.beatRR = 60 / simHR;
 }
@@ -905,28 +1109,49 @@ function buildLearnGrid() {
 }
 
 function selectLearnRhythm(r, btn) {
-  document.querySelectorAll('#rg-learn .r-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#rg-learn .r-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = '';
+    b.style.color = '';
+    b.style.background = '';
+    b.style.boxShadow = '';
+  });
   btn.classList.add('active');
+  btn.style.borderColor = r.color;
+  btn.style.color = r.color;
+  btn.style.background = r.color + '18';
+  btn.style.boxShadow = `0 0 10px ${r.color}28`;
+
   learnRhythmId = r.id;
   document.getElementById('learn-rhythm-label').textContent = r.name;
+  document.getElementById('learn-ecg-wrap').style.setProperty('--rc', r.color);
   engine.reset(r.id, r.hrDefault);
   renderLearnInfo(r);
 }
 
 function renderLearnInfo(r) {
   document.getElementById('learn-info-title').textContent = r.name;
+  document.getElementById('info-panel-header').style.setProperty('--rc', r.color);
+  document.getElementById('info-panel-badge').style.setProperty('--rc', r.color);
+  document.getElementById('info-panel-badge').textContent = CAT_LABELS[r.cat] || r.cat;
+
   const rows = [
-    ['Frecuencia', r.info.rate],
-    ['Regularidad', r.info.reg],
-    ['Onda P', r.info.p],
-    ['Intervalo PR', r.info.pr],
-    ['Complejo QRS', r.info.qrs],
+    ['Frecuencia',    r.info.rate],
+    ['Regularidad',   r.info.reg],
+    ['Onda P',        r.info.p],
+    ['Intervalo PR',  r.info.pr],
+    ['Complejo QRS',  r.info.qrs],
   ];
-  document.getElementById('learn-info-rows').innerHTML = rows.map(([k,v]) =>
-    `<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`
+  document.getElementById('learn-info-rows').innerHTML = rows.map(([k, v]) =>
+    `<div class="info-ecg-cell">
+       <div class="info-ecg-key">${k}</div>
+       <div class="info-ecg-val">${v}</div>
+     </div>`
   ).join('');
-  document.getElementById('learn-sig').innerHTML = `<strong>Significado:</strong> ${r.info.sig}`;
-  document.getElementById('learn-mgmt').innerHTML = `<strong>Manejo:</strong> ${r.info.mgmt}`;
+
+  document.getElementById('learn-sig').textContent = r.info.sig;
+  document.getElementById('learn-mgmt').style.setProperty('--rc', r.color);
+  document.getElementById('learn-mgmt').textContent = r.info.mgmt;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -977,8 +1202,12 @@ function renderEvalQuestion() {
   const distractorIds = DISTRACTORS[r.id] || [];
   const choices = shuffle([r, ...distractorIds.map(id => RHYTHMS.find(x => x.id === id)).filter(Boolean)]);
 
-  document.getElementById('eval-choices').innerHTML = choices.map(c =>
-    `<button class="eval-choice" data-id="${c.id}" onclick="evalAnswer('${c.id}')">${c.name}</button>`
+  const letters = ['A','B','C','D'];
+  document.getElementById('eval-choices').innerHTML = choices.map((c, i) =>
+    `<button class="eval-choice" data-id="${c.id}" onclick="evalAnswer('${c.id}')">
+       <span class="choice-letter">${letters[i]}</span>
+       <span class="choice-text">${c.name}</span>
+     </button>`
   ).join('');
   document.getElementById('eval-fb').style.display = 'none';
   document.getElementById('eval-next-btn').style.display = 'none';
@@ -1053,9 +1282,10 @@ window.addEventListener('DOMContentLoaded', () => {
     buildRhythmGrid('rg-' + cat.replace('bloqueoav','bloqueoav'), cat, selectSimRhythm);
   });
 
-  /* mark first sim button active */
+  /* activate first sim rhythm via proper function */
+  const firstR   = RHYTHMS[0];
   const firstBtn = document.querySelector('#sec-sim .r-btn');
-  if (firstBtn) firstBtn.classList.add('active');
+  if (firstBtn) selectSimRhythm(firstR, firstBtn, '');
 
   /* build learn grid */
   buildLearnGrid();
@@ -1063,7 +1293,11 @@ window.addEventListener('DOMContentLoaded', () => {
   /* start sim engine */
   engine.reset('normal', 72);
   simRenderer.start(engine);
+
+  /* init learn info */
   renderLearnInfo(RHYTHMS[0]);
+  const learnFirst = document.querySelector('#rg-learn .r-btn');
+  if (learnFirst) selectLearnRhythm(RHYTHMS[0], learnFirst);
 });
 
 window.addEventListener('resize', () => {
