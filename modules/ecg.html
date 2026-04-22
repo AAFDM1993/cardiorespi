@@ -314,6 +314,54 @@
 .nota-grade{font-family:var(--fh);font-size:1.15rem;margin:.4rem 0}
 .nota-sub{font-size:.78rem;color:var(--text3)}
 .result-retry{margin-top:1.5rem}
+
+/* ════════════════════════════════
+   DESKTOP LAYOUTS  ≥ 920px
+════════════════════════════════ */
+@media (min-width:920px){
+  /* Simulador: canvas+controls left, rhythm sidebar right */
+  .sim-layout{
+    display:grid;
+    grid-template-columns:1fr 290px;
+    gap:1.1rem;
+    align-items:start;
+  }
+  .sim-sidebar{
+    position:sticky;
+    top:calc(52px + 1rem);
+    max-height:calc(100vh - 80px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:thin;
+    display:flex;flex-direction:column;gap:.4rem;
+    padding-right:2px;
+  }
+  /* Aprendizaje: canvas+selector left, info panel right */
+  .learn-layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.1rem;
+    align-items:start;
+  }
+  .learn-right{
+    position:sticky;
+    top:calc(52px + 1rem);
+    max-height:calc(100vh - 80px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+  }
+  /* Evaluacion: canvas left, choices right */
+  .eval-layout{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:1.1rem;
+    align-items:start;
+  }
+  .eval-right{
+    position:sticky;
+    top:calc(52px + 1rem);
+  }
+}
 </style>
 </head>
 <body>
@@ -328,119 +376,135 @@
   </div>
 </nav>
 
-<main class="container" style="max-width:820px;padding-top:1.5rem">
+<main class="container" style="padding-top:1.25rem">
 
 <!-- ══════════════════════════════════════════════════════
      SIMULADOR
 ═══════════════════════════════════════════════════════ -->
 <section id="sec-sim" class="mode-section active">
+  <div class="sim-layout">
 
-  <div class="ecg-wrap" id="sim-ecg-wrap">
-    <div class="ecg-hud">
-      <div class="ecg-hud-left">
-        <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
-        <div class="ecg-rhythm-name" id="sim-rhythm-label">Ritmo Sinusal Normal</div>
+    <!-- LEFT: canvas + HR control -->
+    <div class="sim-main">
+      <div class="ecg-wrap" id="sim-ecg-wrap">
+        <div class="ecg-hud">
+          <div class="ecg-hud-left">
+            <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-rhythm-name" id="sim-rhythm-label">Ritmo Sinusal Normal</div>
+          </div>
+          <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>BPM</sub></div>
+        </div>
+        <canvas id="simCanvas" height="220"></canvas>
       </div>
-      <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>BPM</sub></div>
-    </div>
-    <canvas id="simCanvas" height="220"></canvas>
-  </div>
 
-  <div class="hr-control">
-    <div class="hr-control-header">
-      <span class="hr-control-label">Frecuencia cardíaca</span>
-      <span class="hr-readout" id="hrDisplay">72<sub>bpm</sub></span>
-    </div>
-    <div class="hr-slider-row">
-      <span class="hr-lim">20</span>
-      <input type="range" id="hrSlider" min="20" max="240" value="72"
-             oninput="onHrChange(this.value)">
-      <span class="hr-lim">240</span>
-    </div>
-    <div class="hr-zones">
-      <span class="hr-zone hz-brady">Bradicardia &lt; 60</span>
-      <span class="hr-zone hz-normal">Normal 60-100</span>
-      <span class="hr-zone hz-tachy">Taquicardia &gt; 100</span>
-    </div>
-  </div>
+      <div class="hr-control">
+        <div class="hr-control-header">
+          <span class="hr-control-label">Frecuencia cardíaca</span>
+          <span class="hr-readout" id="hrDisplay">72<sub>bpm</sub></span>
+        </div>
+        <div class="hr-slider-row">
+          <span class="hr-lim">20</span>
+          <input type="range" id="hrSlider" min="20" max="240" value="72"
+                 oninput="onHrChange(this.value)">
+          <span class="hr-lim">240</span>
+        </div>
+        <div class="hr-zones">
+          <span class="hr-zone hz-brady">Bradicardia &lt; 60</span>
+          <span class="hr-zone hz-normal">Normal 60-100</span>
+          <span class="hr-zone hz-tachy">Taquicardia &gt; 100</span>
+        </div>
+      </div>
+    </div><!-- /sim-main -->
 
-  <div style="margin-top:.85rem;display:flex;flex-direction:column;gap:.4rem">
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#90caf9">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Sinusal</span>
+    <!-- RIGHT: rhythm selector (sticky sidebar on desktop) -->
+    <div class="sim-sidebar">
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#90caf9">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Sinusal</span>
+        </div>
+        <div class="rhythm-grid" id="rg-sinusal"></div>
       </div>
-      <div class="rhythm-grid" id="rg-sinusal"></div>
-    </div>
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#fbbf24">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Auricular</span>
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#fbbf24">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Auricular</span>
+        </div>
+        <div class="rhythm-grid" id="rg-auricular"></div>
       </div>
-      <div class="rhythm-grid" id="rg-auricular"></div>
-    </div>
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#c4b5fd">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Bloqueo AV</span>
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#c4b5fd">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Bloqueo AV</span>
+        </div>
+        <div class="rhythm-grid" id="rg-bloqueoav"></div>
       </div>
-      <div class="rhythm-grid" id="rg-bloqueoav"></div>
-    </div>
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#34d399">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Conducción</span>
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#34d399">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Conducción</span>
+        </div>
+        <div class="rhythm-grid" id="rg-conduccion"></div>
       </div>
-      <div class="rhythm-grid" id="rg-conduccion"></div>
-    </div>
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#f87171">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Ventricular</span>
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#f87171">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Ventricular</span>
+        </div>
+        <div class="rhythm-grid" id="rg-ventricular"></div>
       </div>
-      <div class="rhythm-grid" id="rg-ventricular"></div>
-    </div>
-    <div class="rhythm-group">
-      <div class="rhythm-cat-header" style="--cat-color:#fb923c">
-        <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Isquemia</span>
+      <div class="rhythm-group">
+        <div class="rhythm-cat-header" style="--cat-color:#fb923c">
+          <div class="rhythm-cat-dot"></div><span class="rhythm-cat-label">Isquemia</span>
+        </div>
+        <div class="rhythm-grid" id="rg-isquemia"></div>
       </div>
-      <div class="rhythm-grid" id="rg-isquemia"></div>
-    </div>
-  </div>
+    </div><!-- /sim-sidebar -->
+
+  </div><!-- /sim-layout -->
 </section>
 
 <!-- ══════════════════════════════════════════════════════
      APRENDIZAJE
 ═══════════════════════════════════════════════════════ -->
 <section id="sec-learn" class="mode-section">
+  <div class="learn-layout">
 
-  <div class="ecg-wrap" id="learn-ecg-wrap">
-    <div class="ecg-hud">
-      <div class="ecg-hud-left">
-        <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
-        <div class="ecg-rhythm-name" id="learn-rhythm-label">Ritmo Sinusal Normal</div>
+    <!-- LEFT: canvas + rhythm selector -->
+    <div class="learn-left">
+      <div class="ecg-wrap" id="learn-ecg-wrap">
+        <div class="ecg-hud">
+          <div class="ecg-hud-left">
+            <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-rhythm-name" id="learn-rhythm-label">Ritmo Sinusal Normal</div>
+          </div>
+          <div class="ecg-meta" style="font-size:.65rem">Modo estudio</div>
+        </div>
+        <canvas id="learnCanvas" height="220"></canvas>
       </div>
-      <div class="ecg-meta" style="font-size:.65rem">Modo estudio</div>
-    </div>
-    <canvas id="learnCanvas" height="220"></canvas>
-  </div>
 
-  <div class="rhythm-group" style="margin-top:.85rem">
-    <div class="rhythm-cat-header" style="--cat-color:var(--blue)">
-      <div class="rhythm-cat-dot"></div>
-      <span class="rhythm-cat-label">Seleccionar ritmo</span>
-    </div>
-    <div class="rhythm-grid" id="rg-learn"></div>
-  </div>
+      <div class="rhythm-group" style="margin-top:.85rem">
+        <div class="rhythm-cat-header" style="--cat-color:var(--blue)">
+          <div class="rhythm-cat-dot"></div>
+          <span class="rhythm-cat-label">Seleccionar ritmo</span>
+        </div>
+        <div class="rhythm-grid" id="rg-learn"></div>
+      </div>
+    </div><!-- /learn-left -->
 
-  <div class="info-panel" id="learnInfo">
-    <div class="info-panel-header" id="info-panel-header">
-      <span class="info-panel-title" id="learn-info-title">Ritmo Sinusal Normal</span>
-      <span class="info-panel-badge" id="info-panel-badge">Sinusal</span>
-    </div>
-    <div class="info-ecg-grid" id="learn-info-rows"></div>
-    <div class="info-section">
-      <div class="info-section-title">Significado clínico</div>
-      <div class="info-sig-box" id="learn-sig"></div>
-      <div class="info-section-title" style="margin-top:.5rem">Manejo</div>
-      <div class="info-mgmt-box" id="learn-mgmt"></div>
-    </div>
-  </div>
+    <!-- RIGHT: info panel (sticky on desktop) -->
+    <div class="learn-right">
+      <div class="info-panel" id="learnInfo">
+        <div class="info-panel-header" id="info-panel-header">
+          <span class="info-panel-title" id="learn-info-title">Ritmo Sinusal Normal</span>
+          <span class="info-panel-badge" id="info-panel-badge">Sinusal</span>
+        </div>
+        <div class="info-ecg-grid" id="learn-info-rows"></div>
+        <div class="info-section">
+          <div class="info-section-title">Significado clínico</div>
+          <div class="info-sig-box" id="learn-sig"></div>
+          <div class="info-section-title" style="margin-top:.5rem">Manejo</div>
+          <div class="info-mgmt-box" id="learn-mgmt"></div>
+        </div>
+      </div>
+    </div><!-- /learn-right -->
+
+  </div><!-- /learn-layout -->
 </section>
 
 <!-- ══════════════════════════════════════════════════════
@@ -448,28 +512,37 @@
 ═══════════════════════════════════════════════════════ -->
 <section id="sec-eval" class="mode-section">
   <div id="eval-active">
-    <div class="eval-progress">
-      <span class="eval-q-num" id="eval-qnum">1 / 16</span>
-      <div class="prog-bar"><div class="prog-fill" id="eval-prog-fill" style="width:0%"></div></div>
-      <span class="eval-q-num" id="eval-score-live">0 ✓</span>
-    </div>
+    <div class="eval-layout">
 
-    <div class="ecg-wrap" id="eval-ecg-wrap" style="margin-bottom:.85rem">
-      <div class="ecg-hud">
-        <div class="ecg-hud-left">
-          <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
-          <div class="ecg-meta" style="font-size:.7rem;color:rgba(74,158,255,.5)">¿Qué ritmo es este?</div>
+      <!-- LEFT: ECG canvas -->
+      <div class="eval-left">
+        <div class="ecg-wrap" id="eval-ecg-wrap">
+          <div class="ecg-hud">
+            <div class="ecg-hud-left">
+              <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+              <div class="ecg-meta" style="font-size:.7rem;color:rgba(74,158,255,.45)">Identificar ritmo</div>
+            </div>
+            <div class="ecg-meta">Evaluación</div>
+          </div>
+          <canvas id="evalCanvas" height="220"></canvas>
         </div>
-        <div class="ecg-meta">Evaluación</div>
-      </div>
-      <canvas id="evalCanvas" height="220"></canvas>
-    </div>
+      </div><!-- /eval-left -->
 
-    <div class="eval-choices" id="eval-choices"></div>
-    <div id="eval-fb" class="eval-fb" style="display:none"></div>
-    <button class="btn eval-next-btn" id="eval-next-btn" style="display:none" onclick="evalNext()">
-      Siguiente →
-    </button>
+      <!-- RIGHT: progress + choices + feedback -->
+      <div class="eval-right">
+        <div class="eval-progress">
+          <span class="eval-q-num" id="eval-qnum">1 / 16</span>
+          <div class="prog-bar"><div class="prog-fill" id="eval-prog-fill" style="width:0%"></div></div>
+          <span class="eval-q-num" id="eval-score-live">0 ✓</span>
+        </div>
+        <div class="eval-choices" id="eval-choices"></div>
+        <div id="eval-fb" class="eval-fb" style="display:none"></div>
+        <button class="btn eval-next-btn" id="eval-next-btn" style="display:none" onclick="evalNext()">
+          Siguiente →
+        </button>
+      </div><!-- /eval-right -->
+
+    </div><!-- /eval-layout -->
   </div>
 
   <div id="eval-result" style="display:none">
