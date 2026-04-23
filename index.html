@@ -68,6 +68,58 @@ footer{position:relative;z-index:1;text-align:center;padding:2rem 1.5rem;color:v
 code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,189,248,.08);padding:2px 6px;border-radius:4px}
 
 @media(max-width:600px){.featured-card{flex-direction:column}.featured-arrow{display:none}.modules-grid{grid-template-columns:1fr}}
+
+/* ── IFRAME VIEWER ── */
+#module-viewer{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  flex-direction:column;
+  background:var(--bg);
+}
+#module-viewer.open{display:flex;}
+#viewer-bar{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  padding:.5rem 1rem;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  height:44px;
+}
+#viewer-back{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  padding:5px 14px;
+  border-radius:var(--rs);
+  background:rgba(56,189,248,.1);
+  border:1px solid rgba(56,189,248,.25);
+  color:var(--blue);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:var(--fb);
+  transition:all .2s;
+  flex-shrink:0;
+}
+#viewer-back:hover{background:rgba(56,189,248,.18);}
+#viewer-title{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text2);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#viewer-frame{
+  flex:1;
+  border:none;
+  width:100%;
+  height:100%;
+}
   </style>
 </head>
 <body>
@@ -103,7 +155,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
 <div class="section">
   <div class="section-label">Aplicación principal</div>
 
-  <a class="featured-card" href="modules/fisioterapia_v7.html" target="_blank">
+  <a class="featured-card" href="#" onclick="openModule('modules/fisioterapia_v7.html','FisioResp — App Principal');return false;">
     <div>
       <div class="featured-label">⭐ Módulo central</div>
       <div class="featured-title">FisioResp — App Principal</div>
@@ -127,7 +179,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
   <div class="modules-grid">
 
     <!-- FASE 1: GSA -->
-    <a class="mod-card" href="modules/gasometria.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/gasometria.html','Gasometría Arterial Interactiva');return false;"
        style="--card-color:rgba(248,113,113,.4);--card-accent:rgba(248,113,113,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(248,113,113,.12);color:#f87171">🩸</div>
@@ -151,7 +203,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 2: 6MWT -->
-    <a class="mod-card" href="modules/6mwt.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/6mwt.html','Test de Marcha 6 Minutos');return false;"
        style="--card-color:rgba(74,222,128,.4);--card-accent:rgba(74,222,128,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(74,222,128,.12);color:var(--green)">🏃</div>
@@ -175,7 +227,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 3: Aclaramiento -->
-    <a class="mod-card" href="modules/aclaramiento.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/aclaramiento.html','Técnicas de Aclaramiento Bronquial');return false;"
        style="--card-color:rgba(45,212,191,.4);--card-accent:rgba(45,212,191,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(45,212,191,.12);color:var(--teal)">💨</div>
@@ -199,7 +251,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 4: Calculadoras -->
-    <a class="mod-card" href="modules/calculadoras.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/calculadoras.html','Calculadoras Clínicas Integradas');return false;"
        style="--card-color:rgba(251,191,36,.4);--card-accent:rgba(251,191,36,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(251,191,36,.12);color:var(--amber)">🧮</div>
@@ -224,7 +276,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 5: Historial -->
-    <a class="mod-card" href="modules/historial.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/historial.html','Historial Longitudinal del Paciente');return false;"
        style="--card-color:rgba(167,139,250,.4);--card-accent:rgba(167,139,250,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(167,139,250,.12);color:var(--purple)">📈</div>
@@ -248,7 +300,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 6: Cardiovascular -->
-    <a class="mod-card" href="modules/casos_cardiovascular.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/casos_cardiovascular.html','Casos Cardiovasculares');return false;"
        style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6">❤️</div>
@@ -272,7 +324,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
     </a>
 
     <!-- FASE 7: Simulador ECG -->
-    <a class="mod-card" href="modules/ecg.html" target="_blank"
+    <a class="mod-card" href="#" onclick="openModule('modules/ecg.html','Simulador ECG');return false;"
        style="--card-color:rgba(74,158,255,.4);--card-accent:rgba(74,158,255,.06)">
       <div class="mod-top">
         <div class="mod-icon" style="background:rgba(74,158,255,.12);color:#4a9eff">⚡</div>
@@ -303,6 +355,30 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
   <b>FisioResp</b> — Plataforma educativa de fisioterapia respiratoria &nbsp;·&nbsp; Para uso académico
 </footer>
 
+<!-- IFRAME VIEWER -->
+<div id="module-viewer">
+  <div id="viewer-bar">
+    <button id="viewer-back" onclick="closeModule()">← Inicio</button>
+    <span id="viewer-title"></span>
+  </div>
+  <iframe id="viewer-frame" src="" allowfullscreen></iframe>
+</div>
+
   <script src="assets/js/ui.js"></script>
+<script>
+function openModule(url, title){
+  document.getElementById('viewer-frame').src = url;
+  document.getElementById('viewer-title').textContent = title;
+  document.getElementById('module-viewer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModule(){
+  document.getElementById('module-viewer').classList.remove('open');
+  document.getElementById('viewer-frame').src = '';
+  document.body.style.overflow = '';
+}
+// Cerrar con tecla Escape
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModule(); });
+</script>
 </body>
 </html>

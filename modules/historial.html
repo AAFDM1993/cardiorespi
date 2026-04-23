@@ -93,7 +93,7 @@ tr:last-child td{border-bottom:none}
 <body>
 
 <nav>
-  <a href="../index.html" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
+  <a href="../index.html" onclick="if(window.parent!==window){window.parent.closeModule();return false;}" style="padding:.85rem 1rem;font-size:12px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border);margin-right:.5rem;text-decoration:none;flex-shrink:0" title="Inicio">← Inicio</a>
   <div class="logo">FisioResp <span>·</span> Historial</div>
   <div class="ntab active" onclick="switchMode('learn',this)">📚 Aprendizaje</div>
   <div class="ntab" onclick="switchMode('eval',this)">📝 Evaluación</div>

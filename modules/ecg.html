@@ -367,7 +367,7 @@
 <body>
 
 <nav class="nav">
-  <a href="../index.html" class="nav-back">← Inicio</a>
+  <a href="../index.html" onclick="if(window.parent!==window){window.parent.closeModule();return false;}" class="nav-back">← Inicio</a>
   <span class="nav-title">Simulador ECG</span>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="setMode('sim',this)">Simulador</button>
