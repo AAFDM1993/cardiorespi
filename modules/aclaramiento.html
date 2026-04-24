@@ -83,10 +83,10 @@
   <div class="sec-sub">Biblioteca de técnicas · Animaciones · Comparador · Selector clínico · Secuenciador de sesión</div>
 
   <div class="mode-bar">
-    <button class="mode-btn active" onclick="setMode('biblioteca')">📚 Biblioteca</button>
-    <button class="mode-btn" onclick="setMode('comparar')">⚖️ Comparar</button>
-    <button class="mode-btn" onclick="setMode('selector')">🎯 Selector Clínico</button>
-    <button class="mode-btn" onclick="setMode('secuencia')">🔗 Secuenciador</button>
+    <button class="mode-btn active" onclick="setAclarMode('biblioteca')">📚 Biblioteca</button>
+    <button class="mode-btn" onclick="setAclarMode('comparar')">⚖️ Comparar</button>
+    <button class="mode-btn" onclick="setAclarMode('selector')">🎯 Selector Clínico</button>
+    <button class="mode-btn" onclick="setAclarMode('secuencia')">🔗 Secuenciador</button>
   </div>
 
   <div class="mode-section active" id="mode-biblioteca">
@@ -977,7 +977,7 @@ function getAnimation(id, color){
 /* ====================================================
    MODE SWITCHER
 ====================================================*/
-function setMode(m){
+function setAclarMode(m){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
   const modes=['biblioteca','comparar','selector','secuencia'];
