@@ -67,6 +67,9 @@
 footer{position:relative;z-index:1;text-align:center;padding:2rem 1.5rem;color:var(--text3);font-size:12px;border-top:1px solid var(--border);margin-top:2rem}
 code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,189,248,.08);padding:2px 6px;border-radius:4px}
 
+/* ── AREA TITLES ── */
+.area-title{position:relative;z-index:1;font-family:var(--fh);font-size:1.1rem;font-weight:700;letter-spacing:-.3px;margin-bottom:1.25rem;padding-bottom:.9rem;border-bottom:2px solid var(--area-color,var(--border2));display:flex;align-items:center;gap:.5rem}
+
 @media(max-width:600px){.featured-card{flex-direction:column}.featured-arrow{display:none}.modules-grid{grid-template-columns:1fr}}
 
 /* ── IFRAME VIEWER ── */
@@ -133,7 +136,7 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
   <div class="nav-logo">
     🫁 Fisio<span>Resp</span>
   </div>
-  <div class="nav-pill">v7 · 8 módulos</div>
+  <div class="nav-pill">v8 · Currículo 12 clases</div>
 </nav>
 
 <!-- HERO -->
@@ -144,212 +147,234 @@ code{font-family:var(--fm);font-size:11px;color:var(--blue);background:rgba(56,1
   <h1>Aprende.<br><span class="accent">Evalúa. Decide.</span></h1>
   <p>Simuladores clínicos interactivos para estudiantes y docentes de fisioterapia respiratoria. Casos reales, decisiones reales.</p>
   <div class="hero-stats">
-    <div class="stat"><div class="stat-num">8</div><div class="stat-lbl">Módulos</div></div>
-    <div class="stat"><div class="stat-num">9+</div><div class="stat-lbl">Casos clínicos</div></div>
+    <div class="stat"><div class="stat-num">12</div><div class="stat-lbl">Clases</div></div>
+    <div class="stat"><div class="stat-num">11</div><div class="stat-lbl">Módulos</div></div>
     <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Modos de uso</div></div>
     <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Sin internet</div></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ─── RESPIRATORIO ─── -->
 <div class="section">
-  <div class="section-label">Aplicación principal</div>
-
-  <a class="featured-card" href="#" onclick="openModule('modules/fisioterapia_v7.html','FisioResp — App Principal');return false;">
-    <div>
-      <div class="featured-label">⭐ Módulo central</div>
-      <div class="featured-title">FisioResp — App Principal</div>
-      <div class="featured-desc">
-        Espirometría interactiva con curvas fisiológicamente precisas, 5 casos clínicos con evaluación ABCDE, simulador de ejercicio, banco de preguntas y referencia rápida.
-      </div>
-      <div class="featured-pills">
-        <span class="pill" style="color:var(--blue);border-color:rgba(56,189,248,.3)">Espirometría</span>
-        <span class="pill" style="color:var(--teal);border-color:rgba(45,212,191,.3)">Casos clínicos</span>
-        <span class="pill" style="color:var(--amber);border-color:rgba(251,191,36,.3)">ABCDE interactivo</span>
-        <span class="pill" style="color:var(--green);border-color:rgba(74,222,128,.3)">Simulador ejercicio</span>
-        <span class="pill" style="color:var(--purple);border-color:rgba(167,139,250,.3)">Banco de preguntas</span>
-      </div>
-    </div>
-    <div class="featured-arrow">→</div>
-  </a>
-
-  <!-- MÓDULOS FASES -->
-  <div class="section-label" style="margin-top:2rem">Módulos por fases</div>
-
+  <div class="area-title" style="--area-color:rgba(56,189,248,.5);color:var(--blue)">
+    Respiratorio — Clases 1 a 6
+  </div>
   <div class="modules-grid">
 
-    <!-- FASE 1: GSA -->
-    <a class="mod-card" href="#" onclick="openModule('modules/gasometria.html','Gasometría Arterial Interactiva');return false;"
-       style="--card-color:rgba(248,113,113,.4);--card-accent:rgba(248,113,113,.06)">
+    <div class="mod-card" style="pointer-events:none;opacity:.45">
       <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(248,113,113,.12);color:#f87171">🩸</div>
-        <div class="mod-phase" style="color:var(--red);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)">Fase 1</div>
+        <div class="mod-icon" style="background:rgba(56,189,248,.12);color:var(--blue);font-size:.85rem;font-weight:700">C1</div>
+        <div class="mod-phase" style="color:var(--blue);border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.08)">Próximamente</div>
       </div>
-      <div class="mod-title">Gasometría Arterial Interactiva</div>
-      <div class="mod-desc">Interpretación paso a paso con 9 casos clínicos, simulador de diales en tiempo real, diagrama de Davenport y referencia rápida con fórmulas de compensación.</div>
-      <div class="mod-tags">
-        <span class="tag">Modo aprendizaje</span>
-        <span class="tag">Modo evaluación</span>
-        <span class="tag">Simulador</span>
-        <span class="tag">Referencia</span>
+      <div class="mod-title">Anatomía y Fisiología del Sistema Respiratorio</div>
+      <div class="mod-desc">Anatomía del aparato respiratorio, mecánica ventilatoria y fisiología del intercambio gaseoso.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot" style="background:var(--text3)"></div>
+          <span style="font-size:11px;color:var(--text3)">En desarrollo</span>
+        </div>
       </div>
+    </div>
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-2.html','Clase 2 — Evaluación del Sistema Respiratorio');return false;"
+       style="--card-color:rgba(56,189,248,.4);--card-accent:rgba(56,189,248,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(56,189,248,.12);color:var(--blue);font-size:.85rem;font-weight:700">C2</div>
+        <div class="mod-phase" style="color:var(--blue);border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.08)">Respiratorio</div>
+      </div>
+      <div class="mod-title">Evaluación del Sistema Respiratorio</div>
+      <div class="mod-desc">Patrones respiratorios, evaluación clínica ABCDE y casos clínicos integrados.</div>
       <div class="mod-footer">
         <div style="display:flex;align-items:center;gap:.4rem">
           <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">9 casos · Diagrama Davenport</span>
+          <span style="font-size:11px;color:var(--text3)">2 módulos</span>
+        </div>
+        <div class="mod-open" style="color:var(--blue)">Abrir →</div>
+      </div>
+    </a>
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-3.html','Clase 3 — Procedimientos y Pruebas de Diagnóstico');return false;"
+       style="--card-color:rgba(248,113,113,.4);--card-accent:rgba(248,113,113,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(248,113,113,.12);color:var(--red);font-size:.85rem;font-weight:700">C3</div>
+        <div class="mod-phase" style="color:var(--red);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)">Respiratorio</div>
+      </div>
+      <div class="mod-title">Procedimientos y Pruebas de Diagnóstico</div>
+      <div class="mod-desc">Gasometría arterial, interpretación ácido-base y diagrama de Davenport.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
         </div>
         <div class="mod-open" style="color:var(--red)">Abrir →</div>
       </div>
     </a>
 
-    <!-- FASE 2: 6MWT -->
-    <a class="mod-card" href="#" onclick="openModule('modules/6mwt.html','Test de Marcha 6 Minutos');return false;"
-       style="--card-color:rgba(74,222,128,.4);--card-accent:rgba(74,222,128,.06)">
-      <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(74,222,128,.12);color:var(--green)">🏃</div>
-        <div class="mod-phase" style="color:var(--green);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08)">Fase 2</div>
-      </div>
-      <div class="mod-title">Test de Marcha 6 Minutos</div>
-      <div class="mod-desc">Simulador en tiempo real con 5 perfiles de paciente, monitorización de SpO₂/FC/Borg, criterios de parada automáticos, calculadora de predichos y casos de interpretación.</div>
-      <div class="mod-tags">
-        <span class="tag">Tiempo real</span>
-        <span class="tag">5 perfiles</span>
-        <span class="tag">Predichos</span>
-        <span class="tag">Interpretación</span>
-      </div>
-      <div class="mod-footer">
-        <div style="display:flex;align-items:center;gap:.4rem">
-          <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">5 pacientes · 2 casos interpretación · Protocolo ATS</span>
-        </div>
-        <div class="mod-open" style="color:var(--green)">Abrir →</div>
-      </div>
-    </a>
-
-    <!-- FASE 3: Aclaramiento -->
-    <a class="mod-card" href="#" onclick="openModule('modules/aclaramiento.html','Técnicas de Aclaramiento Bronquial');return false;"
-       style="--card-color:rgba(45,212,191,.4);--card-accent:rgba(45,212,191,.06)">
-      <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(45,212,191,.12);color:var(--teal)">💨</div>
-        <div class="mod-phase" style="color:var(--teal);border-color:rgba(45,212,191,.3);background:rgba(45,212,191,.08)">Fase 3</div>
-      </div>
-      <div class="mod-title">Técnicas de Aclaramiento Bronquial</div>
-      <div class="mod-desc">Biblioteca de 8 técnicas con animaciones SVG del principio físico, comparador lado a lado, selector clínico por escenario y secuenciador de sesión.</div>
-      <div class="mod-tags">
-        <span class="tag">8 técnicas</span>
-        <span class="tag">Animaciones</span>
-        <span class="tag">Selector clínico</span>
-        <span class="tag">Secuenciador</span>
-      </div>
-      <div class="mod-footer">
-        <div style="display:flex;align-items:center;gap:.4rem">
-          <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">DA · CATR · Flutter · PEP · IMT</span>
-        </div>
-        <div class="mod-open" style="color:var(--teal)">Abrir →</div>
-      </div>
-    </a>
-
-    <!-- FASE 4: Calculadoras -->
-    <a class="mod-card" href="#" onclick="openModule('modules/calculadoras.html','Calculadoras Clínicas Integradas');return false;"
-       style="--card-color:rgba(251,191,36,.4);--card-accent:rgba(251,191,36,.06)">
-      <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(251,191,36,.12);color:var(--amber)">🧮</div>
-        <div class="mod-phase" style="color:var(--amber);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.08)">Fase 4</div>
-      </div>
-      <div class="mod-title">Calculadoras Clínicas Integradas</div>
-      <div class="mod-desc">Índice BODE con curva de supervivencia, clasificación GOLD 2024 completa, puntaje CAT, escala MRC visual y predichos espirométricos GLI 2012 con puntaje z y límite inferior de normalidad.</div>
-      <div class="mod-tags">
-        <span class="tag">BODE</span>
-        <span class="tag">GOLD 2024</span>
-        <span class="tag">CAT</span>
-        <span class="tag">MRC</span>
-        <span class="tag">GLI 2012</span>
-      </div>
-      <div class="mod-footer">
-        <div style="display:flex;align-items:center;gap:.4rem">
-          <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">5 calculadoras · Puntaje z</span>
-        </div>
-        <div class="mod-open" style="color:var(--amber)">Abrir →</div>
-      </div>
-    </a>
-
-    <!-- FASE 5: Historial -->
-    <a class="mod-card" href="#" onclick="openModule('modules/historial.html','Historial Longitudinal del Paciente');return false;"
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-4.html','Clase 4 — Evaluación y Tratamiento Fisioterapéutico');return false;"
        style="--card-color:rgba(167,139,250,.4);--card-accent:rgba(167,139,250,.06)">
       <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(167,139,250,.12);color:var(--purple)">📈</div>
-        <div class="mod-phase" style="color:var(--purple);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)">Fase 5</div>
+        <div class="mod-icon" style="background:rgba(167,139,250,.12);color:var(--purple);font-size:.85rem;font-weight:700">C4</div>
+        <div class="mod-phase" style="color:var(--purple);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)">Respiratorio</div>
       </div>
-      <div class="mod-title">Historial Longitudinal del Paciente</div>
-      <div class="mod-desc">Sigue 4 pacientes durante 12 semanas de rehabilitación pulmonar. Puntos de decisión clínica, modo evaluación con puntuación y modo presentación para docentes.</div>
-      <div class="mod-tags">
-        <span class="tag">4 pacientes</span>
-        <span class="tag">12 semanas</span>
-        <span class="tag">Decisiones</span>
-        <span class="tag">Docentes</span>
-      </div>
+      <div class="mod-title">Evaluación y Tratamiento Fisioterapéutico</div>
+      <div class="mod-desc">Seguimiento longitudinal en rehabilitación pulmonar y técnicas de aclaramiento bronquial.</div>
       <div class="mod-footer">
         <div style="display:flex;align-items:center;gap:.4rem">
           <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">EPOC · FQ · EPOC+Post-COVID · Post-UCI</span>
+          <span style="font-size:11px;color:var(--text3)">2 módulos</span>
         </div>
         <div class="mod-open" style="color:var(--purple)">Abrir →</div>
       </div>
     </a>
 
-    <!-- FASE 6: Cardiovascular -->
-    <a class="mod-card" href="#" onclick="openModule('modules/casos_cardiovascular.html','Casos Cardiovasculares');return false;"
-       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-5.html','Clase 5 — Rehabilitación Pulmonar');return false;"
+       style="--card-color:rgba(74,222,128,.4);--card-accent:rgba(74,222,128,.06)">
       <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6">❤️</div>
-        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Fase 6</div>
+        <div class="mod-icon" style="background:rgba(74,222,128,.12);color:var(--green);font-size:.85rem;font-weight:700">C5</div>
+        <div class="mod-phase" style="color:var(--green);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08)">Respiratorio</div>
       </div>
-      <div class="mod-title">Casos Cardiovasculares</div>
-      <div class="mod-desc">Casos clínicos de patología cardiovascular con evaluación ABCDE, monitorización hemodinámica, banco de preguntas y razonamiento clínico integrado.</div>
-      <div class="mod-tags">
-        <span class="tag">2 casos clínicos</span>
-        <span class="tag">ABCDE</span>
-        <span class="tag">Hemodinámica</span>
-        <span class="tag">Preguntas</span>
-      </div>
+      <div class="mod-title">Rehabilitación Pulmonar</div>
+      <div class="mod-desc">Test de marcha de 6 minutos y simulador de fisiopatología respiratoria con técnicas de rehabilitación.</div>
       <div class="mod-footer">
         <div style="display:flex;align-items:center;gap:.4rem">
           <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">Post-IAM · ICC sistólica</span>
+          <span style="font-size:11px;color:var(--text3)">2 módulos</span>
         </div>
-        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+        <div class="mod-open" style="color:var(--green)">Abrir →</div>
       </div>
     </a>
 
-    <!-- FASE 7: Simulador ECG -->
-    <a class="mod-card" href="#" onclick="openModule('modules/ecg.html','Simulador ECG');return false;"
-       style="--card-color:rgba(74,158,255,.4);--card-accent:rgba(74,158,255,.06)">
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-6.html','Clase 6 — Enfermedades Obstructivas y Restrictivas');return false;"
+       style="--card-color:rgba(251,191,36,.4);--card-accent:rgba(251,191,36,.06)">
       <div class="mod-top">
-        <div class="mod-icon" style="background:rgba(74,158,255,.12);color:#4a9eff">⚡</div>
-        <div class="mod-phase" style="color:#4a9eff;border-color:rgba(74,158,255,.3);background:rgba(74,158,255,.08)">Fase 7</div>
+        <div class="mod-icon" style="background:rgba(251,191,36,.12);color:var(--amber);font-size:.85rem;font-weight:700">C6</div>
+        <div class="mod-phase" style="color:var(--amber);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.08)">Respiratorio</div>
       </div>
-      <div class="mod-title">Simulador ECG</div>
-      <div class="mod-desc">Simulador dinámico en tiempo real con 16 ritmos cardíacos. Modos de simulación libre, aprendizaje guiado y evaluación con calificación 0-20.</div>
-      <div class="mod-tags">
-        <span class="tag">ECG dinámico</span>
-        <span class="tag">16 ritmos</span>
-        <span class="tag">Simulador</span>
-        <span class="tag">Evaluación</span>
-      </div>
+      <div class="mod-title">Enfermedades Obstructivas y Restrictivas</div>
+      <div class="mod-desc">Simulador paramétrico, espirometría, índice BODE, GOLD 2024 y predichos GLI 2012.</div>
       <div class="mod-footer">
         <div style="display:flex;align-items:center;gap:.4rem">
           <div class="mod-dot"></div>
-          <span style="font-size:11px;color:var(--text3)">Sinusal · Bloqueos · Arritmias · Isquemia</span>
+          <span style="font-size:11px;color:var(--text3)">2 módulos</span>
+        </div>
+        <div class="mod-open" style="color:var(--amber)">Abrir →</div>
+      </div>
+    </a>
+
+  </div>
+</div><!-- /section respiratorio -->
+
+<!-- ─── CARDIOVASCULAR ─── -->
+<div class="section">
+  <div class="area-title" style="--area-color:rgba(244,114,182,.5);color:#f472b6">
+    Cardiovascular — Clases 7 a 12
+  </div>
+  <div class="modules-grid">
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-7.html','Clase 7 — Anatomía y Fisiología Cardíaca');return false;"
+       style="--card-color:rgba(74,158,255,.4);--card-accent:rgba(74,158,255,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(74,158,255,.12);color:#4a9eff;font-size:.85rem;font-weight:700">C7</div>
+        <div class="mod-phase" style="color:#4a9eff;border-color:rgba(74,158,255,.3);background:rgba(74,158,255,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Anatomía y Fisiología Cardíaca</div>
+      <div class="mod-desc">Simulador ECG con 16 ritmos, diagrama de Wiggers, ciclo cardíaco y ruidos S1–S4.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
         </div>
         <div class="mod-open" style="color:#4a9eff">Abrir →</div>
       </div>
     </a>
 
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-8.html','Clase 8 — Evaluación Cardiovascular');return false;"
+       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6;font-size:.85rem;font-weight:700">C8</div>
+        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Evaluación Cardiovascular</div>
+      <div class="mod-desc">Anamnesis cardiovascular, evaluación ABCDE en IAM e ICC y monitorización hemodinámica.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
+        </div>
+        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+      </div>
+    </a>
 
-  </div><!-- /modules-grid -->
-</div><!-- /section -->
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-9.html','Clase 9 — Rehabilitación Cardíaca');return false;"
+       style="--card-color:rgba(74,222,128,.4);--card-accent:rgba(74,222,128,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(74,222,128,.12);color:var(--green);font-size:.85rem;font-weight:700">C9</div>
+        <div class="mod-phase" style="color:var(--green);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Rehabilitación Cardíaca</div>
+      <div class="mod-desc">Test de marcha de 6 minutos en pacientes post-IAM e ICC con criterios de parada cardiovasculares.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
+        </div>
+        <div class="mod-open" style="color:var(--green)">Abrir →</div>
+      </div>
+    </a>
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-10.html','Clase 10 — Enfermedades Cardíacas');return false;"
+       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6;font-size:.75rem;font-weight:700">C10</div>
+        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Enfermedades Cardíacas</div>
+      <div class="mod-desc">Aterosclerosis, HTA, fisiopatología de las cardiopatías y razonamiento clínico integrado.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
+        </div>
+        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+      </div>
+    </a>
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-11.html','Clase 11 — Riesgo Cardiovascular');return false;"
+       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6;font-size:.75rem;font-weight:700">C11</div>
+        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Riesgo Cardiovascular</div>
+      <div class="mod-desc">Escala de Framingham 2008, gauge de riesgo a 10 años y factores de riesgo modificables y no modificables.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
+        </div>
+        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+      </div>
+    </a>
+
+    <a class="mod-card" href="#" onclick="openModule('modules/clase-12.html','Clase 12 — Prescripción del Ejercicio');return false;"
+       style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+      <div class="mod-top">
+        <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6;font-size:.75rem;font-weight:700">C12</div>
+        <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">Cardiovascular</div>
+      </div>
+      <div class="mod-title">Prescripción del Ejercicio</div>
+      <div class="mod-desc">Modelo FITT, método de Karvonen, escala de Borg y METs para prescripción en cardiopatías.</div>
+      <div class="mod-footer">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="mod-dot"></div>
+          <span style="font-size:11px;color:var(--text3)">1 módulo</span>
+        </div>
+        <div class="mod-open" style="color:#f472b6">Abrir →</div>
+      </div>
+    </a>
+
+  </div>
+</div><!-- /section cardiovascular -->
 
 <footer>
   <b>FisioResp</b> — Plataforma educativa de fisioterapia respiratoria &nbsp;·&nbsp; Para uso académico
