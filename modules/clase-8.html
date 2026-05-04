@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 8 — FisioResp</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/fisioresp.css">
+<style>
+.hw{max-width:960px;margin:0 auto;padding:2rem 1.5rem 3rem}
+.hl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#f472b6;margin-bottom:.4rem}
+.ht{font-family:var(--fh);font-size:clamp(1.4rem,4vw,2.2rem);line-height:1.1;letter-spacing:-.5px;margin-bottom:.3rem}
+.ha{font-size:12px;color:var(--text3);margin-bottom:2rem}
+.ho{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem 1.75rem;margin-bottom:2rem}
+.ho h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:.9rem}
+.ho ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.45rem}
+.ho li{font-size:13.5px;color:var(--text2);line-height:1.5}
+.hm h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.hm h2::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+<div class="hw">
+  <div class="hl">C8 · Cardiovascular</div>
+  <div class="ht">Evaluación Cardiovascular</div>
+  <div class="ha">Área Cardiovascular — Clase 8 de 12</div>
+  <div class="ho">
+    <h2>Objetivos de aprendizaje</h2>
+    <ul>
+      <li>Realizar una anamnesis cardiovascular estructurada e identificar factores de riesgo</li>
+      <li>Aplicar el enfoque ABCDE en el paciente con IAM e ICC aguda</li>
+      <li>Interpretar los parámetros básicos de monitorización hemodinámica</li>
+      <li>Clasificar la gravedad del IAM con la escala Killip-Kimball</li>
+    </ul>
+  </div>
+  <div class="hm">
+    <h2>Módulos</h2>
+    <div class="modules-grid">
+
+      <a class="mod-card" href="#" onclick="openMod('modules/casos_cardiovascular.html','Casos y Evaluación Cardiovascular');return false;"
+         style="--card-color:rgba(244,114,182,.4);--card-accent:rgba(244,114,182,.06)">
+        <div class="mod-top">
+          <div class="mod-icon" style="background:rgba(244,114,182,.12);color:#f472b6;font-size:.8rem;font-weight:700">CV</div>
+          <div class="mod-phase" style="color:#f472b6;border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)">C8</div>
+        </div>
+        <div class="mod-title">Casos y Evaluación Cardiovascular</div>
+        <div class="mod-desc">Anamnesis, ABCDE en IAM e ICC, monitorización hemodinámica y estratificación Killip-Kimball.</div>
+        <div class="mod-footer">
+          <div style="display:flex;align-items:center;gap:.4rem">
+            <div class="mod-dot"></div>
+            <span style="font-size:11px;color:var(--text3)">IAM · ICC · Anamnesis · Killip</span>
+          </div>
+          <div class="mod-open" style="color:#f472b6">Abrir →</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+<script>
+function openMod(url, title) {
+  if (window.parent && window.parent.openModule) window.parent.openModule(url, title);
+}
+</script>
+</body>
+</html>
