@@ -445,6 +445,22 @@ hr, .divider { border: none; border-top: 1px solid var(--border); margin: 1.25re
   background: rgba(56,189,248,.04);
 }
 
+/* ── MODULE CARDS (hub pages) ── */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.mod-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;text-decoration:none;color:inherit;display:block;transition:all .25s;position:relative;overflow:hidden}
+.mod-card::before{content:'';position:absolute;inset:0;background:var(--card-accent,transparent);opacity:0;transition:opacity .2s;pointer-events:none}
+.mod-card:hover{border-color:var(--card-color,var(--border2));transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.mod-card:hover::before{opacity:1}
+.mod-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.mod-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.mod-phase{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:100px;border:1px solid}
+.mod-title{font-family:var(--fh);font-size:1rem;margin-bottom:.5rem;position:relative;z-index:1}
+.mod-desc{font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:1rem;position:relative;z-index:1}
+.mod-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;position:relative;z-index:1}
+.mod-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.mod-open{font-weight:600;font-size:12px;transition:transform .2s}
+.mod-card:hover .mod-open{transform:translateX(3px)}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 600px) {
   .wrap, .container { padding: 1rem; }
