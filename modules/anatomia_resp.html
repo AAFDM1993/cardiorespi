@@ -42,11 +42,11 @@
 </div>
 
 <div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('anatomia')">Anatomía</button>
-  <button class="tab-btn" onclick="switchTab('volumenes')">Volúmenes</button>
-  <button class="tab-btn" onclick="switchTab('mecanica')">Mecánica</button>
-  <button class="tab-btn" onclick="switchTab('intercambio')">Intercambio</button>
-  <button class="tab-btn" onclick="switchTab('control')">Control</button>
+  <button type="button" class="tab-btn active" data-tab="anatomia" onclick="switchTab('anatomia')">Anatomía</button>
+  <button type="button" class="tab-btn" data-tab="volumenes" onclick="switchTab('volumenes')">Volúmenes</button>
+  <button type="button" class="tab-btn" data-tab="mecanica" onclick="switchTab('mecanica')">Mecánica</button>
+  <button type="button" class="tab-btn" data-tab="intercambio" onclick="switchTab('intercambio')">Intercambio</button>
+  <button type="button" class="tab-btn" data-tab="control" onclick="switchTab('control')">Control</button>
 </div>
 
 <!-- TAB 1: ANATOMÍA -->
@@ -430,7 +430,7 @@ function switchTab(id) {
   document.querySelectorAll('.panel').forEach(p => { p.style.display = 'none'; });
   document.getElementById(id).style.display = 'block';
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + id + "'"));
+    btn.classList.toggle('active', btn.dataset.tab === id);
   });
 }
 </script>
