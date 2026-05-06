@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anatomía y Fisiología Respiratoria — FisioResp</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/fisioresp.css">
+<script src="../assets/js/ui.js"></script>
+<style>
+.tab-nav{display:flex;gap:.5rem;flex-wrap:wrap;padding:1.25rem 1.5rem .75rem;border-bottom:1px solid var(--border);background:var(--bg2)}
+.tab-btn{padding:6px 16px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;font-weight:600;font-family:var(--fb);cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.tab-btn:hover{border-color:var(--border2);color:var(--text2)}
+.tab-btn.active{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.4);color:var(--blue)}
+.tab-content{max-width:900px;margin:0 auto;padding:2rem 1.5rem 3rem}
+.panel{display:none}
+.sec-title{font-family:var(--fh);font-size:1.05rem;font-weight:700;color:var(--blue);margin:2rem 0 .75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(56,189,248,.2)}
+.sec-title:first-child{margin-top:0}
+.body-text{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:1rem}
+.body-text strong{color:var(--text1)}
+.body-text ul{margin:.5rem 0 .5rem 1.2rem;display:flex;flex-direction:column;gap:.3rem}
+.formula{text-align:center;font-family:var(--fm);font-size:15px;color:var(--blue);margin:1rem 0;padding:.75rem;background:rgba(56,189,248,.06);border-radius:8px;border:1px solid rgba(56,189,248,.2)}
+.ref-table-wrap{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.ref-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:.75rem}
+.ref-table{width:100%;border-collapse:collapse;font-size:13px}
+.ref-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--blue);border-bottom:1px solid rgba(56,189,248,.25);background:rgba(56,189,248,.04)}
+.ref-table td{padding:8px 12px;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:top}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:var(--card2)}
+.mod-header{padding:1.5rem 1.5rem .5rem;background:var(--bg2);border-bottom:1px solid var(--border)}
+.mod-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:.3rem}
+.mod-h1{font-family:var(--fh);font-size:clamp(1.3rem,3.5vw,1.8rem);line-height:1.1;letter-spacing:-.4px;margin-bottom:.25rem}
+.mod-subtitle{font-size:13px;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div class="mod-header">
+  <div class="mod-eyebrow">C1 · Respiratorio</div>
+  <div class="mod-h1">Anatomía y Fisiología del Sistema Respiratorio</div>
+  <div class="mod-subtitle">Referencia clínica completa — Clase 1 de 12</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('anatomia')">Anatomía</button>
+  <button class="tab-btn" onclick="switchTab('volumenes')">Volúmenes</button>
+  <button class="tab-btn" onclick="switchTab('mecanica')">Mecánica</button>
+  <button class="tab-btn" onclick="switchTab('intercambio')">Intercambio</button>
+  <button class="tab-btn" onclick="switchTab('control')">Control</button>
+</div>
+
+<!-- TAB 1: ANATOMÍA -->
+<div id="anatomia" class="panel" style="display:block">
+<div class="tab-content">
+
+  <div class="sec-title">Vías Aéreas Superiores</div>
+  <div class="body-text">
+    <p>Las vías aéreas superiores acondicionan el aire inspirado antes de que llegue a los pulmones:</p>
+    <ul>
+      <li><strong>Nariz:</strong> Calienta, humidifica y filtra el aire mediante el moco y los cilios. Los cornetes nasales aumentan la superficie de contacto.</li>
+      <li><strong>Faringe:</strong> Dividida en nasofaringe, orofaringe y laringofaringe. Actúa como vía común para el aire y los alimentos.</li>
+      <li><strong>Laringe:</strong> Aloja las cuerdas vocales y actúa como esfínter protector de la vía aérea inferior durante la deglución.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Vías Aéreas Inferiores</div>
+  <div class="body-text">
+    <p>Conducen el aire desde la laringe hasta los alvéolos de forma progresivamente ramificada:</p>
+    <ul>
+      <li><strong>Tráquea:</strong> Tubo cartilaginoso de ~12 cm que se bifurca en la carina en los bronquios principales derecho (más vertical, corto) e izquierdo.</li>
+      <li><strong>Bronquios lobares y segmentarios:</strong> El bronquio derecho origina 3 bronquios lobares (superior, medio, inferior). El izquierdo origina 2 (superior e inferior). Cada bronquio lobar se subdivide en bronquios segmentarios correspondientes a los segmentos broncopulmonares.</li>
+      <li><strong>Bronquiolos:</strong> Sin cartílago. Los bronquiolos terminales son la última vía de conducción pura. Los bronquiolos respiratorios ya participan parcialmente en el intercambio gaseoso.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Unidad Respiratoria (Acino)</div>
+  <div class="body-text">
+    <p>El <strong>acino</strong> es la unidad funcional del intercambio gaseoso. Está formado por:</p>
+    <ul>
+      <li>Bronquiolo respiratorio</li>
+      <li>Conductos alveolares</li>
+      <li>Sacos alveolares</li>
+      <li>Alvéolos (~300 millones en ambos pulmones, superficie total ~70 m²)</li>
+    </ul>
+    <p>Los <strong>neumocitos tipo I</strong> forman la pared alveolar delgada (intercambio gaseoso). Los <strong>neumocitos tipo II</strong> producen surfactante pulmonar y pueden regenerar los neumocitos tipo I.</p>
+  </div>
+
+  <div class="sec-title">Pulmones y Pleura</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Pulmón derecho:</strong> 3 lóbulos (superior, medio, inferior) separados por cisura mayor y menor.</li>
+      <li><strong>Pulmón izquierdo:</strong> 2 lóbulos (superior e inferior) separados por cisura mayor. Presenta la língula (equivalente funcional al lóbulo medio).</li>
+      <li><strong>Pleura visceral:</strong> Recubre directamente la superficie pulmonar.</li>
+      <li><strong>Pleura parietal:</strong> Reviste la cavidad torácica, el diafragma y el mediastino.</li>
+      <li><strong>Espacio pleural:</strong> Espacio virtual entre ambas pleuras con presión negativa (~−5 cmH₂O en reposo) que mantiene los pulmones expandidos. Contiene ~10–20 mL de líquido lubricante.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Circulación Pulmonar y Bronquial</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Circulación pulmonar:</strong> Las arterias pulmonares transportan sangre desoxigenada desde el ventrículo derecho hasta los capilares alveolares. Las venas pulmonares retornan sangre oxigenada al ventrículo izquierdo. Es un circuito de baja presión (~25/8 mmHg) y alta complacencia.</li>
+      <li><strong>Circulación bronquial:</strong> Nutre las vías aéreas de conducción (hasta los bronquiolos terminales) y el parénquima pulmonar con sangre oxigenada procedente de la aorta.</li>
+    </ul>
+  </div>
+
+  <div class="ref-table-wrap">
+    <div class="ref-label">Músculos respiratorios — Referencia</div>
+    <table class="ref-table">
+      <thead><tr><th>Músculo</th><th>Fase</th><th>Función</th></tr></thead>
+      <tbody>
+        <tr><td>Diafragma</td><td>Inspiración</td><td>Principal músculo inspiratorio. Se contrae, desciende y aumenta el volumen torácico vertical</td></tr>
+        <tr><td>Intercostales externos</td><td>Inspiración</td><td>Elevan las costillas, amplían la caja torácica anteroposterior y lateralmente</td></tr>
+        <tr><td>Escalenos</td><td>Inspiración forzada</td><td>Elevan las dos primeras costillas</td></tr>
+        <tr><td>Esternocleidomastoideo</td><td>Inspiración forzada</td><td>Eleva el esternón y las clavículas</td></tr>
+        <tr><td>Pectorales menores</td><td>Inspiración forzada</td><td>Elevan costillas 3–5 cuando la cintura escapular está fija</td></tr>
+        <tr><td>Retroceso elástico</td><td>Espiración normal</td><td>Proceso pasivo — no requiere contracción muscular activa</td></tr>
+        <tr><td>Intercostales internos</td><td>Espiración forzada</td><td>Deprimen las costillas, reducen el volumen torácico</td></tr>
+        <tr><td>Abdominales</td><td>Espiración forzada</td><td>Comprimen el abdomen, empujan el diafragma hacia arriba</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 2: VOLÚMENES -->
+<div id="volumenes" class="panel">
+<div class="tab-content">
+
+  <div class="sec-title">Volúmenes Pulmonares</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Volumen Corriente (VT):</strong> Volumen de aire movilizado en una respiración normal en reposo (~500 mL). Parámetro básico de la ventilación.</li>
+      <li><strong>Volumen de Reserva Inspiratoria (VRI):</strong> Volumen adicional que puede inspirarse sobre el VT mediante inspiración máxima (~3000 mL). Refleja la reserva inspiratoria disponible.</li>
+      <li><strong>Volumen de Reserva Espiratoria (VRE):</strong> Volumen adicional que puede espirarse tras una espiración normal pasiva (~1200 mL). Se activa en el ejercicio y en la espiración forzada.</li>
+      <li><strong>Volumen Residual (VR):</strong> Volumen de aire que permanece en los pulmones tras una espiración máxima forzada (~1200 mL). No es medible por espirometría simple — requiere dilución de gases (helio) o pletismografía corporal. Aumenta en enfermedades obstructivas (atrapamiento de aire).</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Capacidades Pulmonares</div>
+  <div class="body-text">
+    <p>Las capacidades son la suma de dos o más volúmenes:</p>
+    <ul>
+      <li><strong>Capacidad Pulmonar Total (CPT):</strong> VT + VRI + VRE + VR ≈ 6000 mL. Volumen máximo que pueden contener los pulmones. Disminuye en enfermedades restrictivas.</li>
+      <li><strong>Capacidad Vital (CV):</strong> VT + VRI + VRE ≈ 4700 mL. Volumen máximo movilizable en una sola espiración tras inspiración máxima. Medible por espirometría. Disminuye en enfermedades restrictivas y obstructivas graves.</li>
+      <li><strong>Capacidad Residual Funcional (CRF):</strong> VRE + VR ≈ 2400 mL. Volumen de aire en los pulmones al final de una espiración normal pasiva. Representa el punto de equilibrio entre el retroceso elástico del pulmón (colapso) y la tendencia de la caja torácica a expandirse. No medible por espirometría simple.</li>
+      <li><strong>Capacidad Inspiratoria (CI):</strong> VT + VRI ≈ 3500 mL. Volumen máximo que puede inspirarse desde la CRF.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Espacio Muerto y Ventilación Alveolar</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Espacio muerto anatómico (VD):</strong> Vías de conducción que no participan en el intercambio gaseoso (~150 mL). Incluye desde la nariz hasta los bronquiolos terminales.</li>
+      <li><strong>Espacio muerto alveolar:</strong> Alvéolos ventilados pero no perfundidos (V/Q = ∞). Mínimo en condiciones normales. Aumenta en el tromboembolismo pulmonar.</li>
+      <li><strong>Espacio muerto fisiológico:</strong> Suma del espacio muerto anatómico y el alveolar. En pulmones sanos ≈ espacio muerto anatómico.</li>
+      <li><strong>Ventilación alveolar (VA):</strong> Volumen de aire que realmente llega a los alvéolos por unidad de tiempo.</li>
+    </ul>
+    <div class="formula">VA = FR × (VT − VD)</div>
+    <p>Ejemplo: FR = 15 resp/min, VT = 500 mL, VD = 150 mL → VA = 15 × 350 = 5250 mL/min.</p>
+    <p>Una respiración superficial y rápida puede mantener la VE (ventilación/minuto) pero reducir la VA al aumentar la proporción relativa del espacio muerto.</p>
+  </div>
+
+  <div class="ref-table-wrap">
+    <div class="ref-label">Volúmenes y capacidades — Valores de referencia</div>
+    <table class="ref-table">
+      <thead><tr><th>Parámetro</th><th>Valor (~)</th><th>Componentes</th><th>Espirometría</th></tr></thead>
+      <tbody>
+        <tr><td>Volumen Corriente (VT)</td><td>500 mL</td><td>—</td><td>Sí</td></tr>
+        <tr><td>Vol. Reserva Inspiratoria (VRI)</td><td>3000 mL</td><td>—</td><td>Sí</td></tr>
+        <tr><td>Vol. Reserva Espiratoria (VRE)</td><td>1200 mL</td><td>—</td><td>Sí</td></tr>
+        <tr><td>Volumen Residual (VR)</td><td>1200 mL</td><td>—</td><td>No</td></tr>
+        <tr><td>Capacidad Pulmonar Total (CPT)</td><td>6000 mL</td><td>VT + VRI + VRE + VR</td><td>No</td></tr>
+        <tr><td>Capacidad Vital (CV)</td><td>4700 mL</td><td>VT + VRI + VRE</td><td>Sí</td></tr>
+        <tr><td>Capacidad Residual Funcional (CRF)</td><td>2400 mL</td><td>VRE + VR</td><td>No</td></tr>
+        <tr><td>Capacidad Inspiratoria (CI)</td><td>3500 mL</td><td>VT + VRI</td><td>Sí</td></tr>
+        <tr><td>Espacio muerto anatómico (VD)</td><td>150 mL</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 3: MECÁNICA -->
+<div id="mecanica" class="panel">
+<div class="tab-content">
+
+  <div class="sec-title">Ciclo Respiratorio</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Inspiración (proceso activo):</strong> El diafragma se contrae y desciende (~1,5 cm en reposo, hasta 10 cm en inspiración forzada). Los intercostales externos elevan las costillas. Aumenta el volumen torácico → desciende la presión alveolar por debajo de la atmosférica → el aire fluye hacia los pulmones.</li>
+      <li><strong>Espiración normal (proceso pasivo):</strong> Los músculos se relajan. El retroceso elástico del parénquima pulmonar y la caja torácica reducen el volumen torácico → la presión alveolar supera la atmosférica → el aire sale. No requiere contracción muscular activa en reposo.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Compliance (Distensibilidad)</div>
+  <div class="body-text">
+    <p>La <strong>compliance</strong> mide la facilidad con que el pulmón se expande ante un cambio de presión:</p>
+    <div class="formula">C = ΔV / ΔP (L/cmH₂O)</div>
+    <ul>
+      <li><strong>Mayor compliance:</strong> El pulmón se infla con poco esfuerzo → característico del <strong>enfisema</strong> (destrucción del tejido elástico). Valor normal: ~0,2 L/cmH₂O.</li>
+      <li><strong>Menor compliance (pulmón rígido):</strong> Se requiere mayor presión para el mismo volumen → característico de la <strong>fibrosis pulmonar</strong>, edema pulmonar y síndrome de distrés respiratorio agudo (SDRA).</li>
+      <li>La compliance del sistema respiratorio total es menor que la pulmonar sola (la caja torácica añade su propia elasticidad en serie).</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Resistencia de la Vía Aérea (Raw)</div>
+  <div class="body-text">
+    <p>La <strong>resistencia</strong> cuantifica la oposición al flujo de aire:</p>
+    <div class="formula">R = ΔP / Flujo (cmH₂O/L/s)</div>
+    <ul>
+      <li>Depende principalmente del <strong>calibre</strong> de la vía aérea. Ley de Poiseuille: R ∝ 1/r⁴ → duplicar el radio reduce la resistencia 16 veces.</li>
+      <li>También depende de la longitud de la vía y la densidad del gas.</li>
+      <li>La mayor resistencia se genera en los bronquios medianos (2ª–6ª generación). Las vías muy pequeñas son paralelas → baja resistencia total.</li>
+      <li>Aumenta en: broncoespasmo (asma), secreciones bronquiales, edema de mucosa, cuerpos extraños.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Tensión Superficial y Surfactante</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Tensión superficial:</strong> Fuerza en la interfase aire-líquido que recubre internamente los alvéolos. Tiende a colapsarlos.</li>
+      <li><strong>Ley de Laplace:</strong> P = 2T/r. A menor radio alveolar, mayor la presión de colapso. Sin surfactante, los alvéolos pequeños se vaciarían en los grandes.</li>
+      <li><strong>Surfactante pulmonar:</strong> Producido por los <strong>neumocitos tipo II</strong>. Reduce la tensión superficial de forma inversamente proporcional al radio alveolar → estabiliza alvéolos de distintos tamaños, previene atelectasias y reduce el trabajo respiratorio. Componente principal: dipalmitoilfosfatidilcolina (DPPC).</li>
+      <li><strong>Déficit de surfactante:</strong> Causa el Síndrome de Distrés Respiratorio Neonatal en prematuros (pulmones inmaduros). Tratamiento: surfactante exógeno intratraqueal.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Presiones del Sistema Respiratorio</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Presión alveolar (Palv):</strong> En equilibrio estático = presión atmosférica (0 cmH₂O relativos). Desciende durante la inspiración activa; aumenta durante la espiración.</li>
+      <li><strong>Presión pleural (Ppl):</strong> Siempre negativa en condiciones normales (~−5 cmH₂O en reposo, ~−10 cmH₂O en inspiración profunda) → evita el colapso pulmonar. Se vuelve positiva en el neumotórax a tensión.</li>
+      <li><strong>Presión transpulmonar (Ptp):</strong> Ptp = Palv − Ppl. Fuerza neta que mantiene el pulmón expandido. En reposo ~5 cmH₂O.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Trabajo Respiratorio</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Trabajo elástico:</strong> Para vencer la compliance del sistema (pulmón + caja torácica). Mayor en pulmones rígidos (baja compliance).</li>
+      <li><strong>Trabajo resistivo:</strong> Para vencer la resistencia al flujo de aire. Mayor en obstrucción bronquial. Aumenta con la frecuencia respiratoria y la velocidad de flujo.</li>
+    </ul>
+    <p>En reposo, el trabajo respiratorio representa ~2–3% del consumo total de O₂. En enfermedad pulmonar grave puede superar el 30%, comprometiendo la capacidad de ejercicio.</p>
+  </div>
+
+  <div class="ref-table-wrap">
+    <div class="ref-label">Mecánica ventilatoria — Fórmulas y valores</div>
+    <table class="ref-table">
+      <thead><tr><th>Concepto</th><th>Fórmula</th><th>Unidad</th><th>Valor normal</th></tr></thead>
+      <tbody>
+        <tr><td>Compliance pulmonar</td><td>C = ΔV / ΔP</td><td>L/cmH₂O</td><td>~0,2</td></tr>
+        <tr><td>Resistencia vía aérea (Raw)</td><td>R = ΔP / Flujo</td><td>cmH₂O/L/s</td><td>0,5–2,5</td></tr>
+        <tr><td>Ley de Laplace</td><td>P = 2T / r</td><td>cmH₂O</td><td>—</td></tr>
+        <tr><td>Presión pleural (reposo)</td><td>—</td><td>cmH₂O</td><td>~−5</td></tr>
+        <tr><td>Presión transpulmonar (reposo)</td><td>Ptp = Palv − Ppl</td><td>cmH₂O</td><td>~5</td></tr>
+        <tr><td>Ventilación/minuto (VE)</td><td>VE = FR × VT</td><td>L/min</td><td>~7,5</td></tr>
+        <tr><td>Ventilación alveolar (VA)</td><td>VA = FR × (VT − VD)</td><td>L/min</td><td>~5,25</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 4: INTERCAMBIO -->
+<div id="intercambio" class="panel">
+<div class="tab-content">
+
+  <div class="sec-title">Difusión en la Membrana Alvéolo-Capilar</div>
+  <div class="body-text">
+    <p>El intercambio de O₂ y CO₂ entre los alvéolos y la sangre capilar pulmonar ocurre por <strong>difusión pasiva</strong> a favor del gradiente de presión parcial.</p>
+    <ul>
+      <li><strong>Ley de Fick:</strong> El flujo de gas es proporcional a la diferencia de presiones parciales (ΔP), al área de la membrana (A) y a la solubilidad del gas (S), e inversamente proporcional al grosor de la membrana (d):</li>
+    </ul>
+    <div class="formula">Flujo ∝ (ΔP × A × S) / d</div>
+    <ul>
+      <li>El CO₂ difunde ~20 veces más rápido que el O₂ por su mayor solubilidad. La hipercapnia casi nunca es causada por alteraciones de la difusión.</li>
+      <li>Grosor normal de la membrana: ~0,5 µm. Aumenta en edema pulmonar, fibrosis y neumonía → deteriora principalmente el intercambio de O₂.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Ecuación del Gas Alveolar</div>
+  <div class="body-text">
+    <p>Permite calcular la presión alveolar de O₂ (PAO₂):</p>
+    <div class="formula">PAO₂ = PiO₂ − (PACO₂ / R)</div>
+    <ul>
+      <li><strong>PiO₂</strong> = presión inspirada de O₂ = FiO₂ × (P<sub>atm</sub> − P<sub>H₂O</sub>) = 0,21 × (760 − 47) ≈ 150 mmHg a nivel del mar con aire ambiente.</li>
+      <li><strong>PACO₂</strong> ≈ PaCO₂ ≈ 40 mmHg en condiciones normales.</li>
+      <li><strong>R</strong> = cociente respiratorio ≈ 0,8 (relación CO₂ producido/O₂ consumido, varía con el sustrato energético).</li>
+      <li>PAO₂ normal ≈ 150 − (40/0,8) = 150 − 50 = <strong>100 mmHg</strong>.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Gradiente Alvéolo-Arterial de O₂ (AaDO₂)</div>
+  <div class="body-text">
+    <div class="formula">AaDO₂ = PAO₂ (calculada) − PaO₂ (medida en gasometría)</div>
+    <ul>
+      <li>Valor normal: &lt;10–15 mmHg. Aumenta fisiológicamente con la edad.</li>
+      <li><strong>AaDO₂ elevado:</strong> indica alteración en el intercambio gaseoso por alteración de difusión, shunt intrapulmonar o desequilibrio V/Q.</li>
+      <li><strong>AaDO₂ normal con hipoxemia:</strong> sugiere hipoventilación global (PaCO₂ elevada) o hipoxia hipobárica (altitud). El pulmón funciona correctamente.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Transporte de Oxígeno</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>97% unido a hemoglobina (HbO₂):</strong> Cada molécula de Hb une 4 moléculas de O₂ de forma cooperativa.</li>
+      <li><strong>3% disuelto en plasma:</strong> Proporcional a la PaO₂.</li>
+      <li><strong>Curva de disociación de la oxihemoglobina:</strong> Sigmoide. Alta afinidad a PaO₂ alta (captación en pulmón); menor afinidad a PaO₂ baja (liberación en tejidos).</li>
+      <li><strong>Desplazamiento a la derecha (menor afinidad → mayor liberación de O₂):</strong> Aumento de temperatura, PaCO₂, 2,3-DPG, y descenso de pH — <em>efecto Bohr</em>. Favorece la entrega de O₂ en tejidos activos.</li>
+      <li><strong>Desplazamiento a la izquierda (mayor afinidad → menor liberación):</strong> Descenso de temperatura, PaCO₂, 2,3-DPG y aumento de pH. Favorece la captación de O₂ en el pulmón.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Transporte de CO₂</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>~70% como bicarbonato (HCO₃⁻):</strong> El CO₂ entra al hematíe y se combina con H₂O (catalizado por la anhidrasa carbónica): CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻. El HCO₃⁻ sale al plasma por intercambio con Cl⁻ (efecto Hamburger).</li>
+      <li><strong>~23% como carbaminohemoglobina:</strong> El CO₂ se une directamente a los grupos amino de la Hb. La hemoglobina desoxigenada tiene mayor afinidad por el CO₂ — <em>efecto Haldane</em>.</li>
+      <li><strong>~7% disuelto en plasma.</strong></li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Relación Ventilación-Perfusión (V/Q)</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>V/Q normal:</strong> ~0,8. Varía fisiológicamente de ápice (~1,3) a base (~0,6) por efecto gravitacional.</li>
+      <li><strong>Shunt (V/Q = 0):</strong> Unidades perfundidas pero no ventiladas (ej. atelectasia, consolidación neumónica). Sangre no oxigenada alcanza la circulación sistémica. La hipoxia por shunt no mejora significativamente con O₂ suplementario (el O₂ no llega a los alvéolos colapsados).</li>
+      <li><strong>Espacio muerto alveolar (V/Q = ∞):</strong> Unidades ventiladas pero no perfundidas (ej. tromboembolismo pulmonar). Aumenta el trabajo ventilatorio sin mejorar el intercambio gaseoso.</li>
+    </ul>
+  </div>
+
+  <div class="ref-table-wrap">
+    <div class="ref-label">Intercambio gaseoso — Valores de referencia</div>
+    <table class="ref-table">
+      <thead><tr><th>Parámetro</th><th>Valor normal</th><th>Significado clínico</th></tr></thead>
+      <tbody>
+        <tr><td>PaO₂</td><td>80–100 mmHg</td><td>&lt;60 mmHg = insuficiencia respiratoria tipo I</td></tr>
+        <tr><td>PaCO₂</td><td>35–45 mmHg</td><td>&gt;45 mmHg = hipercapnia / tipo II</td></tr>
+        <tr><td>SaO₂</td><td>&gt;95%</td><td>&lt;90% = hipoxemia grave</td></tr>
+        <tr><td>PAO₂ (nivel del mar, FiO₂ 21%)</td><td>~100 mmHg</td><td>Calculada con ecuación del gas alveolar</td></tr>
+        <tr><td>Gradiente AaDO₂</td><td>&lt;10–15 mmHg</td><td>Elevado = alteración difusión, shunt o V/Q</td></tr>
+        <tr><td>Cociente respiratorio (R)</td><td>~0,8</td><td>Varía con el sustrato energético</td></tr>
+        <tr><td>V/Q normal</td><td>~0,8</td><td>Ápice ~1,3 / Base ~0,6</td></tr>
+        <tr><td>CO₂ como HCO₃⁻</td><td>~70%</td><td>Forma principal de transporte</td></tr>
+        <tr><td>CO₂ como carbaminoHb</td><td>~23%</td><td>Aumenta con desoxigenación (efecto Haldane)</td></tr>
+        <tr><td>CO₂ disuelto</td><td>~7%</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 5: CONTROL -->
+<div id="control" class="panel">
+<div class="tab-content">
+
+  <div class="sec-title">Centro Respiratorio</div>
+  <div class="body-text">
+    <p>El ritmo y la profundidad de la respiración son controlados por centros nerviosos en el <strong>tronco del encéfalo</strong>:</p>
+    <ul>
+      <li><strong>Grupo Respiratorio Dorsal (GRD):</strong> En el bulbo raquídeo. Genera el ritmo inspiratorio básico. Activa principalmente el diafragma y los intercostales externos via el nervio frénico.</li>
+      <li><strong>Grupo Respiratorio Ventral (GRV):</strong> En el bulbo. Inactivo en reposo. Se activa en situaciones de alta demanda ventilatoria (ejercicio intenso, obstrucción) para reclutar músculos espiratorios e inspiratorios accesorios.</li>
+      <li><strong>Centro apnéusico:</strong> En la protuberancia inferior. Estimula y prolonga la inspiración. Normalmente inhibido por el centro neumotáxico. Su lesión aislada produce respiración apnéustica (inspiraciones prolongadas con breves espiraciones).</li>
+      <li><strong>Centro neumotáxico:</strong> En la protuberancia superior. Inhibe al centro apnéusico limitando la duración de la inspiración. Controla la frecuencia respiratoria y el volumen corriente.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Quimiorreceptores</div>
+  <div class="body-text">
+    <p><strong>Centrales:</strong></p>
+    <ul>
+      <li>Ubicados en la superficie ventral del bulbo raquídeo.</li>
+      <li>Responden a cambios en el <strong>pH del líquido cefalorraquídeo (LCR)</strong>, que refleja la PaCO₂ (el CO₂ atraviesa libremente la barrera hematoencefálica → se combina con H₂O → H⁺ + HCO₃⁻).</li>
+      <li><strong>Principal mecanismo de regulación a corto plazo.</strong> Un aumento de PaCO₂ de 1 mmHg aumenta la ventilación ~2–3 L/min.</li>
+      <li>No responden directamente a la hipoxia. En hipercapnia crónica, se adaptan (se normaliza el pH del LCR), con lo que los quimiorreceptores periféricos pasan a ser el principal estímulo.</li>
+    </ul>
+    <p><strong>Periféricos:</strong></p>
+    <ul>
+      <li><strong>Cuerpos carotídeos:</strong> En la bifurcación de las arterias carótidas comunes. Son los principales.</li>
+      <li><strong>Cuerpos aórticos:</strong> En el cayado aórtico. Respuesta más débil.</li>
+      <li>Responden a: <strong>descenso de PaO₂ (&lt;60 mmHg)</strong>, aumento de PaCO₂ y descenso del pH arterial.</li>
+      <li>Constituyen el <strong>principal estímulo ventilatorio en la hipoxia crónica</strong> (ej. EPOC avanzado con hipercapnia crónica).</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Mecanorreceptores Pulmonares</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Receptores de estiramiento (fibras A mielínicas):</strong> En el músculo liso de las vías aéreas. Se activan cuando el pulmón se distiende más allá de un umbral (VT &gt; 1 L en adultos). Señal via nervio vago al centro neumotáxico → inhiben la inspiración. Constituyen el <strong>reflejo de Hering-Breuer</strong>. Es más relevante en neonatos y durante el ejercicio intenso.</li>
+      <li><strong>Receptores de irritantes (fibras A rápidas):</strong> En el epitelio de las vías aéreas. Responden a humo, polvo, gases irritantes, histamina. Desencadenan <strong>tos, estornudo, broncoconstricción e hiperpnea refleja</strong>.</li>
+      <li><strong>Receptores J o yuxtacapilares (fibras C amielínicas):</strong> En el parénquima pulmonar, próximos a los capilares alveolares. Responden a <strong>congestión vascular, edema pulmonar e inflamación</strong>. Producen <strong>taquipnea superficial, disnea intensa y bradicardia refleja</strong>.</li>
+    </ul>
+  </div>
+
+  <div class="sec-title">Otros Moduladores de la Ventilación</div>
+  <div class="body-text">
+    <ul>
+      <li><strong>Ejercicio:</strong> Aumenta la ventilación de forma proporcional al consumo de O₂. Participan los proprioceptores musculoesqueléticos, el aumento de temperatura y la estimulación simpática. El mecanismo exacto de la respuesta inmediata al inicio del ejercicio no está completamente elucidado.</li>
+      <li><strong>Temperatura corporal:</strong> La fiebre aumenta la ventilación. La hipotermia la deprime.</li>
+      <li><strong>Corteza cerebral:</strong> Permite el control voluntario (hablar, cantar, contener la respiración). La ansiedad produce hiperventilación.</li>
+      <li><strong>Dolor:</strong> Estimula la ventilación. El dolor postoperatorio puede inhibirla (respiración superficial por defensa de la herida).</li>
+      <li><strong>Fármacos depresores:</strong> Opiáceos, benzodiacepinas y anestésicos deprimen los centros respiratorios — principal causa de depresión respiratoria medicamentosa.</li>
+    </ul>
+  </div>
+
+  <div class="ref-table-wrap">
+    <div class="ref-label">Quimiorreceptores y mecanorreceptores — Comparación</div>
+    <table class="ref-table">
+      <thead><tr><th>Receptor</th><th>Localización</th><th>Estímulo principal</th><th>Respuesta</th></tr></thead>
+      <tbody>
+        <tr><td>Quimiorreceptores centrales</td><td>Bulbo raquídeo</td><td>↑PaCO₂ → ↓pH LCR</td><td>↑FR y VT. Principal regulador a corto plazo</td></tr>
+        <tr><td>Quimiorreceptores periféricos</td><td>Cuerpos carotídeos y aórticos</td><td>↓PaO₂ (&lt;60 mmHg), ↑PaCO₂, ↓pH</td><td>↑Ventilación. Principal respuesta a hipoxia</td></tr>
+        <tr><td>Receptores de estiramiento</td><td>Músculo liso bronquial</td><td>Distensión pulmonar (VT &gt;1 L)</td><td>Inhiben inspiración — reflejo Hering-Breuer</td></tr>
+        <tr><td>Receptores de irritantes</td><td>Epitelio vías aéreas</td><td>Humo, polvo, histamina</td><td>Tos, broncoconstricción, hiperpnea</td></tr>
+        <tr><td>Receptores J</td><td>Parénquima pulmonar</td><td>Edema, congestión, inflamación</td><td>Taquipnea superficial, disnea, bradicardia</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => { p.style.display = 'none'; });
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + id + "'"));
+  });
+}
+</script>
+
+</body>
+</html>
