@@ -362,6 +362,25 @@
     top:calc(52px + 1rem);
   }
 }
+
+/* ════════════════════════════════
+   CICLO CARDÍACO
+════════════════════════════════ */
+.cc-group-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin:1.75rem 0 .85rem;display:flex;align-items:center;gap:.5rem}
+.cc-group-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.cc-phase-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.85rem}
+.cc-phase{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;border-left:3px solid var(--pc,var(--blue))}
+.cc-phase-num{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--pc,var(--blue));margin-bottom:.25rem;font-family:var(--fh)}
+.cc-phase-name{font-family:var(--fh);font-size:.88rem;color:var(--text1);margin-bottom:.4rem}
+.cc-phase-body{font-size:11.5px;color:var(--text2);line-height:1.55}
+.cc-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start}
+@media(max-width:680px){.cc-two-col{grid-template-columns:1fr}}
+.cc-sound{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;margin-bottom:.6rem;border-left:3px solid var(--sc,var(--blue))}
+.cc-sound-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem}
+.cc-sound-name{font-family:var(--fh);font-size:.92rem;color:var(--sc,var(--blue))}
+.cc-sound-tag{font-size:10px;padding:2px 8px;border-radius:100px;border:1px solid var(--sc,var(--blue));color:var(--sc,var(--blue));opacity:.75;font-weight:600}
+.cc-sound-body{font-size:11.5px;color:var(--text2);line-height:1.55}
+.cc-sound-body b{color:var(--text1)}
 </style>
 </head>
 <body>
@@ -373,6 +392,9 @@
     <button class="nav-tab active" onclick="setMode('sim',this)">Simulador</button>
     <button class="nav-tab" onclick="setMode('learn',this)">Aprendizaje</button>
     <button class="nav-tab" onclick="setMode('eval',this)">Evaluación</button>
+    <button class="nav-tab" onclick="setMode('cardio',this)">Ciclo Cardíaco</button>
+    <button class="nav-tab" onclick="setMode('fisio-cv',this)">Fisiología CV</button>
+    <button class="nav-tab" onclick="setMode('eval-cv',this)">Evaluación CV</button>
   </div>
 </nav>
 
@@ -389,10 +411,10 @@
       <div class="ecg-wrap" id="sim-ecg-wrap">
         <div class="ecg-hud">
           <div class="ecg-hud-left">
-            <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
             <div class="ecg-rhythm-name" id="sim-rhythm-label">Ritmo Sinusal Normal</div>
           </div>
-          <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>BPM</sub></div>
+          <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>lpm</sub></div>
         </div>
         <canvas id="simCanvas" height="220"></canvas>
       </div>
@@ -470,7 +492,7 @@
       <div class="ecg-wrap" id="learn-ecg-wrap">
         <div class="ecg-hud">
           <div class="ecg-hud-left">
-            <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
             <div class="ecg-rhythm-name" id="learn-rhythm-label">Ritmo Sinusal Normal</div>
           </div>
           <div class="ecg-meta" style="font-size:.65rem">Modo estudio</div>
@@ -519,7 +541,7 @@
         <div class="ecg-wrap" id="eval-ecg-wrap">
           <div class="ecg-hud">
             <div class="ecg-hud-left">
-              <div class="ecg-meta">LEAD II &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+              <div class="ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
               <div class="ecg-meta" style="font-size:.7rem;color:rgba(74,158,255,.45)">Identificar ritmo</div>
             </div>
             <div class="ecg-meta">Evaluación</div>
@@ -553,6 +575,416 @@
       <div class="nota-sub" id="res-sub"></div>
     </div>
     <button class="btn result-retry" onclick="evalStart()">Repetir evaluación</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     CICLO CARDÍACO
+═══════════════════════════════════════════════════════ -->
+<section id="sec-cardio" class="mode-section">
+
+  <div style="margin-bottom:1.25rem">
+    <h2 style="font-family:var(--fh);font-size:1.3rem;margin-bottom:.35rem">Ciclo Cardíaco</h2>
+    <p style="color:var(--text2);font-size:13px;max-width:700px;line-height:1.7">
+      Secuencia de eventos mecánicos, eléctricos y fonocardiográficos de un latido completo.
+      A 72 lpm cada ciclo dura <strong>~833 ms</strong>: ~280 ms de sístole y ~550 ms de diástole.
+    </p>
+  </div>
+
+  <!-- ── Diagrama de Wiggers ── -->
+  <div style="background:#07070d;border-radius:12px;border:1px solid rgba(74,158,255,.15);overflow:hidden;margin-bottom:1.5rem">
+    <div style="font-size:.58rem;color:rgba(74,158,255,.35);letter-spacing:.12em;text-transform:uppercase;padding:.45rem .75rem .1rem;font-family:var(--fm)">Diagrama de Wiggers · 72 lpm · un ciclo completo</div>
+    <svg viewBox="0 0 560 262" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+
+      <!-- Grid horizontal (presión: 0·40·80·120 mmHg) -->
+      <!-- y = 148 - (p/140)*123 → 0→148, 40→113, 80→78, 120→43 -->
+      <line x1="50" y1="148" x2="510" y2="148" stroke="#fff" stroke-opacity=".05" stroke-width=".8"/>
+      <line x1="50" y1="113" x2="510" y2="113" stroke="#fff" stroke-opacity=".05" stroke-width=".8"/>
+      <line x1="50" y1="78"  x2="510" y2="78"  stroke="#fff" stroke-opacity=".05" stroke-width=".8"/>
+      <line x1="50" y1="43"  x2="510" y2="43"  stroke="#fff" stroke-opacity=".05" stroke-width=".8"/>
+      <!-- Separadores de área -->
+      <line x1="23" y1="152" x2="510" y2="152" stroke="#fff" stroke-opacity=".04" stroke-width="1"/>
+      <line x1="23" y1="195" x2="510" y2="195" stroke="#fff" stroke-opacity=".04" stroke-width="1"/>
+
+      <!-- Etiquetas eje Y (presión) -->
+      <text x="44" y="151" fill="#fff" fill-opacity=".28" font-size="7.5" font-family="sans-serif" text-anchor="end">0</text>
+      <text x="44" y="116" fill="#fff" fill-opacity=".28" font-size="7.5" font-family="sans-serif" text-anchor="end">40</text>
+      <text x="44" y="81"  fill="#fff" fill-opacity=".28" font-size="7.5" font-family="sans-serif" text-anchor="end">80</text>
+      <text x="44" y="46"  fill="#fff" fill-opacity=".28" font-size="7.5" font-family="sans-serif" text-anchor="end">120</text>
+      <text x="12" y="100" fill="#fff" fill-opacity=".2" font-size="7.5" font-family="sans-serif" text-anchor="middle" transform="rotate(-90,12,100)">mmHg</text>
+      <!-- Volumen -->
+      <text x="44" y="163" fill="#fb923c" fill-opacity=".4" font-size="7" font-family="sans-serif" text-anchor="end">EDV</text>
+      <text x="44" y="190" fill="#fb923c" fill-opacity=".4" font-size="7" font-family="sans-serif" text-anchor="end">ESV</text>
+
+      <!-- Divisores de fase (verticales) -->
+      <!-- S1 x=50 -->
+      <line x1="50"  y1="28" x2="50"  y2="244" stroke="#f87171" stroke-width="1.4" stroke-opacity=".5"/>
+      <!-- Apertura aórtica x=82 -->
+      <line x1="82"  y1="28" x2="82"  y2="236" stroke="#fff"    stroke-width=".7" stroke-opacity=".15" stroke-dasharray="2,4"/>
+      <!-- S2 x=266 -->
+      <line x1="266" y1="28" x2="266" y2="244" stroke="#c084fc" stroke-width="1.4" stroke-opacity=".5"/>
+      <!-- Apertura mitral x=303 -->
+      <line x1="303" y1="28" x2="303" y2="236" stroke="#fff"    stroke-width=".7" stroke-opacity=".15" stroke-dasharray="2,4"/>
+
+      <!-- Barras SÍSTOLE / DIÁSTOLE -->
+      <line x1="50" y1="29" x2="266" y2="29" stroke="#f87171" stroke-width="1.2" stroke-opacity=".6"/>
+      <text x="158" y="20" fill="#f87171" font-size="8.5" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".85">SÍSTOLE</text>
+      <line x1="266" y1="29" x2="510" y2="29" stroke="#4a9eff" stroke-width="1.2" stroke-opacity=".6"/>
+      <text x="388" y="20" fill="#4a9eff" font-size="8.5" font-family="sans-serif" text-anchor="middle" font-weight="700" fill-opacity=".85">DIÁSTOLE</text>
+
+      <!-- Sub-fases -->
+      <text x="66"  y="38" fill="#fff" fill-opacity=".32" font-size="7" font-family="sans-serif" text-anchor="middle">CIV</text>
+      <text x="174" y="38" fill="#fff" fill-opacity=".42" font-size="7" font-family="sans-serif" text-anchor="middle">← Eyección →</text>
+      <text x="284" y="38" fill="#fff" fill-opacity=".32" font-size="7" font-family="sans-serif" text-anchor="middle">RIV</text>
+      <text x="406" y="38" fill="#fff" fill-opacity=".42" font-size="7" font-family="sans-serif" text-anchor="middle">← Llenado →</text>
+
+      <!-- CURVA Presión Aórtica (azul) -->
+      <path d="M 23,78 L 82,78 C 115,53 142,44 165,44 C 200,46 240,69 256,77 C 263,82 268,82 272,76 C 320,77 420,78 510,78"
+            fill="none" stroke="#4a9eff" stroke-width="1.8" stroke-opacity=".8" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- CURVA Presión VI (teal) -->
+      <path d="M 23,143 L 50,143 C 65,142 72,120 82,78 C 110,52 140,44 165,43 C 200,44 240,68 266,78 C 278,110 290,138 303,143 L 510,143"
+            fill="none" stroke="#2dd4bf" stroke-width="2" stroke-opacity=".9" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- CURVA Volumen VI (naranja) -->
+      <path d="M 23,160 L 82,160 C 130,162 190,183 266,186 L 303,186 C 330,186 360,163 395,161 C 420,160 440,160 455,160 C 478,159 496,160 510,160"
+            fill="none" stroke="#fb923c" stroke-width="1.8" stroke-opacity=".85" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- CURVA ECG (verde) -->
+      <path d="M 23,215 L 48,215 L 52,218 L 58,193 L 64,231 L 70,215 L 120,215 C 135,215 143,210 162,206 C 178,203 196,211 206,215 L 440,215 C 445,213 452,207 458,207 C 464,207 471,213 476,215 L 510,215"
+            fill="none" stroke="#4ade80" stroke-width="1.5" stroke-opacity=".8" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- Etiquetas de curvas -->
+      <text x="516" y="79"  fill="#4a9eff" fill-opacity=".65" font-size="7.5" font-family="sans-serif">Ao</text>
+      <text x="516" y="95"  fill="#2dd4bf" fill-opacity=".65" font-size="7.5" font-family="sans-serif">VI·P</text>
+      <text x="516" y="174" fill="#fb923c" fill-opacity=".65" font-size="7.5" font-family="sans-serif">Vol</text>
+      <text x="516" y="218" fill="#4ade80" fill-opacity=".65" font-size="7.5" font-family="sans-serif">ECG</text>
+
+      <!-- Marcadores S1 S2 -->
+      <rect x="40"  y="245" width="22" height="13" rx="3" fill="#f87171" fill-opacity=".18" stroke="#f87171" stroke-opacity=".4" stroke-width=".8"/>
+      <text x="51"  y="255" fill="#f87171" font-size="8.5" font-family="sans-serif" text-anchor="middle" font-weight="700">S1</text>
+      <rect x="255" y="245" width="22" height="13" rx="3" fill="#c084fc" fill-opacity=".18" stroke="#c084fc" stroke-opacity=".4" stroke-width=".8"/>
+      <text x="266" y="255" fill="#c084fc" font-size="8.5" font-family="sans-serif" text-anchor="middle" font-weight="700">S2</text>
+    </svg>
+    <!-- Leyenda -->
+    <div style="display:flex;gap:1.1rem;flex-wrap:wrap;padding:.35rem .75rem .5rem;border-top:1px solid rgba(255,255,255,.05)">
+      <span style="font-size:10.5px;color:#2dd4bf;font-family:var(--fm)">— Presión VI</span>
+      <span style="font-size:10.5px;color:#4a9eff;font-family:var(--fm)">— Presión Aórtica</span>
+      <span style="font-size:10.5px;color:#fb923c;font-family:var(--fm)">— Volumen VI</span>
+      <span style="font-size:10.5px;color:#4ade80;font-family:var(--fm)">— ECG (DII)</span>
+      <span style="font-size:10.5px;color:#f87171;font-family:var(--fm)">▎S1 cierre AV</span>
+      <span style="font-size:10.5px;color:#c084fc;font-family:var(--fm)">▎S2 cierre semilunares</span>
+    </div>
+  </div>
+
+  <!-- ── Fases ── -->
+  <div class="cc-group-label">Fases del ciclo cardíaco</div>
+  <div class="cc-phase-grid">
+
+    <div class="cc-phase" style="--pc:#4a9eff">
+      <div class="cc-phase-num">Fase 1</div>
+      <div class="cc-phase-name">Llenado pasivo</div>
+      <div class="cc-phase-body">Mitral abierta; sangre fluye aurícula → ventrículo por gradiente de presión. Aporta ~70% del volumen telediastólico. Incluye llenado rápido y diastasis (llenado lento).</div>
+    </div>
+
+    <div class="cc-phase" style="--pc:#38bdf8">
+      <div class="cc-phase-num">Fase 2 · onda P</div>
+      <div class="cc-phase-name">Sístole auricular</div>
+      <div class="cc-phase-body">Despolarización auricular (onda P). Contracción activa de la aurícula aporta el <strong>30% final</strong> del llenado ("patada auricular"). Crítica en taquicardias o FA.</div>
+    </div>
+
+    <div class="cc-phase" style="--pc:#f87171">
+      <div class="cc-phase-num">Fase 3 · S1</div>
+      <div class="cc-phase-name">Contracción isovolumétrica</div>
+      <div class="cc-phase-body"><strong>Mitral y tricúspide cerradas</strong> (→ S1). Presión VI sube bruscamente sin eyección. Dura ~60 ms. Termina cuando presión VI supera presión aórtica y se abren las semilunares.</div>
+    </div>
+
+    <div class="cc-phase" style="--pc:#fb923c">
+      <div class="cc-phase-num">Fase 4</div>
+      <div class="cc-phase-name">Eyección ventricular</div>
+      <div class="cc-phase-body">Válvulas semilunares abiertas. Fracción de eyección normal ≥ 55%. Volumen sistólico ~70 mL. Eyección rápida (~2/3 del VS en la primera mitad) + fase lenta.</div>
+    </div>
+
+    <div class="cc-phase" style="--pc:#c084fc">
+      <div class="cc-phase-num">Fase 5 · S2</div>
+      <div class="cc-phase-name">Relajación isovolumétrica</div>
+      <div class="cc-phase-body"><strong>Semilunares cerradas</strong> (→ S2). Ventrículo se relaja sin cambio de volumen. Dura ~60 ms. Termina cuando presión VI cae por debajo de presión auricular y se abre la mitral.</div>
+    </div>
+
+  </div>
+
+  <!-- ── Dos columnas: ruidos + focos ── -->
+  <div class="cc-two-col" style="margin-top:.5rem">
+
+    <!-- Ruidos cardíacos -->
+    <div>
+      <div class="cc-group-label">Ruidos cardíacos</div>
+
+      <div class="cc-sound" style="--sc:#f87171">
+        <div class="cc-sound-hdr">
+          <span class="cc-sound-name">S1 &nbsp;"lub"</span>
+          <span class="cc-sound-tag">Inicio sístole</span>
+        </div>
+        <div class="cc-sound-body">
+          <b>Origen:</b> cierre de mitral (M1) + tricúspide (T1). M1 precede T1.<br>
+          <b>Foco:</b> apexiano (5° EIC izq, LMC).<br>
+          <b>↑</b> EM, HVI &nbsp;·&nbsp; <b>↓</b> IMA, CM dilatada, derrame pericárdico.
+        </div>
+      </div>
+
+      <div class="cc-sound" style="--sc:#c084fc">
+        <div class="cc-sound-hdr">
+          <span class="cc-sound-name">S2 &nbsp;"dub"</span>
+          <span class="cc-sound-tag">Inicio diástole</span>
+        </div>
+        <div class="cc-sound-body">
+          <b>Origen:</b> cierre de aórtico (A2) + pulmonar (P2). A2 precede P2.<br>
+          <b>Desdoblamiento fisiológico</b> en inspiración: P2 retrasado por ↑llenado VD.<br>
+          <b>Desdoblamiento fijo</b> → CIA &nbsp;·&nbsp; <b>Paradójico</b> → BRI, EA severa.
+        </div>
+      </div>
+
+      <div class="cc-sound" style="--sc:#fbbf24">
+        <div class="cc-sound-hdr">
+          <span class="cc-sound-name">S3 &nbsp;"lub-dub-ta"</span>
+          <span class="cc-sound-tag">Llenado rápido</span>
+        </div>
+        <div class="cc-sound-body">
+          <b>Origen:</b> vibración de la pared ventricular al final del llenado rápido.<br>
+          <b>Normal</b> en &lt; 40 años y embarazo.<br>
+          <b>Patológico:</b> ICC, MCD, IM grave. Galope ventricular.
+        </div>
+      </div>
+
+      <div class="cc-sound" style="--sc:#ef4444">
+        <div class="cc-sound-hdr">
+          <span class="cc-sound-name">S4 &nbsp;"ta-lub-dub"</span>
+          <span class="cc-sound-tag">Siempre patológico</span>
+        </div>
+        <div class="cc-sound-body">
+          <b>Origen:</b> sístole auricular sobre ventrículo poco distensible.<br>
+          <b>Causas:</b> HVI (HTA, EA severa), cardiopatía isquémica, MCH.<br>
+          Precede a S1. Ausente en FA (no hay sístole auricular).
+        </div>
+      </div>
+    </div>
+
+    <!-- Focos de auscultación -->
+    <div>
+      <div class="cc-group-label">Focos de auscultación · <span style="color:var(--blue)">¡Ahora PTM!</span></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem">
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.85rem">
+          <span style="font-size:11.5px;color:#fb923c;font-weight:700">A</span><span style="font-size:11px;color:var(--text2)"> Aórtico — 2° EIC dcho · borde esternal</span><br>
+          <span style="font-size:11.5px;color:#38bdf8;font-weight:700">P</span><span style="font-size:11px;color:var(--text2)"> Pulmonar — 2° EIC izq · borde esternal</span><br>
+          <span style="font-size:11.5px;color:#4ade80;font-weight:700">T</span><span style="font-size:11px;color:var(--text2)"> Tricúspide — 4° EIC izq · borde esternal</span><br>
+          <span style="font-size:11.5px;color:#f87171;font-weight:700">M</span><span style="font-size:11px;color:var(--text2)"> Mitral — 5° EIC izq · línea medioclavicular</span>
+        </div>
+        <svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#07070d;border-radius:8px">
+
+          <!-- Clavículas -->
+          <line x1="80"  y1="38" x2="120" y2="52" stroke="#ffffff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
+          <line x1="180" y1="38" x2="140" y2="52" stroke="#ffffff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- Esternón -->
+          <rect x="118" y="50" width="24" height="130" rx="6" fill="#ffffff" fill-opacity=".06" stroke="#ffffff" stroke-opacity=".15" stroke-width="1"/>
+          <text x="130" y="190" fill="#ffffff" fill-opacity=".2" font-size="7" font-family="sans-serif" text-anchor="middle">esternón</text>
+
+          <!-- Costillas izquierdas (paciente) — derecha en pantalla -->
+          <path d="M 142,68 Q 190,70 200,85"  fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 142,85 Q 195,88 210,108" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 142,102 Q 196,106 212,130" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 142,119 Q 195,124 210,150" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <!-- Costillas derechas (paciente) — izquierda en pantalla -->
+          <path d="M 118,68 Q 70,70 60,85"    fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 118,85 Q 65,88 50,108"   fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 118,102 Q 64,106 48,130" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+          <path d="M 118,119 Q 65,124 50,150" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="1.2"/>
+
+          <!-- Línea de secuencia A→P→T→M -->
+          <polyline points="163,72 97,72 97,118 78,145" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1" stroke-dasharray="4,3"/>
+
+          <!-- A: Aórtico 2° EIC dcho (paciente) → x=163, y=72 -->
+          <circle cx="163" cy="72" r="9" fill="#fb923c" fill-opacity=".2" stroke="#fb923c" stroke-width="2"/>
+          <text x="163" y="76" fill="#fb923c" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="700">A</text>
+          <text x="178" y="68" fill="#fb923c" fill-opacity=".75" font-size="8" font-family="sans-serif">2°EIC dcho</text>
+
+          <!-- P: Pulmonar 2° EIC izq → x=97, y=72 -->
+          <circle cx="97" cy="72" r="9" fill="#38bdf8" fill-opacity=".2" stroke="#38bdf8" stroke-width="2"/>
+          <text x="97" y="76" fill="#38bdf8" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="700">P</text>
+          <text x="54" y="68" fill="#38bdf8" fill-opacity=".75" font-size="8" font-family="sans-serif">2°EIC izq</text>
+
+          <!-- T: Tricúspide 4° EIC izq → x=97, y=118 -->
+          <circle cx="97" cy="118" r="9" fill="#4ade80" fill-opacity=".2" stroke="#4ade80" stroke-width="2"/>
+          <text x="97" y="122" fill="#4ade80" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="700">T</text>
+          <text x="54" y="114" fill="#4ade80" fill-opacity=".75" font-size="8" font-family="sans-serif">4°EIC izq</text>
+
+          <!-- M: Mitral/Apex 5° EIC izq LMC → x=78, y=145 -->
+          <circle cx="78" cy="145" r="9" fill="#f87171" fill-opacity=".2" stroke="#f87171" stroke-width="2"/>
+          <text x="78" y="149" fill="#f87171" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="700">M</text>
+          <text x="38" y="158" fill="#f87171" fill-opacity=".75" font-size="7.5" font-family="sans-serif">5°EIC izq</text>
+          <text x="38" y="167" fill="#f87171" fill-opacity=".55" font-size="7" font-family="sans-serif">LMC · apex</text>
+        </svg>
+        <div style="margin-top:.6rem;font-size:11px;color:var(--text3);line-height:1.55">
+          <span style="font-family:var(--fh);font-size:.78rem;color:var(--blue)">Mnemotecnia:</span>
+          Empieza en el foco <strong style="color:#fb923c">A</strong>órtico (2° dcho), sube al
+          <strong style="color:#38bdf8">P</strong>ulmonar (2° izq), baja a
+          <strong style="color:#4ade80">T</strong>ricúspide (4° izq) y termina en
+          <strong style="color:#f87171">M</strong>itral/apex (5° izq LMC).
+          <br><em style="color:var(--text3)">¡Ahora P·T·M! → A·P·T·M</em>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cc-two-col -->
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     FISIOLOGÍA CV
+═══════════════════════════════════════════════════════ -->
+<section id="sec-fisio-cv" class="mode-section">
+  <div style="margin-bottom:1.25rem">
+    <h2 style="font-family:var(--fh);font-size:1.3rem;margin-bottom:.35rem">Fisiología Cardiovascular</h2>
+    <p style="color:var(--text2);font-size:13px;max-width:700px;line-height:1.7">
+      Anatomía cardíaca, fisiología del bombeo y respuesta cardiovascular al ejercicio — fundamentos para la rehabilitación cardíaca y la prescripción de ejercicio.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:1.25rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Anatomía del Corazón</div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">4 cámaras:</strong> <span style="color:var(--text2)">AD y VD (circuito pulmonar) — AI y VI (circuito sistémico). El tabique interventricular separa los ventrículos.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Válvulas:</strong> <span style="color:var(--text2)">Tricúspide (AD→VD), Pulmonar (VD→AP), Mitral (AI→VI), Aórtica (VI→Ao). Apertura y cierre pasivos por gradiente de presión.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Sistema de conducción:</strong> <span style="color:var(--text2)">Nodo SA (marcapasos natural, 60-100 lpm) → Nodo AV (retraso 0.12s) → Haz de His → Ramas → Fibras de Purkinje.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Circulación coronaria:</strong> <span style="color:var(--text2)">Arteria coronaria izquierda (DA + Cx) irriga VI. Arteria coronaria derecha irriga VD y cara inferior del VI.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Pericardio:</strong> <span style="color:var(--text2)">Saco fibroso que envuelve el corazón. El derrame pericárdico puede comprimir el corazón (taponamiento).</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Gasto cardíaco:</strong> <span style="color:var(--text2)">GC = FC × VS. Normal: 4-8 L/min. Con ejercicio máximo puede llegar a 20-25 L/min en atletas.</span></div></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Fisiología Cardiovascular</div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Precarga:</strong> <span style="color:var(--text2)">Volumen de sangre que llega al ventrículo al final de la diástole (VTD). Ley de Frank-Starling: mayor precarga → mayor fuerza de contracción.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Postcarga:</strong> <span style="color:var(--text2)">Resistencia que debe vencer el ventrículo para eyectar sangre. En HTA la postcarga del VI está aumentada.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Contractilidad:</strong> <span style="color:var(--text2)">Fuerza intrínseca del miocardio independiente de precarga/postcarga. Reducida en ICC, aumentada por catecolaminas.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Fracción de eyección:</strong> <span style="color:var(--text2)">FE = VS/VTD. Normal &gt;55%. FE &lt;40% = ICC con FE reducida. Parámetro clave en rehabilitación cardíaca.</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Presión arterial:</strong> <span style="color:var(--text2)">PA = GC × RVP. PAS normal &lt;120 mmHg, PAD &lt;80 mmHg. La PA sistólica sube con el ejercicio (normal hasta 200 mmHg).</span></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Doble producto:</strong> <span style="color:var(--text2)">DP = FC × PAS. Estima el consumo de O₂ miocárdico. Umbral de isquemia: DP &gt;20.000-25.000 en cardiopatía isquémica.</span></div></div>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+    <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Respuesta Cardiovascular al Ejercicio</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+        <div style="font-weight:600;color:var(--red);margin-bottom:.5rem">▶ Inicio</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• FC aumenta por retiro vagal</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• VS aumenta por mayor retorno venoso</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• GC puede triplicarse en los primeros 30s</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• PAS sube, PAD se mantiene o baja levemente</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+        <div style="font-weight:600;color:var(--red);margin-bottom:.5rem">⚡ Ejercicio sostenido</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• FC progresiva hasta FCmáx (220-edad)</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• Redistribución del flujo: músculos activos reciben 80-85% del GC</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• VO₂ aumenta linealmente con la carga</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• Umbral anaeróbico: lactato &gt;2 mmol/L, VE/VCO₂ aumenta</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+        <div style="font-weight:600;color:var(--red);margin-bottom:.5rem">↓ Recuperación</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• FC baja rápidamente en los primeros 2 min (HRR)</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• HRR &lt;12 lpm al minuto 1 = factor de riesgo cardiovascular</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• PA normaliza en 5-10 min</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:4px">• Deuda de O₂: VO₂ permanece elevado post-ejercicio</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     EVALUACIÓN CV
+═══════════════════════════════════════════════════════ -->
+<section id="sec-eval-cv" class="mode-section">
+  <div style="margin-bottom:1.25rem">
+    <h2 style="font-family:var(--fh);font-size:1.3rem;margin-bottom:.35rem">Evaluación Cardiovascular en Fisioterapia</h2>
+    <p style="color:var(--text2);font-size:13px;max-width:700px;line-height:1.7">
+      Parámetros de seguridad, criterios de suspensión del ejercicio y reconocimiento de patrones ECG de alarma que el fisioterapeuta debe conocer.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:1.25rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Signos Vitales Cardiovasculares</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:5px 4px;color:var(--text3);font-weight:600">Parámetro</th><th style="padding:5px 4px;color:var(--text3);font-weight:600">Normal</th><th style="padding:5px 4px;color:var(--text3);font-weight:600">Alarma</th></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">FC reposo</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">60–100 lpm</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;50 o &gt;110 lpm</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">PAS</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">90–139 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;90 o &gt;180 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">PAD</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">60–89 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;60 o &gt;110 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">Presión de pulso</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">30–50 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;20 o &gt;80 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">FCmáx ejercicio</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">220 − edad</td><td style="padding:5px 4px;color:var(--red);text-align:center">Arritmia, angina, mareo</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">Recuperación FC (HRR)</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">≥12 lpm al min 1</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;12 lpm = riesgo CV</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Criterios de Suspensión del Ejercicio</div>
+      <div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--rs);padding:.75rem;font-size:12.5px;color:var(--red);margin-bottom:.75rem">Detener inmediatamente si aparece cualquiera de estos signos:</div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Angina o dolor torácico típico (opresivo, irradiado)</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Descenso de PAS &gt;10 mmHg con aumento de carga</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">PAS &gt;220 mmHg o PAD &gt;110 mmHg</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">FC &gt;FCmáx predicha con síntomas</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Arritmia ventricular sostenida (TV, FV)</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Bloqueo AV de 2° o 3° grado de nueva aparición</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Signos de bajo gasto: palidez, diaforesis, confusión</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Desaturación SpO₂ &lt;85% sin respuesta a O₂</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Solicitud del paciente de detener el ejercicio</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:1.25rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Clasificación Funcional NYHA</div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--green);min-width:2rem;text-align:center">I</div>
+        <div style="font-size:13px;color:var(--text2)">Sin limitación. Actividad ordinaria sin síntomas.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--teal);min-width:2rem;text-align:center">II</div>
+        <div style="font-size:13px;color:var(--text2)">Limitación leve. Síntomas con actividad moderada (subir escaleras, caminar rápido).</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--amber);min-width:2rem;text-align:center">III</div>
+        <div style="font-size:13px;color:var(--text2)">Limitación marcada. Síntomas con actividad mínima (vestirse, caminar en llano).</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--red);min-width:2rem;text-align:center">IV</div>
+        <div style="font-size:13px;color:var(--text2)">Síntomas en reposo. Incapacidad de actividad sin síntomas.</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Patrones ECG de Alarma — Reconocer y Actuar</div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Fibrilación Auricular</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">Ausencia de onda P, RR irregular. FC variable 100-180 lpm.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Suspender ejercicio si FC &gt;110 lpm o inestabilidad hemodinámica.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Taquicardia Ventricular</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">QRS ancho (&gt;0.12s), FC &gt;100 lpm, disociación AV.</div>
+        <div style="font-size:12px;color:var(--amber)">→ EMERGENCIA. Suspender inmediatamente. Llamar equipo de emergencias.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Bloqueo AV 3° grado</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">Disociación completa P-QRS. FC ventricular 30-50 lpm.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Contraindicación absoluta de ejercicio. Derivación urgente.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Elevación ST</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">ST elevado &gt;1mm en 2 derivaciones contiguas.</div>
+        <div style="font-size:12px;color:var(--amber)">→ EMERGENCIA. Posible IAM. Suspender, O₂, llamar emergencias.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Depresión ST</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">ST deprimido &gt;1mm durante el ejercicio. Isquemia subendocárdica.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Suspender ejercicio. Reposo. Notificar médico.</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -620,7 +1052,7 @@ const RHYTHMS = [
   {
     id:'lbbb', name:'BCRI (LBBB)', cat:'conduccion', hrDefault:70, color:'#34d399',
     info:{rate:'60–100 lpm',reg:'Regular',p:'Presentes, 1 por QRS',pr:'Normal o ligeramente prolongado',qrs:'≥ 0.12 s; mellado en V5-V6',
-      sig:'Indica cardiopatía subyacente; si nuevo + dolor torácico = equivalente STEMI.',
+      sig:'Indica cardiopatía subyacente; si nuevo + dolor torácico = equivalente IAMCEST.',
       mgmt:'Valorar cardiopatía isquémica; si nuevo + síntomas → cateterismo urgente.'}
   },
   {
@@ -648,13 +1080,13 @@ const RHYTHMS = [
       mgmt:'RCP inmediata + desfibrilación a 200 J bifásico; adrenalina 1 mg IV; amiodarona.'}
   },
   {
-    id:'stemi', name:'STEMI (Supradesnivel ST)', cat:'isquemia', hrDefault:88, color:'#fb923c',
+    id:'stemi', name:'IAMCEST (Supradesnivel ST)', cat:'isquemia', hrDefault:88, color:'#fb923c',
     info:{rate:'Variable',reg:'Regular (salvo arritmias)',p:'Presentes',pr:'Normal',qrs:'Puede ser normal; onda Q patológica tardía',
       sig:'Oclusión coronaria total. Elevación ≥ 1 mm en ≥ 2 derivaciones contiguas.',
-      mgmt:'Activar protocolo STEMI; angioplastia primaria < 90 min o fibrinólisis si no disponible.'}
+      mgmt:'Activar protocolo IAMCEST; angioplastia primaria < 90 min o fibrinólisis si no disponible.'}
   },
   {
-    id:'nstemi', name:'NSTEMI / Angina Inestable', cat:'isquemia', hrDefault:82, color:'#fca5a5',
+    id:'nstemi', name:'IAMSEST / Angina Inestable', cat:'isquemia', hrDefault:82, color:'#fca5a5',
     info:{rate:'Variable',reg:'Regular',p:'Presentes',pr:'Normal',qrs:'Normal',
       sig:'Depresión ST ≥ 0.5 mm o inversión de onda T; troponinas +.',
       mgmt:'Anticoagulación + antiagregación; estrategia invasiva precoz (< 24–48 h).'}
@@ -1075,7 +1507,7 @@ function initRenderers() {
    MODE CONTROLLER
 ═══════════════════════════════════════════════════════ */
 function setMode(m, btn) {
-  ['sim','learn','eval'].forEach(id => {
+  ['sim','learn','eval','cardio','fisio-cv','eval-cv'].forEach(id => {
     document.getElementById('sec-'+id).classList.toggle('active', id===m);
   });
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -1149,7 +1581,7 @@ function selectSimRhythm(r, btn, gridId) {
   simHR = r.hrDefault;
   document.getElementById('hrSlider').value = simHR;
   document.getElementById('hrDisplay').innerHTML = `${simHR}<sub>bpm</sub>`;
-  document.getElementById('sim-hr-badge').innerHTML = `${simHR}<sub>BPM</sub>`;
+  document.getElementById('sim-hr-badge').innerHTML = `${simHR}<sub>lpm</sub>`;
   document.getElementById('sim-rhythm-label').textContent = r.name;
   setRhythmColor(r.color);
   engine.reset(r.id, simHR);
@@ -1158,7 +1590,7 @@ function selectSimRhythm(r, btn, gridId) {
 function onHrChange(val) {
   simHR = +val;
   document.getElementById('hrDisplay').innerHTML = `${val}<sub>bpm</sub>`;
-  document.getElementById('sim-hr-badge').innerHTML = `${val}<sub>BPM</sub>`;
+  document.getElementById('sim-hr-badge').innerHTML = `${val}<sub>lpm</sub>`;
   engine.hr = simHR;
   engine.beatRR = 60 / simHR;
 }
