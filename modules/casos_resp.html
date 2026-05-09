@@ -1348,6 +1348,111 @@ const CASES = [
   goals:['Prevenir complicaciones del reposo: TVP, atelectasias, úlceras por presión','Mantener permeabilidad de VA y optimizar oxigenación','Movilización pasiva segura 2×/día','Educación inicial sobre posición, automonitoreo y signos de alarma'],
   interventions:['Posicionamiento Fowler 60-90° + piernas colgando (reduce precarga 30%)','O₂ para SpO₂ 94-96% — nunca al 100%','Movilización pasiva MMII 2×/día (prevención TVP)','Técnicas de control respiratorio suaves (espiración prolongada) — NO aclaramiento activo','Monitorización continua: SpO₂, FC, FR, PA y Borg en cada cambio postural']
 },
+/* ============================================================
+   CASO 11 — ICC Post-Aguda: Transición al Alta
+   Nivel: Intermedio — Fisioterapia cardiorrespiratoria
+============================================================*/
+{
+  id:11, name:'ICC Post-Aguda — Transición al Alta', age:68, sex:'Masculino', sev:'mod',
+  dx:'Insuficiencia Cardíaca con FE reducida (FEr) — NYHA III en mejoría — Día 5-7 post-ingreso',
+  chief:'Disnea con esfuerzo mínimo, tolera decúbito a 30°, edema bilateral residual grado I. BNP en descenso progresivo.',
+  hx:'Mismo paciente del caso anterior. Respondió al tratamiento diurético EV. Furosemida pasó de EV a VO. Alta prevista en 2-3 días. Preocupado por recaer en casa — pregunta "¿cómo sé cuándo debo volver a urgencias?"',
+  baseVitals:{fc:88,fr:20,spo2:94,pas:138,pad:86,temp:36.8,borg:4},
+  spiroPattern:'restrictive',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.43',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'36 mmHg',ref:'35–45 mmHg',status:'ok'},
+      {name:'PaO₂',val:'72 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'24 mEq/L',ref:'22–26 mEq/L',status:'ok'},
+      {name:'SaO₂',val:'94%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.24 (2L/min gafas nasales)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'BNP',val:'680 pg/mL',ref:'<100 pg/mL',status:'hi'},
+      {name:'Troponina',val:'0.04 ng/mL',ref:'<0.04 ng/mL',status:'ok'},
+      {name:'Creatinina',val:'1.5 mg/dL',ref:'0.7–1.2 mg/dL',status:'hi'},
+      {name:'Na⁺',val:'136 mEq/L',ref:'135–145 mEq/L',status:'ok'},
+      {name:'K⁺',val:'3.8 mEq/L',ref:'3.5–5.0 mEq/L',status:'ok'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'El paciente tolera decúbito 30° sin ortopnea activa. Habla en frases completas. Sin cianosis. Sin estridor. ¿Evaluación de A en el contexto post-agudo?',
+      opts:[
+        {txt:'A normal en reposo. La resolución de la ortopnea indica reducción de la presión capilar pulmonar por efecto de la diuresis. El paciente puede tolerar decúbito 30° — mejoría significativa respecto al ingreso. Continúas con B.',correct:true,
+          fb:'✓ Correcto. La ortopnea es uno de los primeros síntomas en mejorar con el tratamiento diurético, porque refleja directamente la presión capilar pulmonar. Tolerar decúbito 30° (vs imposibilidad de acostarse en el ingreso) indica que la presión capilar pulmonar ha bajado significativamente — aunque el BNP 680 confirma que la congestión no está totalmente resuelta. A en reposo está resuelto. La evaluación de B y C determinará el nivel de actividad posible.',cls:'good'},
+        {txt:'Aunque tolera decúbito 30°, la ICC persiste (BNP 680). Mantener restricción de decúbito y posición Fowler obligatoria.',correct:false,
+          fb:'⚠ Excesivamente restrictivo. El BNP 680 indica ICC aún presente, pero la tolerancia al decúbito 30° sin ortopnea es el criterio clínico que determina la posición del paciente — no el BNP en sí. Mantener posición Fowler obligatoria cuando el paciente ya no tiene ortopnea limita innecesariamente la movilización y el confort, y puede empeorar la atelectasia basal.',cls:'warn'},
+        {txt:'Hablar en frases completas con O₂ 2L/min = A completamente normal. Sin restricciones de actividad.',correct:false,
+          fb:'⚠ Incompleto. Aunque A ha mejorado, las limitaciones de actividad no las determina solo A — B y C son los que condicionan la intensidad del ejercicio. El BNP 680, la Creatinina 1.5 y la SpO₂ 94% con O₂ 2L/min indican que la descompensación aún no está completamente resuelta. "Sin restricciones de actividad" es prematuro.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 20 rpm, SpO₂ 94% con O₂ 2L/min gafas nasales. Crepitantes finos residuales en bases (menos extensos que al ingreso). Sin sibilancias. ¿Plan fisioterapéutico para B en esta fase?',
+      opts:[
+        {txt:'B en mejoría progresiva. Crepitantes basales residuales = congestión parcial persistente. Intervención: (1) Control respiratorio activo — respiración diafragmática, espiración prolongada; (2) Expansión torácica controlada para prevenir atelectasias basales; (3) Inicio de movilización activa-asistida con monitorización SpO₂. Objetivo SpO₂ >92% durante el esfuerzo.',correct:true,
+          fb:'✓ Correcto. En la fase post-aguda, los crepitantes basales residuales indican que queda algo de congestión, pero ya no es edema pulmonar agudo. Las técnicas de expansión torácica y control respiratorio ya están indicadas para: (1) prevenir atelectasias por inmovilización prolongada, (2) movilizar el escaso líquido intersticial residual con la ventilación colateral, (3) reeducar el patrón respiratorio que se volvió superficial por la disnea. El objetivo de SpO₂ >92% con esfuerzo es el umbral de seguridad para esta fase.',cls:'good'},
+        {txt:'Crepitantes residuales = congestión activa. Misma restricción que al ingreso: solo posicionamiento, sin técnicas activas.',correct:false,
+          fb:'✗ Demasiado conservador. La fase post-aguda requiere progresión. Los crepitantes basales residuales en día 5-7 no contraindican las técnicas respiratorias activas — las indicaciones son: (1) mejoría clínica progresiva (BNP en descenso 2.400→680), (2) tolerancia al decúbito, (3) FR 20 rpm estable. Mantener la misma restricción que en fase aguda retrasa la recuperación y aumenta el riesgo de atelectasias y TVP.',cls:'bad'},
+        {txt:'SpO₂ 94% con O₂ 2L/min = dependiente de O₂. Contraindicado el retiro de O₂ y contraindicado el ejercicio.',correct:false,
+          fb:'⚠ El O₂ suplementario en esta fase no es una contraindicación del ejercicio — es un monitorizable. La pregunta es si la SpO₂ se mantiene ≥92% durante el esfuerzo. La movilización progresiva con monitorización SpO₂ continua es precisamente el método para evaluar cuándo y cómo retirar el O₂ de forma segura. Esperar a que el paciente respire "sin O₂ en reposo" antes de movilizarlo es un criterio demasiado restrictivo.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 88 lpm (FA, controlada). PA 138/86 mmHg. BNP 680 pg/mL (descendiendo desde 2.400). Edema pretibial grado I bilateral. Sin ingurgitación yugular. ¿Qué determinas en C y qué nivel de actividad permite?',
+      opts:[
+        {txt:'C en mejoría significativa: FA controlada, PA optimizada, BNP en descenso confirma respuesta al tratamiento, edema grado I residual (sin IY = congestión sistémica resuelta parcialmente). Nivel de actividad: movilización activa → sedestación prolongada → bipedestación → marcha corta en pasillo (50m) con monitorización SpO₂ y Borg.',correct:true,
+          fb:'✓ Correcto. La clave diagnóstica es la TENDENCIA: BNP 2.400→680 confirma respuesta al tratamiento. La ausencia de ingurgitación yugular indica que la congestión sistémica está resuelta — el edema grado I residual es periférico, no sistémico. PA 138/86 con enalapril es un buen control. En este contexto, la progresión a marcha corta en pasillo es la intervención fisioterapéutica más importante para preparar al paciente para el alta.',cls:'good'},
+        {txt:'BNP 680 pg/mL sigue siendo >400. ICC aún descompensada. Mismas restricciones que en ingreso.',correct:false,
+          fb:'✗ El BNP no debe interpretarse de forma aislada — debe evaluarse en contexto y en tendencia. BNP 2.400→680 es una respuesta excelente al tratamiento (reducción del 72%). BNP 680 persiste elevado porque la cardiopatía de base (FE 32%) siempre tendrá BNP mayor que el rango normal — el umbral de "descompensación resuelta" para iniciar ejercicio es BNP en descenso + ausencia de signos clínicos de congestión (IY, crepitantes extensos), no BNP <100.',cls:'bad'},
+        {txt:'FC 88 lpm con carvedilol es taquicardia. Ajuste farmacológico antes de cualquier actividad.',correct:false,
+          fb:'⚠ Incorrecto. FC 88 lpm en FA crónica con carvedilol (betabloqueante) es una frecuencia ventricular adecuadamente controlada — el objetivo en FA crónica es FC 60-90 lpm en reposo. Taquicardia se define como >100 lpm en este contexto. No es indicación de ajuste farmacológico urgente y no contraindica la actividad física supervisada.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientado. Menos angustiado que al ingreso pero preocupado: "¿Cómo sé cuándo tengo que volver a urgencias? Me da miedo que esto me pase de nuevo en casa." ¿Cómo manejas D y qué intervención educativa realizas?',
+      opts:[
+        {txt:'D estable con ansiedad anticipatoria realista. Intervención educativa estructurada: (1) Regla del peso diario: si aumenta >2 kg en 2 días → consultar urgente; (2) Signos de alarma: ortopnea nueva, edema que sube por encima de rodilla, disnea en reposo; (3) Posición de rescate: sentar con piernas colgando si aparece disnea nocturna; (4) Plan de acción escrito para el alta. El miedo a recaer es un predictor de adherencia — canalizarlo hacia la educación es terapéutico.',correct:true,
+          fb:'✓ Excelente. La ansiedad anticipatoria en ICC tiene valor predictivo: los pacientes que identifican y actúan ante los signos de alarma reducen la hospitalización. La regla del peso diario es el indicador más sensible de la descompensación incipiente (la retención de líquido precede a los síntomas 2-3 días). El plan de acción escrito para el alta (qué hacer, cuándo llamar, cuándo ir a urgencias) mejora la adherencia y reduce la mortalidad. Esta intervención educativa es tan importante como la fisioterapia respiratoria.',cls:'good'},
+        {txt:'El miedo a recaer es ansiedad excesiva. Derivas a psicología para manejo del estrés post-hospitalización.',correct:false,
+          fb:'⚠ Inadecuado como primera respuesta. El miedo a recaer del paciente es realista y adaptativo — el 25% de los pacientes con ICC descompensada reingresan en los 30 días siguientes. Derivar a psicología sin responder primero a su pregunta concreta ("¿cuándo vuelvo a urgencias?") es evadir la responsabilidad educativa del fisioterapeuta. La psicología puede ser parte del equipo multidisciplinar, pero la educación es la intervención inmediata.',cls:'warn'},
+        {txt:'D estable y cooperador. No hay intervención de D específica en esta fase post-aguda.',correct:false,
+          fb:'✗ Incorrecto. D en la fase post-aguda es precisamente donde más intervención educativa se puede hacer — el paciente está estable, orientado y motivado por el miedo a recaer. La educación para el alta en ICC es una intervención basada en evidencia que reduce el reingreso hospitalario. Ignorar la oportunidad educativa en esta fase es una oportunidad perdida.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Furosemida pasó de EV 120mg a VO 80mg. Carvedilol, enalapril, espironolactona, rivaroxaban sin cambios. Na⁺ 136 mEq/L (corregido). Creatinina 1.5 mg/dL (mejorando). K⁺ 3.8 mEq/L. ¿Qué condiciona E en la fase de transición?',
+      opts:[
+        {txt:'Cambio de furosemida EV a VO: biodisponibilidad oral 50% menor en ICC — monitorizar diuresis y peso diario para confirmar que la dosis VO mantiene la descongestión. Na⁺ 136 corregido: ya no es contraindicación del ejercicio. Creatinina 1.5 mejorando: función renal recuperándose con la descongestión. Carvedilol: usar Borg como guía de intensidad del ejercicio (FC atenúada). K⁺ 3.8: vigilar hipopotasemia con furosemida VO.',correct:true,
+          fb:'✓ Correcto y con un matiz clínico importante: la biodisponibilidad oral de la furosemida en ICC es variable (10-100%, promedio 50%) debido a la congestión de la pared intestinal. El paso de EV a VO es una transición de riesgo — algunos pacientes se recongestionen si la dosis VO no compensa. El peso diario en esta fase es el indicador más sensible del éxito de la transición. La hipopotasemia con furosemida+espironolactona: la espironolactona es ahorrador de K⁺, pero la furosemida puede superar este efecto — vigilar K⁺ seriado.',cls:'good'},
+        {txt:'Furosemida VO = tratamiento completado. El alta puede realizarse hoy.',correct:false,
+          fb:'⚠ Incompleto como criterio de alta. El paso a furosemida VO es condición necesaria pero no suficiente para el alta. Los criterios estándar de alta en ICC incluyen: (1) peso estable o en descenso 48h, (2) euvolemia clínica (sin IY, sin ortopnea, edema mínimo), (3) función renal estable, (4) presión arterial controlada, (5) educación para el alta completada, (6) seguimiento ambulatorio asegurado en 7 días. Solo el médico puede determinar el alta.',cls:'warn'},
+        {txt:'Rivaroxaban + furosemida = interacción farmacológica de riesgo hemorrágico. Suspender rivaroxaban durante la fase de diuresis.',correct:false,
+          fb:'✗ Incorrecto. No existe una interacción clínicamente relevante entre rivaroxaban y furosemida que justifique la suspensión. El rivaroxaban está indicado en FA para prevención del ictus cardioembólico — suspenderlo en un paciente con FA crónica y cardiopatía isquémica sería de alto riesgo (ictus, embolismo pulmonar). Nunca suspender anticoagulación sin indicación médica explícita.',cls:'bad'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:14,
+    restVitals:{fc:88,fr:20,spo2:94,borg:4,pas:138},
+    phases:[
+      {name:'Movilización activa MMII',pct:10,fc:90,fr:21,spo2:93,borg:4,pas:140,log:'Movilización activa MMII — FC 90 lpm · FR 21 rpm · SpO₂ 93% · Borg 4 · PAS 140 mmHg · Bien tolerado'},
+      {name:'Sedestación prolongada',pct:20,fc:92,fr:21,spo2:93,borg:4,pas:138,log:'Sedestación prolongada 20 min — FC 92 lpm · FR 21 rpm · SpO₂ 93% · Borg 4 · PAS 138 mmHg · Estable'},
+      {name:'Bipedestación sostenida',pct:30,fc:96,fr:22,spo2:92,borg:5,pas:142,log:'Bipedestación 5 min — FC 96 lpm · FR 22 rpm · SpO₂ 92% · Borg 5 · PAS 142 mmHg · Monitorizar PA ortostática'},
+      {name:'Marcha pasillo 50m',pct:40,fc:102,fr:24,spo2:91,borg:5,pas:146,log:'Marcha pasillo 50m — FC 102 lpm · FR 24 rpm · SpO₂ 91% · Borg 5 · PAS 146 mmHg · Límite tolerable por disnea leve'},
+      {name:'Recuperación sentado',pct:10,fc:92,fr:21,spo2:93,borg:4,pas:139,log:'Recuperación sentado — FC 92 lpm · FR 21 rpm · SpO₂ 93% · Borg 4 · PAS 139 mmHg · Recuperación completa en 3 min'}
+    ],
+    physiologyNotes:'En la fase post-aguda (día 5-7), la presión capilar pulmonar ha disminuido (BNP 2.400→680) pero la FE 32% persiste — la cardiopatía de base no mejora en días. El VO₂ pico sube de ~9 a ~14 mL/kg/min por la descongestión (NYHA IV→III). El objetivo es la movilización progresiva escalonada para: (1) evaluar la tolerancia real al esfuerzo, (2) prevenir el desacondicionamiento por reposo prolongado, (3) preparar para el alta y la rehabilitación ambulatoria. La SpO₂ 91% en marcha 50m está en el límite — confirmar que el paciente tiene O₂ portátil o que puede hacer esa distancia sin O₂ antes del alta.'
+  },
+  goals:['Movilización progresiva segura hasta marcha en pasillo','Evaluar tolerancia al esfuerzo pre-alta','Educación estructurada para el alta: peso diario, signos de alarma, plan de acción','Coordinar seguimiento ambulatorio en 7 días post-alta'],
+  interventions:['Movilización activa-asistida MMII → bipedestación → marcha supervisada','Control respiratorio activo: respiración diafragmática + expansión basal','Monitorización SpO₂ continua durante esfuerzo — suspender si <92%','Educación para el alta: regla del peso, signos de alarma, posición de rescate','Coordinación con trabajo social y enfermería para plan de alta integral']
+},
 ];
 
 /* ====================================================
