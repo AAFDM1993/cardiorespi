@@ -1453,6 +1453,108 @@ const CASES = [
   goals:['Movilización progresiva segura hasta marcha en pasillo','Evaluar tolerancia al esfuerzo pre-alta','Educación estructurada para el alta: peso diario, signos de alarma, plan de acción','Coordinar seguimiento ambulatorio en 7 días post-alta'],
   interventions:['Movilización activa-asistida MMII → bipedestación → marcha supervisada','Control respiratorio activo: respiración diafragmática + expansión basal','Monitorización SpO₂ continua durante esfuerzo — suspender si <92%','Educación para el alta: regla del peso, signos de alarma, posición de rescate','Coordinación con trabajo social y enfermería para plan de alta integral']
 },
+/* ============================================================
+   CASO 12 — ICC Crónica Estable: Rehabilitación Fase II
+   Nivel: Intermedio — Rehabilitación cardíaca ambulatoria
+============================================================*/
+{
+  id:12, name:'ICC Crónica Estable — Rehabilitación', age:68, sex:'Masculino', sev:'mild',
+  dx:'Insuficiencia Cardíaca con FE reducida (FEr) — NYHA II — Fase estable crónica — Candidato Rehabilitación Cardíaca Fase II',
+  chief:'Consulta ambulatoria de seguimiento. Disnea solo con esfuerzos moderados (subir 2 pisos). Sin disnea de reposo ni ortopnea. Cumple criterios de entrada a programa de rehabilitación cardíaca.',
+  hx:'Mismo paciente. 6 semanas post-alta hospitalaria. BNP estable en 145 pg/mL (control ambulatorio). Peso estable. No ha reingresado. Cumple tratamiento (carvedilol, enalapril, espironolactona, rivaroxaban). Refiere: "Camino mucho menos que antes por miedo a que el corazón no aguante."',
+  baseVitals:{fc:68,fr:16,spo2:96,pas:124,pad:78,temp:36.6,borg:2},
+  spiroPattern:'restrictive',
+  labs:{
+    gsa:[
+      {name:'BNP',val:'145 pg/mL',ref:'<100 pg/mL',status:'hi'},
+      {name:'Creatinina',val:'1.1 mg/dL',ref:'0.7–1.2 mg/dL',status:'ok'},
+      {name:'Na⁺',val:'140 mEq/L',ref:'135–145 mEq/L',status:'ok'},
+      {name:'K⁺',val:'4.2 mEq/L',ref:'3.5–5.0 mEq/L',status:'ok'}
+    ],
+    hem:[
+      {name:'Hb',val:'12.8 g/dL',ref:'13–17 g/dL',status:'lo'},
+      {name:'Glucemia',val:'118 mg/dL',ref:'70–100 mg/dL',status:'hi'},
+      {name:'HbA1c',val:'7.2%',ref:'<7%',status:'hi'},
+      {name:'Col LDL',val:'78 mg/dL',ref:'<70 mg/dL',status:'hi'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Paciente en consulta ambulatoria, sentado cómodamente. Sin disnea en reposo. Habla con fluidez. Sin signos de dificultad respiratoria. ¿Evaluación de A en contexto ambulatorio?',
+      opts:[
+        {txt:'A completamente normal. Sin disnea en reposo, sin ortopnea, habla fluida sin pausas. En el contexto ambulatorio estable, A no representa ninguna limitación para el programa de rehabilitación. Continúas con B.',correct:true,
+          fb:'✓ Correcto. En ICC crónica estable NYHA II, la evaluación de A es confirmatoria en reposo — no hay hallazgos. La importancia de A en este caso es en el contexto del ejercicio: monitorizar si aparece disnea desproporcionada al esfuerzo (NYHA III súbito durante la sesión sería criterio de parada). La ausencia de ortopnea, DPN y disnea en reposo confirma la estabilidad de la fase crónica.',cls:'good'},
+        {txt:'Aunque A parece normal, la ICC crónica siempre implica riesgo de descompensación aguda. Evaluación A cada 5 minutos durante la sesión.',correct:false,
+          fb:'⚠ Excesivamente cauteloso y mal planteado. La monitorización durante el ejercicio es de SpO₂, FC, PA y Borg — no de la evaluación de A cada 5 minutos, que sería clínicamente redundante. Los criterios de parada del ejercicio en ICC compensada son objetivos (SpO₂ <88%, FC >FC pico estimada, Borg >6, PA sistólica <90 o >180 mmHg, arritmia sintomática, dolor precordial). La evaluación de A es puntual al inicio de la sesión.',cls:'warn'},
+        {txt:'ICC crónica = riesgo cardiovascular alto. Solicitar nuevo ECG y ecocardiograma antes de iniciar el programa.',correct:false,
+          fb:'⚠ Excesivo. El paciente tiene seguimiento cardiológico activo con BNP estable y cumple criterios clínicos de Rehabilitación Cardíaca Fase II (NYHA II, sin signos de congestión, hemodinámicamente estable). Los requisitos de entrada a un programa de RC Fase II son clínicos — no se requiere ECG/eco nuevos en cada sesión si el paciente tiene seguimiento reciente. Un ECG de referencia al inicio del programa es adecuado.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 16 rpm, SpO₂ 96% AA en reposo. Leve reducción del murmullo vesicular en bases, sin crepitantes. Sin sibilancias. Expansión normal. ¿Evaluación de B y condicionantes para la prescripción de ejercicio?',
+      opts:[
+        {txt:'B aceptable para RC Fase II. SpO₂ 96% AA en reposo. Leve reducción del MV basal: secuela de la ICC (fibrosis intersticial leve / micro-atelectasias crónicas). Sin crepitantes = sin congestión activa. Condicionante: monitorizar SpO₂ durante el ejercicio — si cae a <88% añadir O₂ de esfuerzo. Realizar 6MWT como línea de base para la prescripción.',correct:true,
+          fb:'✓ Correcto. La SpO₂ 96% AA en reposo en ICC crónica estable es aceptable para el ejercicio (el umbral estándar de entrada a RC es SpO₂ ≥90% AA en reposo). La reducción leve del MV basal sin crepitantes es una secuela frecuente de la ICC crónica — no contraindica el ejercicio. El 6MWT al inicio del programa es la herramienta de referencia para: (1) establecer la línea de base funcional, (2) calcular la FC de entrenamiento con el test, (3) monitorizar la respuesta al programa cada 6-8 semanas.',cls:'good'},
+        {txt:'SpO₂ 96% = bajo normal. Contraindicado el ejercicio aeróbico hasta SpO₂ >98% AA.',correct:false,
+          fb:'✗ Incorrecto. SpO₂ 96% AA es completamente aceptable para el ejercicio en ICC crónica. La contraindicación del ejercicio aeróbico por SpO₂ se establece cuando SpO₂ en reposo <88-90%. SpO₂ >96% es el objetivo durante el ejercicio, no la condición previa. Establecer SpO₂ >98% como umbral privaría de los beneficios del ejercicio a prácticamente todos los pacientes con ICC crónica.',cls:'bad'},
+        {txt:'Leve reducción del MV basal = atelectasias activas. Iniciar técnicas de aclaramiento y drenaje antes del programa de ejercicio.',correct:false,
+          fb:'⚠ Inadecuado. La reducción leve del MV basal en ICC crónica estable no requiere técnicas de aclaramiento — no hay secreciones que movilizar. Las técnicas de aclaramiento se indican en patología bronquial (EPOC, bronquiectasias, FQ). En ICC, el equivalente es el control respiratorio y la expansión torácica como parte del calentamiento del programa de RC.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 68 lpm (FA, bien controlada). PA 124/78 mmHg. BNP 145 pg/mL (estable). Sin edema. Sin ingurgitación yugular. FE 32% (persiste). ¿Qué determinas en C y cómo diseñas la prescripción de ejercicio?',
+      opts:[
+        {txt:'C compensado y estable: FA con FC 68 controlada, PA óptima, BNP estable 145 sin signos de congestión. FE 32% persiste pero compensada. Prescripción: ejercicio aeróbico 40-60% FCR (Karvonen) — PERO con carvedilol la FC máxima está reducida ~15-20%, usar Borg 3-4 como guía principal. Inicio: 20 min/sesión, 3 sesiones/semana, progresión gradual.',correct:true,
+          fb:'✓ Correcto y con el matiz farmacológico clave: el carvedilol (betabloqueante no selectivo) reduce la FC máxima en un 15-20% respecto a la fórmula estándar (220-edad). Si se usa 220-68=152 lpm como FCmáx y se calcula el 40-60% de reserva, el resultado será un rango de FC que el carvedilol no permitirá alcanzar. La solución: usar la FCmáx alcanzada en el 6MWT (que ya tiene el efecto del betabloqueante incorporado) o usar Borg 3-4 como indicador primario de intensidad. El ejercicio aeróbico moderado en ICC crónica estable reduce la mortalidad y mejora la capacidad funcional — es la intervención más potente disponible.',cls:'good'},
+        {txt:'FE 32% = disfunción sistólica severa. El ejercicio aeróbico está contraindicado. Solo técnicas respiratorias.',correct:false,
+          fb:'✗ Incorrecto y potencialmente perjudicial por omisión. La FE reducida NO contraindica el ejercicio en ICC compensada — al contrario, es la indicación más fuerte. Los ensayos HF-ACTION y ExTraMATCH han demostrado que el ejercicio aeróbico supervisado en ICC con FE reducida reduce la mortalidad cardiovascular, las hospitalizaciones y mejora la calidad de vida. La contraindicación es la ICC DESCOMPENSADA (congestión activa, inestabilidad hemodinámica), no la FE baja estable.',cls:'bad'},
+        {txt:'PA 124/78 = buen control. Prescribes ejercicio de alta intensidad (>80% FCR) para maximizar el beneficio cardiovascular.',correct:false,
+          fb:'✗ Incorrecto. El ejercicio de alta intensidad (>80% FCR) en ICC con FE 32% puede superar la reserva cardiorrespiratoria y precipitar descompensación. La intensidad recomendada en ICC crónica compensada es moderada: 40-60% FCR con progresión gradual. El entrenamiento interválico de alta intensidad (HIIT) puede considerarse en casos seleccionados con supervisión especializada, pero no es la prescripción estándar de inicio.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientado, GCS 15. Verbaliza: "Camino mucho menos que antes porque tengo miedo de que el corazón no aguante el esfuerzo. Mi cardióloga me dijo que haga ejercicio pero no me creo que sea seguro." ¿Cómo manejas D?',
+      opts:[
+        {txt:'D con kinesofobia cardíaca — barrera terapéutica mayor. Intervención: (1) Validar el miedo ("es comprensible después de lo que vivió"); (2) Psicoeducación basada en evidencia: "El ejercicio supervisado en su situación reduce el riesgo de reingreso y mejora la calidad de vida — su cardióloga tiene razón"; (3) Inicio progresivo con monitorización visible para que el paciente vea en tiempo real que su corazón "aguanta"; (4) Establecer metas funcionales concretas: "en 8 semanas subir 2 pisos sin parar".',correct:true,
+          fb:'✓ Excelente. La kinesofobia cardíaca es la barrera terapéutica más prevalente en la RC y uno de los predictores más potentes de abandono del programa. El paciente tiene razón en un sentido: su corazón es diferente al de un sano. Pero el error es extrapolar que "diferente" significa "frágil al ejercicio". La monitorización en tiempo real (FC, SpO₂ en pantalla) durante las primeras sesiones tiene un efecto terapéutico potente: el paciente ve con datos que su corazón responde y se adapta. Los objetivos funcionales concretos y progresivos reemplazan el miedo abstracto por logros medibles.',cls:'good'},
+        {txt:'El paciente duda de la seguridad del ejercicio. Suspender el programa hasta que la cardióloga emita un nuevo informe de seguridad.',correct:false,
+          fb:'✗ Inadecuado. La cardióloga ya indicó el ejercicio. La duda del paciente es psicológica (kinesofobia), no médica. Suspender el programa "hasta nuevo informe" es validar el miedo sin base clínica y retrasar una intervención que mejora el pronóstico. El fisioterapeuta tiene la responsabilidad de abordar la kinesofobia como barrera terapéutica.',cls:'bad'},
+        {txt:'La kinesofobia no es un problema médico. El ejercicio se prescribe y el paciente decide si lo hace. No es incumbencia del fisioterapeuta.',correct:false,
+          fb:'✗ Incorrecto y reductivo. La adherencia terapéutica es un objetivo clínico del fisioterapeuta. Si el 40% de los pacientes abandona la RC por kinesofobia y el fisioterapeuta no la aborda, el resultado clínico es nulo independientemente de la calidad de la prescripción. La intervención psicoeducativa es parte integral de la RC basada en evidencia.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Carvedilol 25mg/12h (betabloqueante), enalapril 10mg/12h (IECA), espironolactona 25mg (diurético ahorrador K⁺), rivaroxaban 20mg (anticoagulante). HbA1c 7.2% (DM2 borderline). Anemia leve Hb 12.8 g/dL. ¿Qué condiciona E a la prescripción de ejercicio?',
+      opts:[
+        {txt:'Análisis completo: (1) Carvedilol → FCmáx reducida 15-20%: usar FCmáx del 6MWT + Borg 3-4 como indicador principal; (2) Enalapril → hipotensión post-ejercicio: prolongar la vuelta a calma 10 min; (3) Rivaroxaban → precaución con actividades de impacto/caída; (4) HbA1c 7.2% + ejercicio → monitorizar glucemia pre/post (el ejercicio aeróbico mejora la sensibilidad a la insulina y puede causar hipoglucemia tardía si el paciente usa insulina o sulfonilureas); (5) Hb 12.8 g/dL (anemia leve) → reducción del transporte de O₂ → VO₂ pico puede estar limitado por la anemia además de la ICC.',correct:true,
+          fb:'✓ Análisis exhaustivo. El punto más sutil es la interacción del carvedilol con la prescripción de ejercicio por FC: si usas 220-68=152 lpm y calculas el 50% de reserva FC (FC reposo 68: 68 + 0.5×(152-68) = 110 lpm), el carvedilol puede impedir que el paciente alcance 110 lpm a pesar de un esfuerzo apropiado. Resultado: el paciente trabaja al 70% de su capacidad real y el fisioterapeuta cree que está al 50%. Solución: FCmáx del 6MWT (ya incorpora el efecto del betabloqueante) o Borg 3-4 como indicador primario. La anemia leve (Hb 12.8) no contraindica el ejercicio pero puede estar contribuyendo a la fatiga de esfuerzo.',cls:'good'},
+        {txt:'Rivaroxaban = anticoagulante. Contraindicado el ejercicio aeróbico por riesgo de sangrado con el esfuerzo.',correct:false,
+          fb:'✗ Incorrecto. Los anticoagulantes orales no contraindican el ejercicio aeróbico de intensidad moderada. Las restricciones del rivaroxaban son para actividades de alto impacto (deportes de contacto, actividades con riesgo de traumatismo). La bicicleta estática, la marcha y el ejercicio aeróbico supervisado son completamente seguros con anticoagulación oral. Privar al paciente del ejercicio por el rivaroxaban sería un error clínico significativo.',cls:'bad'},
+        {txt:'HbA1c 7.2% = DM2 descontrolada. Contraindicado el ejercicio hasta optimizar el control glucémico (<7%).',correct:false,
+          fb:'⚠ Excesivo. HbA1c 7.2% es borderline — está 0.2% por encima del objetivo. No es DM2 descontrolada (que se definiría como HbA1c >10-12% con hiperglucemia sintomática). El ejercicio aeróbico es UNA DE LAS INTERVENCIONES más efectivas para reducir la HbA1c — suspenderlo "hasta controlar la glucemia" es circular. La precaución real es monitorizar la glucemia pre/post-ejercicio para ajustar la dieta o medicación si hay hipoglucemia post-esfuerzo.',cls:'warn'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:18,
+    restVitals:{fc:68,fr:16,spo2:96,borg:2,pas:124},
+    phases:[
+      {name:'Calentamiento',pct:10,fc:72,fr:17,spo2:96,borg:2,pas:126,log:'Calentamiento 5 min — FC 72 lpm · FR 17 rpm · SpO₂ 96% · Borg 2 · PAS 126 mmHg · Sin cambios significativos'},
+      {name:'Fase aeróbica',pct:40,fc:88,fr:20,spo2:94,borg:3,pas:132,log:'Fase aeróbica 20 min al 50% FCR — FC 88 lpm · FR 20 rpm · SpO₂ 94% · Borg 3 · PAS 132 mmHg · Intensidad objetivo Borg 3-4'},
+      {name:'Pico moderado',pct:60,fc:96,fr:22,spo2:93,borg:4,pas:138,log:'Pico moderado — FC 96 lpm · FR 22 rpm · SpO₂ 93% · Borg 4 · PAS 138 mmHg · Límite superior zona objetivo'},
+      {name:'Vuelta a calma',pct:20,fc:80,fr:18,spo2:95,borg:3,pas:130,log:'Vuelta a calma 10 min — FC 80 lpm · FR 18 rpm · SpO₂ 95% · Borg 3 · PAS 130 mmHg · Recuperación progresiva'},
+      {name:'Post-ejercicio',pct:5,fc:70,fr:16,spo2:96,borg:2,pas:124,log:'Post-ejercicio 5 min — FC 70 lpm · FR 16 rpm · SpO₂ 96% · Borg 2 · PAS 124 mmHg · Recuperación completa'}
+    ],
+    physiologyNotes:'En ICC crónica compensada (NYHA II), la FE 32% persiste pero el corazón se ha "remodelado" crónicamente. El VO₂ pico (~18 mL/kg/min, NYHA II) permite ejercicio aeróbico moderado. El carvedilol atenúa la respuesta cronotrópica al ejercicio: FC pico real ~100-105 lpm vs. 152 lpm teórico (220-68). Por esto el Borg es el indicador principal de intensidad. El ejercicio aeróbico regular en ICC reduce: (1) la activación neurohormonal (SNS, SRAA), (2) la inflamación sistémica, (3) mejora la función endotelial y la capacidad de vasodilatación periférica — todos mecanismos que mejoran el VO₂ pico incluso sin cambios en la FE.'
+  },
+  goals:['Completar 8 semanas de RC Fase II (24 sesiones)','Mejorar VO₂ pico de 18 a ≥21 mL/kg/min','Reducir kinesofobia: Borg percibido vs. FC objetiva','Optimizar adherencia farmacológica y automonitoreo domiciliario'],
+  interventions:['Ejercicio aeróbico 20-30 min, Borg 3-4, 3 sesiones/semana con progresión gradual','6MWT inicial y cada 8 semanas como medida de seguimiento','Psicoeducación sobre seguridad del ejercicio y mecanismos de beneficio','Educación: automonitoreo de FC, Borg y síntomas en ejercicio domiciliario','Coordinación con cardiología para ajuste de betabloqueante si FC pico <80 lpm limita la sesión']
+},
 ];
 
 /* ====================================================
