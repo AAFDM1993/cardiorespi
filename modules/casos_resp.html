@@ -1267,7 +1267,8 @@ const CASES = [
       {name:'BNP',val:'2.400 pg/mL',ref:'<100 pg/mL',status:'hi'},
       {name:'Troponina',val:'0.09 ng/mL',ref:'<0.04 ng/mL',status:'hi'},
       {name:'Creatinina',val:'2.0 mg/dL',ref:'0.7–1.2 mg/dL',status:'hi'},
-      {name:'Na⁺',val:'130 mEq/L',ref:'135–145 mEq/L',status:'lo'}
+      {name:'Na⁺',val:'130 mEq/L',ref:'135–145 mEq/L',status:'lo'},
+      {name:'K⁺',val:'4.9 mEq/L',ref:'3.5–5.0 mEq/L',status:'ok'}
     ]
   },
   abcdeScenarios:[
@@ -1280,7 +1281,7 @@ const CASES = [
         {txt:'Cianosis + frases cortas = obstrucción parcial de VA alta. Realizas maniobra frente-mentón y preparas bolsa-mascarilla.',correct:false,
           fb:'✗ Incorrecto. La maniobra frente-mentón es para obstrucción de VA por lengua en paciente inconsciente o con GCS reducido. Este paciente está consciente, habla (frases cortas), y no tiene estridor (el signo cardinal de la obstrucción alta). La cianosis labial con SpO₂ 89% es hipoxemia por edema pulmonar — la VA está completamente permeable.',cls:'bad'},
         {txt:'SpO₂ 89% = insuficiencia respiratoria aguda. Activas código de emergencia antes de continuar la evaluación.',correct:false,
-          fb:'⚠ Excesivo en este momento del ABCDE. El paciente está consciente, orientado y en posición de trípode — adaptación que indica que aún mantiene reserva ventilatoria. La SpO₂ 89% es grave pero no es parada respiratoria. El ABCDE continúa con B mientras el equipo médico ya está informado. Activar una emergencia sin completar la evaluación puede generar intervenciones innecesarias o inadecuadas.',cls:'bad'}
+          fb:'⚠ Excesivo en este momento del ABCDE. El paciente está consciente, orientado y en posición de trípode — adaptación que indica que aún mantiene reserva ventilatoria. La SpO₂ 89% es grave pero no es parada respiratoria. El ABCDE continúa con B mientras el equipo médico ya está informado. Activar una emergencia sin completar la evaluación puede generar intervenciones innecesarias o inadecuadas.',cls:'warn'}
       ]
     },
     {
@@ -1292,7 +1293,7 @@ const CASES = [
         {txt:'Crepitantes bilaterales = bronconeumonía bilateral. Inicias drenaje autógeno y percusión para movilizar secreciones.',correct:false,
           fb:'✗ Error diagnóstico crítico. Los crepitantes de neumonía son focales o unilaterales, se asocian a fiebre alta (>38.5°C), esputo purulento y consolidación en RX. Los crepitantes de ICC son: (1) bilaterales y simétricos, (2) predominan en bases y ascienden con la gravedad, (3) NO desaparecen con la tos, (4) asociados a cardiomegalia y Kerley. El drenaje autógeno en edema pulmonar agudo es perjudicial: aumenta el trabajo respiratorio y puede precipitar el fallo ventilatorio.',cls:'bad'},
         {txt:'FR 26 y SpO₂ 89% indican parada respiratoria inminente. Preparas intubación orotraqueal inmediata.',correct:false,
-          fb:'⚠ Prematuro. La intubación en edema pulmonar agudo cardiogénico se reserva para: GCS <8, apnea, SpO₂ <85% refractaria a CPAP/VMNI, o inestabilidad hemodinámica severa. Este paciente tiene SpO₂ 89% con O₂ convencional — la progresión correcta es: O₂ + posición Fowler → si no mejora: CPAP → si no mejora: intubación. El CPAP puede evitar la intubación en la mayoría de los casos de edema pulmonar agudo cardiogénico.',cls:'bad'}
+          fb:'⚠ Prematuro. La intubación en edema pulmonar agudo cardiogénico se reserva para: GCS <8, apnea, SpO₂ <85% refractaria a CPAP/VMNI, o inestabilidad hemodinámica severa. Este paciente tiene SpO₂ 89% con O₂ convencional — la progresión correcta es: O₂ + posición Fowler → si no mejora: CPAP → si no mejora: intubación. El CPAP puede evitar la intubación en la mayoría de los casos de edema pulmonar agudo cardiogénico.',cls:'warn'}
       ]
     },
     {
@@ -1304,7 +1305,7 @@ const CASES = [
         {txt:'FA con FC 102 lpm = taquicardia ventricular. Cardioversión eléctrica urgente antes de cualquier fisioterapia.',correct:false,
           fb:'✗ Incorrecto. FC 102 lpm en FA crónica es una respuesta ventricular moderadamente elevada — no es taquicardia ventricular (que sería un ritmo regular y monomorfo >150 lpm, emergencia real). La FA crónica con FC 102 en el contexto de ICC descompensada se controla farmacológicamente (digoxina, betabloqueante). La cardioversión en FA crónica (>48h de evolución) requiere anticoagulación previa o exclusión de trombo auricular mediante ecocardiograma transesofágico.',cls:'bad'},
         {txt:'Troponina 0.09 = IAM con elevación del ST. Suspendes toda intervención y activas el código infarto.',correct:false,
-          fb:'⚠ Razonamiento de seguridad válido pero incorrecto en este contexto. El IAM con elevación del ST se diagnostica por: (1) dolor anginoso típico, (2) elevación del ST en ECG, (3) elevación dinámica de troponina (>20% entre dos determinaciones seriadas). Este paciente tiene ICC descompensada con troponina levemente elevada sin datos de SCACEST. La troponina elevada en ICC descompensada es frecuente (en el 40-50% de los casos) por daño miocárdico por estrés. El médico ya gestiona esto — el fisioterapeuta continúa con su evaluación.',cls:'bad'}
+          fb:'⚠ Razonamiento de seguridad válido pero incorrecto en este contexto. El IAM con elevación del ST se diagnostica por: (1) dolor anginoso típico, (2) elevación del ST en ECG, (3) elevación dinámica de troponina (>20% entre dos determinaciones seriadas). Este paciente tiene ICC descompensada con troponina levemente elevada sin datos de SCACEST. La troponina elevada en ICC descompensada es frecuente (en el 40-50% de los casos) por daño miocárdico por estrés. El médico ya gestiona esto — el fisioterapeuta continúa con su evaluación.',cls:'warn'}
       ]
     },
     {
@@ -1316,7 +1317,7 @@ const CASES = [
         {txt:'Angustia severa = benzodiacepina para facilitar la cooperación y reducir el trabajo respiratorio.',correct:false,
           fb:'✗ Contraindicado. Las benzodiacepinas deprimen el centro respiratorio. En ICC descompensada con SpO₂ 89% y FR 26, cualquier depresión del drive ventilatorio puede precipitar un fallo ventilatorio que requiera intubación de emergencia. La angustia se trata con comunicación terapéutica y control de la causa (congestión pulmonar), no con sedantes.',cls:'bad'},
         {txt:'La esposa angustiada es un recurso de apoyo emocional. La invitas a que ayude a calmar al paciente.',correct:false,
-          fb:'⚠ Inadecuado en este momento crítico. La esposa angustiada amplifica el estado de alarma del paciente y dificulta el trabajo del fisioterapeuta. En la fase de evaluación y estabilización, el entorno calmado y controlado es un componente terapéutico. La esposa puede esperar fuera y reunirse con el paciente cuando esté más estable. Esta decisión debe tomarse con empatía y explicación.',cls:'bad'}
+          fb:'⚠ Inadecuado en este momento crítico. La esposa angustiada amplifica el estado de alarma del paciente y dificulta el trabajo del fisioterapeuta. En la fase de evaluación y estabilización, el entorno calmado y controlado es un componente terapéutico. La esposa puede esperar fuera y reunirse con el paciente cuando esté más estable. Esta decisión debe tomarse con empatía y explicación.',cls:'warn'}
       ]
     },
     {
@@ -1328,7 +1329,7 @@ const CASES = [
         {txt:'Furosemida EV activa = esperar 6 horas post-dosis para cualquier movilización.',correct:false,
           fb:'⚠ Excesivo. La furosemida EV genera pico de diuresis a los 30-60 minutos y puede causar hipotensión en las primeras 1-2h. Esperar 6 horas paraliza innecesariamente la fisioterapia preventiva. La estrategia correcta: monitorizar PA antes de cualquier cambio postural, movilización pasiva segura en cama (no requiere bipedestación). La prevención de TVP con movilización pasiva puede iniciarse independientemente de la diuresis.',cls:'bad'},
         {txt:'Digoxina = cardiotónico. Aumenta la contractilidad cardíaca, por lo que el ejercicio es más seguro con digoxina.',correct:false,
-          fb:'✗ Razonamiento parcialmente correcto pero mal aplicado. La digoxina aumenta la contractilidad y reduce la frecuencia ventricular en FA — pero en ICC descompensada con BNP 2.400 y SpO₂ 89%, la digoxina NO compensa el déficit de reserva cardíaca para el ejercicio. El ejercicio activo sigue contraindicado. Además, la digoxina tiene ventana terapéutica estrecha y puede ser tóxica con la hiponatremia y la insuficiencia renal actuales.',cls:'bad'}
+          fb:'✗ Razonamiento parcialmente correcto pero mal aplicado. La digoxina aumenta la contractilidad y reduce la frecuencia ventricular en FA — pero en ICC descompensada con BNP 2.400 y SpO₂ 89%, la digoxina NO compensa el déficit de reserva cardíaca para el ejercicio. El ejercicio activo sigue contraindicado. Además, la digoxina tiene ventana terapéutica estrecha y puede ser tóxica con la hiponatremia y la insuficiencia renal actuales.',cls:'warn'}
       ]
     }
   ],
@@ -1338,6 +1339,7 @@ const CASES = [
     phases:[
       {name:'Posición Fowler',pct:5,fc:102,fr:24,spo2:91,borg:6,pas:148,log:'Posición Fowler 60° — FC 102 lpm · FR 24 rpm · SpO₂ 91% · Borg 6 · PAS 148 mmHg · Reducción de precarga por posición'},
       {name:'Mov. pasiva MMII',pct:10,fc:104,fr:25,spo2:90,borg:6,pas:150,log:'Movilización pasiva MMII — FC 104 lpm · FR 25 rpm · SpO₂ 90% · Borg 6 · PAS 150 mmHg · Prevención TVP sin aumento de demanda O₂'},
+      {name:'Control respiratorio',pct:8,fc:105,fr:23,spo2:91,borg:6,pas:150,log:'Control respiratorio — FC 105 lpm · FR 23 rpm · SpO₂ 91% · Borg 6 · PAS 150 mmHg · Espiración prolongada — reducción del trabajo respiratorio'},
       {name:'Sedestación borde',pct:20,fc:110,fr:27,spo2:88,borg:7,pas:155,log:'Sedestación borde de cama — FC 110 lpm · FR 27 rpm · SpO₂ 88% · Borg 7 · PAS 155 mmHg · LÍMITE — detener aquí'},
       {name:'Retorno Fowler',pct:5,fc:104,fr:24,spo2:90,borg:6,pas:149,log:'Retorno a Fowler 60° — FC 104 lpm · FR 24 rpm · SpO₂ 90% · Borg 6 · PAS 149 mmHg · Recuperación'}
     ],
