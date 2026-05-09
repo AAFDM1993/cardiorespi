@@ -1243,6 +1243,109 @@ const CASES = [
   goals:['Retrasar o evitar la intubación con VMNI precoz','Monitorizar CVF seriada como indicador clave','Prevenir complicaciones por inmovilidad (TVP, úlceras)','Preparar para rehabilitación en fase de recuperación'],
   interventions:['CVF seriada cada 4-6h (umbral intubación: CVF <20 mL/kg)','VMNI nocturna profiláctica (BiPAP IPAP 10-12/EPAP 4-6)','Movilización pasiva/activo-asistida con monitorización ECG','Posicionamiento 30-45° + cambios posturales lentos','Educación: pronóstico favorable, objetivos funcionales concretos']
 },
+/* ============================================================
+   CASO 10 — ICC Descompensada: Fase Aguda Hospitalaria
+   Nivel: Avanzado — Fisioterapia cardiorrespiratoria
+============================================================*/
+{
+  id:10, name:'ICC Descompensada — Fase Aguda', age:68, sex:'Masculino', sev:'sev',
+  dx:'Insuficiencia Cardíaca con FE reducida (FEr) — NYHA IV — Descompensación aguda severa',
+  chief:'Disnea de reposo, ortopnea, imposibilidad de decúbito, edema bilateral MMII grado III, aumento de peso 6 kg en 5 días.',
+  hx:'ICC diagnosticada hace 3 años (FE 32% en último eco). Cardiopatía isquémica post-IAM anterior hace 5 años. HTA, DM2, FA crónica anticoagulada. Recibe: carvedilol 25mg/12h, enalapril 10mg/12h, furosemida 80mg/día VO, espironolactona 25mg, digoxina 0.125mg, rivaroxaban 20mg. Ingresa por empeoramiento de 5 días — no toleraba la furosemida por náuseas.',
+  baseVitals:{fc:102,fr:26,spo2:89,pas:152,pad:96,temp:37.1,borg:7},
+  spiroPattern:'restrictive',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.42',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'33 mmHg',ref:'35–45 mmHg',status:'lo'},
+      {name:'PaO₂',val:'58 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'22 mEq/L',ref:'22–26 mEq/L',status:'ok'},
+      {name:'SaO₂',val:'89%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.28 (Venturi)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'BNP',val:'2.400 pg/mL',ref:'<100 pg/mL',status:'hi'},
+      {name:'Troponina',val:'0.09 ng/mL',ref:'<0.04 ng/mL',status:'hi'},
+      {name:'Creatinina',val:'2.0 mg/dL',ref:'0.7–1.2 mg/dL',status:'hi'},
+      {name:'Na⁺',val:'130 mEq/L',ref:'135–145 mEq/L',status:'lo'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Paciente en posición de trípode, habla solo en frases de 2-3 palabras ("no... puedo... acostarme"). Sin estridor. Labios cianóticos. SpO₂ 89% con O₂ 28%. ¿Evaluación de A?',
+      opts:[
+        {txt:'VA permeable. La cianosis labial es consecuencia de hipoxemia severa por edema pulmonar cardiogénico, no obstrucción de VA alta. Las frases cortas reflejan el esfuerzo ventilatorio extremo. Intervención inmediata: posición semiincorporada 45° para reducir precarga y mejorar mecánica ventilatoria.',correct:true,
+          fb:'✓ Correcto. En ICC descompensada severa, la cianosis labial es central — refleja hipoxemia por shunt intrapulmonar (alvéolos inundados por líquido de edema), no obstrucción mecánica de la VA. La posición de trípode que adopta el paciente es una adaptación espontánea correcta: activa los músculos accesorios y reduce la precarga. No la cambies. La intervención de A es confirmar la permeabilidad y optimizar la posición semiincorporada.',cls:'good'},
+        {txt:'Cianosis + frases cortas = obstrucción parcial de VA alta. Realizas maniobra frente-mentón y preparas bolsa-mascarilla.',correct:false,
+          fb:'✗ Incorrecto. La maniobra frente-mentón es para obstrucción de VA por lengua en paciente inconsciente o con GCS reducido. Este paciente está consciente, habla (frases cortas), y no tiene estridor (el signo cardinal de la obstrucción alta). La cianosis labial con SpO₂ 89% es hipoxemia por edema pulmonar — la VA está completamente permeable.',cls:'bad'},
+        {txt:'SpO₂ 89% = insuficiencia respiratoria aguda. Activas código de emergencia antes de continuar la evaluación.',correct:false,
+          fb:'⚠ Excesivo en este momento del ABCDE. El paciente está consciente, orientado y en posición de trípode — adaptación que indica que aún mantiene reserva ventilatoria. La SpO₂ 89% es grave pero no es parada respiratoria. El ABCDE continúa con B mientras el equipo médico ya está informado. Activar una emergencia sin completar la evaluación puede generar intervenciones innecesarias o inadecuadas.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 26 rpm, SpO₂ 89% con O₂ 28% Venturi. Crepitantes finos bilaterales hasta ápices (no desaparecen con la tos). Sin sibilancias. Expansión torácica simétrica pero muy reducida. RX: cardiomegalia severa, redistribución vascular, líneas B de Kerley, patrón "alas de mariposa". ¿Intervención B prioritaria?',
+      opts:[
+        {txt:'Edema pulmonar cardiogénico severo. Intervención: (1) O₂ para SpO₂ 94-96% — no más (evitar hiperoxia); (2) Posición Fowler 60-90° con piernas colgando — reduce retorno venoso y precarga hasta 30%; (3) Si SpO₂ no mejora: CPAP 5-10 cmH₂O (evidencia A en edema pulmonar agudo); (4) Fisioterapia respiratoria de aclaramiento CONTRAINDICADA.',correct:true,
+          fb:'✓ Correcto y completo. Los crepitantes finos bilaterales que NO desaparecen con la tos son el signo patognomónico del edema pulmonar alveolar — hay líquido de edema en los alvéolos, no secreciones que movilizar. El patrón "alas de mariposa" en RX confirma edema pulmonar cardiogénico central. El CPAP en edema pulmonar agudo tiene evidencia de nivel A: reduce el trabajo respiratorio, mejora la oxigenación y reduce la tasa de intubación. La decisión de CPAP es médica — el fisioterapeuta puede preparar el equipo y posicionar al paciente.',cls:'good'},
+        {txt:'Crepitantes bilaterales = bronconeumonía bilateral. Inicias drenaje autógeno y percusión para movilizar secreciones.',correct:false,
+          fb:'✗ Error diagnóstico crítico. Los crepitantes de neumonía son focales o unilaterales, se asocian a fiebre alta (>38.5°C), esputo purulento y consolidación en RX. Los crepitantes de ICC son: (1) bilaterales y simétricos, (2) predominan en bases y ascienden con la gravedad, (3) NO desaparecen con la tos, (4) asociados a cardiomegalia y Kerley. El drenaje autógeno en edema pulmonar agudo es perjudicial: aumenta el trabajo respiratorio y puede precipitar el fallo ventilatorio.',cls:'bad'},
+        {txt:'FR 26 y SpO₂ 89% indican parada respiratoria inminente. Preparas intubación orotraqueal inmediata.',correct:false,
+          fb:'⚠ Prematuro. La intubación en edema pulmonar agudo cardiogénico se reserva para: GCS <8, apnea, SpO₂ <85% refractaria a CPAP/VMNI, o inestabilidad hemodinámica severa. Este paciente tiene SpO₂ 89% con O₂ convencional — la progresión correcta es: O₂ + posición Fowler → si no mejora: CPAP → si no mejora: intubación. El CPAP puede evitar la intubación en la mayoría de los casos de edema pulmonar agudo cardiogénico.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 102 lpm (FA, ritmo irregular). PA 152/96 mmHg. BNP 2.400 pg/mL. Troponina 0.09 ng/mL (elevada). Edema pretibial grado III bilateral. Ingurgitación yugular ++ a 45°. ¿Qué determinas en C y cómo condiciona el plan fisioterapéutico?',
+      opts:[
+        {txt:'C críticamente comprometido: FA con respuesta ventricular no controlada, HTA, BNP 2.400 (descompensación severa), troponina elevada por estrés miocárdico, edema grado III + IY++ (congestión sistémica severa). Ejercicio activo absolutamente contraindicado. Solo: posicionamiento Fowler, O₂, movilización pasiva MMII para prevención de TVP.',correct:true,
+          fb:'✓ Análisis cardiovascular correcto y completo. BNP 2.400 pg/mL (>400 = muy alta probabilidad de ICC descompensada severa). La troponina 0.09 ng/mL levemente elevada en ICC descompensada refleja daño miocárdico por estrés de pared e isquemia subendocárdica por hipoperfusión — no es necesariamente un IAM nuevo (el médico lo evaluará con curva de troponinas). La IY ++ indica presión venosa central muy elevada: el VD tampoco puede más. Con VO₂ pico estimado <10 mL/kg/min, cualquier ejercicio activo superaría la reserva cardiorrespiratoria disponible.',cls:'good'},
+        {txt:'FA con FC 102 lpm = taquicardia ventricular. Cardioversión eléctrica urgente antes de cualquier fisioterapia.',correct:false,
+          fb:'✗ Incorrecto. FC 102 lpm en FA crónica es una respuesta ventricular moderadamente elevada — no es taquicardia ventricular (que sería un ritmo regular y monomorfo >150 lpm, emergencia real). La FA crónica con FC 102 en el contexto de ICC descompensada se controla farmacológicamente (digoxina, betabloqueante). La cardioversión en FA crónica (>48h de evolución) requiere anticoagulación previa o exclusión de trombo auricular mediante ecocardiograma transesofágico.',cls:'bad'},
+        {txt:'Troponina 0.09 = IAM con elevación del ST. Suspendes toda intervención y activas el código infarto.',correct:false,
+          fb:'⚠ Razonamiento de seguridad válido pero incorrecto en este contexto. El IAM con elevación del ST se diagnostica por: (1) dolor anginoso típico, (2) elevación del ST en ECG, (3) elevación dinámica de troponina (>20% entre dos determinaciones seriadas). Este paciente tiene ICC descompensada con troponina levemente elevada sin datos de SCACEST. La troponina elevada en ICC descompensada es frecuente (en el 40-50% de los casos) por daño miocárdico por estrés. El médico ya gestiona esto — el fisioterapeuta continúa con su evaluación.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientado, GCS 15. Muy angustiado: "Me voy a ahogar, no puedo respirar, llevo 3 noches sin dormir acostado." Tono de voz desesperado. Su esposa también está angustiada en la habitación. ¿Cómo manejas D?',
+      opts:[
+        {txt:'D alerta con angustia reactiva a disnea real (no ansiedad funcional). La privación de sueño por ortopnea agrava el estado emocional. Intervención: voz calmada, explicación simple del mecanismo ("hay líquido en los pulmones — la posición sentada lo alivia y el tratamiento lo eliminará"), confirmar posición semiincorporada como alivio activo. Técnicas de control respiratorio suave: espiración prolongada por los labios. Sin ansiolíticos.',correct:true,
+          fb:'✓ Correcto. La distinción clave: la angustia en ICC descompensada es una respuesta racional a una amenaza real (hipoxemia, disnea severa). No es kinesofobia ni ansiedad funcional. El paciente tiene razón — se ahoga en decúbito. La intervención de D es: (1) validar la experiencia ("entiendo que esto es muy angustiante"), (2) explicar de forma simple y tranquilizadora, (3) confirmar que la posición semiincorporada ya es parte del tratamiento, (4) respiración nasal lenta con espiración prolongada para reducir el ciclo hiperventilación-ansiedad. Los ansiolíticos están contraindicados con SpO₂ 89% — deprimen el drive ventilatorio.',cls:'good'},
+        {txt:'Angustia severa = benzodiacepina para facilitar la cooperación y reducir el trabajo respiratorio.',correct:false,
+          fb:'✗ Contraindicado. Las benzodiacepinas deprimen el centro respiratorio. En ICC descompensada con SpO₂ 89% y FR 26, cualquier depresión del drive ventilatorio puede precipitar un fallo ventilatorio que requiera intubación de emergencia. La angustia se trata con comunicación terapéutica y control de la causa (congestión pulmonar), no con sedantes.',cls:'bad'},
+        {txt:'La esposa angustiada es un recurso de apoyo emocional. La invitas a que ayude a calmar al paciente.',correct:false,
+          fb:'⚠ Inadecuado en este momento crítico. La esposa angustiada amplifica el estado de alarma del paciente y dificulta el trabajo del fisioterapeuta. En la fase de evaluación y estabilización, el entorno calmado y controlado es un componente terapéutico. La esposa puede esperar fuera y reunirse con el paciente cuando esté más estable. Esta decisión debe tomarse con empatía y explicación.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Recibe: carvedilol 25mg/12h, enalapril 10mg/12h, furosemida EV 120mg/día (aumentada en el ingreso), espironolactona 25mg, digoxina 0.125mg, rivaroxaban 20mg. Na⁺ 130 mEq/L, Creatinina 2.0 mg/dL, K⁺ 4.9 mEq/L. ¿Qué condiciona E al plan fisioterapéutico?',
+      opts:[
+        {txt:'Análisis farmacológico y contextual completo: (1) Carvedilol: atenúa FC máxima — Borg es el indicador de intensidad (cuando se inicie ejercicio en fases posteriores); (2) Furosemida EV 120mg: diuresis intensa → hipotensión ortostática al sentar/levantar — monitorizar PA; (3) Digoxina: ventana terapéutica estrecha — suspender sesión si FC <50 lpm o síntomas de toxicidad (náuseas, visión amarilla, confusión); (4) Rivaroxaban: precaución con caídas en movilización; (5) Hiponatremia 130: riesgo de convulsiones — contraindicado el ejercicio hasta corrección; (6) Creatinina 2.0: función renal comprometida — la furosemida puede empeorarla (síndrome cardiorrenal).',correct:true,
+          fb:'✓ Análisis exhaustivo y correcto. El punto crítico del síndrome cardiorrenal: la ICC descompensada reduce el flujo renal → la creatinina sube; si se administra demasiada furosemida para descongestionar, el flujo renal cae más → mayor daño renal → dilema terapéutico. El fisioterapeuta debe conocer esto para entender por qué el médico puede mostrarse conservador con la diuresis. La hiponatremia 130 mEq/L (riesgo de convulsiones con hiponatremia <135) es un dato que refuerza la contraindicación del ejercicio activo.',cls:'good'},
+        {txt:'Furosemida EV activa = esperar 6 horas post-dosis para cualquier movilización.',correct:false,
+          fb:'⚠ Excesivo. La furosemida EV genera pico de diuresis a los 30-60 minutos y puede causar hipotensión en las primeras 1-2h. Esperar 6 horas paraliza innecesariamente la fisioterapia preventiva. La estrategia correcta: monitorizar PA antes de cualquier cambio postural, movilización pasiva segura en cama (no requiere bipedestación). La prevención de TVP con movilización pasiva puede iniciarse independientemente de la diuresis.',cls:'bad'},
+        {txt:'Digoxina = cardiotónico. Aumenta la contractilidad cardíaca, por lo que el ejercicio es más seguro con digoxina.',correct:false,
+          fb:'✗ Razonamiento parcialmente correcto pero mal aplicado. La digoxina aumenta la contractilidad y reduce la frecuencia ventricular en FA — pero en ICC descompensada con BNP 2.400 y SpO₂ 89%, la digoxina NO compensa el déficit de reserva cardíaca para el ejercicio. El ejercicio activo sigue contraindicado. Además, la digoxina tiene ventana terapéutica estrecha y puede ser tóxica con la hiponatremia y la insuficiencia renal actuales.',cls:'bad'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:9,
+    restVitals:{fc:102,fr:26,spo2:89,borg:7,pas:152},
+    phases:[
+      {name:'Posición Fowler',pct:5,fc:102,fr:24,spo2:91,borg:6,pas:148,log:'Posición Fowler 60° — FC 102 lpm · FR 24 rpm · SpO₂ 91% · Borg 6 · PAS 148 mmHg · Reducción de precarga por posición'},
+      {name:'Mov. pasiva MMII',pct:10,fc:104,fr:25,spo2:90,borg:6,pas:150,log:'Movilización pasiva MMII — FC 104 lpm · FR 25 rpm · SpO₂ 90% · Borg 6 · PAS 150 mmHg · Prevención TVP sin aumento de demanda O₂'},
+      {name:'Sedestación borde',pct:20,fc:110,fr:27,spo2:88,borg:7,pas:155,log:'Sedestación borde de cama — FC 110 lpm · FR 27 rpm · SpO₂ 88% · Borg 7 · PAS 155 mmHg · LÍMITE — detener aquí'},
+      {name:'Retorno Fowler',pct:5,fc:104,fr:24,spo2:90,borg:6,pas:149,log:'Retorno a Fowler 60° — FC 104 lpm · FR 24 rpm · SpO₂ 90% · Borg 6 · PAS 149 mmHg · Recuperación'}
+    ],
+    physiologyNotes:'En ICC Fase Aguda con FE 32% y BNP 2.400, el gasto cardíaco en reposo apenas mantiene la perfusión tisular. El VI no puede aumentar el volumen sistólico (Frank-Starling severamente limitado). Cualquier incremento de demanda → mayor presión capilar pulmonar → empeoramiento del edema pulmonar. El VO₂ pico estimado es ~9 mL/kg/min (umbral de NYHA IV: <10). El objetivo NO es el ejercicio sino la movilización mínima para prevenir TVP y atelectasias, con monitorización continua.'
+  },
+  goals:['Prevenir complicaciones del reposo: TVP, atelectasias, úlceras por presión','Mantener permeabilidad de VA y optimizar oxigenación','Movilización pasiva segura 2×/día','Educación inicial sobre posición, automonitoreo y signos de alarma'],
+  interventions:['Posicionamiento Fowler 60-90° + piernas colgando (reduce precarga 30%)','O₂ para SpO₂ 94-96% — nunca al 100%','Movilización pasiva MMII 2×/día (prevención TVP)','Técnicas de control respiratorio suaves (espiración prolongada) — NO aclaramiento activo','Monitorización continua: SpO₂, FC, FR, PA y Borg en cada cambio postural']
+},
 ];
 
 /* ====================================================
