@@ -100,6 +100,7 @@
     <button class="mode-btn" onclick="setMode('calc')">📐 Calculadora</button>
     <button class="mode-btn" onclick="setMode('interp')">🧠 Interpretación</button>
     <button class="mode-btn" onclick="setMode('ref')">📖 Referencia</button>
+    <button class="mode-btn" onclick="setMode('rehab')">❤️ Rehab Cardíaca</button>
   </div>
 
   <!-- ===================== SIMULADOR ===================== -->
@@ -424,6 +425,89 @@
       </div>
     </div>
   </div>
+
+  <!-- ===================== REHAB CARDÍACA ===================== -->
+  <div class="mode-section" id="mode-rehab">
+
+    <div class="card mb-2">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Fases de la Rehabilitación Cardíaca</div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem;margin-bottom:.5rem">
+        <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.4rem">Fase I — Hospitalaria</div>
+        <div style="font-size:12.5px;color:var(--text2)">Inicio 24-48h post-evento estable. Movilización progresiva: cama → sedestación → bipedestación → marcha. Objetivo: prevenir desacondicionamiento. Educación inicial.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem;margin-bottom:.5rem">
+        <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.4rem">Fase II — Ambulatoria supervisada</div>
+        <div style="font-size:12.5px;color:var(--text2)">4-12 semanas post-alta. Ejercicio aeróbico supervisado con monitorización ECG. Intensidad: 50-80% FCmáx o Borg 11-14. Educación intensiva: dieta, medicación, factores de riesgo.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem;margin-bottom:.5rem">
+        <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.4rem">Fase III — Mantenimiento</div>
+        <div style="font-size:12.5px;color:var(--text2)">Indefinida. Ejercicio autónomo con supervisión periódica. Objetivo: mantener los beneficios a largo plazo. Grupos de ejercicio comunitarios.</div>
+      </div>
+    </div>
+
+    <div class="grid g2 mb-2">
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Prescripción de Ejercicio en Cardiopatía</div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Tipo:</strong> <span style="color:var(--text2)">Aeróbico continuo o interválico. Fuerza moderada como complemento (60-70% 1RM).</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Intensidad:</strong> <span style="color:var(--text2)">50-80% FCmáx o 40-70% VO₂ pico. Borg 11-14. Doble producto &lt;20.000.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Duración:</strong> <span style="color:var(--text2)">20-60 min por sesión (excluyendo calentamiento y vuelta a la calma).</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Frecuencia:</strong> <span style="color:var(--text2)">3-5 sesiones/semana. Mínimo 8 semanas para beneficio clínico significativo.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Progresión:</strong> <span style="color:var(--text2)">Aumentar duración antes que intensidad. Incrementos del 10% semanal.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.6rem;font-size:13px"><span style="color:var(--red);flex-shrink:0;margin-top:2px">▹</span><div><strong style="color:var(--text)">Contraindicaciones:</strong> <span style="color:var(--text2)">ICC descompensada, angina inestable, arritmia ventricular no controlada, estenosis aórtica severa sintomática.</span></div></div>
+        <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:var(--rs);padding:.75rem;font-size:12.5px;color:var(--green);margin-top:.75rem">
+          <strong>Beneficios demostrados (meta-análisis):</strong> Reducción mortalidad CV 20-30%, reducción reingresos 28%, mejora VO₂ pico 15-25%, mejora calidad de vida y reducción de depresión.
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Fármacos CV y Fisioterapia</div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:.75rem">Efectos sobre la respuesta al ejercicio y consideraciones prácticas:</div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Betabloqueantes:</strong> <span style="color:var(--text2)">Reducen FCmáx → usar Borg en lugar de % FCmáx. FCmáx real ≈ (220-edad)×0.75.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">IECA / ARA-II:</strong> <span style="color:var(--text2)">Hipotensión ortostática. Monitorizar PA al bipedestarse.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Diuréticos:</strong> <span style="color:var(--text2)">Reducen volemia → menor tolerancia al ejercicio. Riesgo de hipopotasemia y calambres.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Digoxina:</strong> <span style="color:var(--text2)">Reduce FC en FA. Toxicidad: náuseas, visión amarilla, arritmias. Suspender si FC &lt;50 lpm.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Nitratos:</strong> <span style="color:var(--text2)">Vasodilatación venosa → hipotensión. Paciente puede usar NTG antes del ejercicio si angina estable.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Anticoagulantes:</strong> <span style="color:var(--text2)">No afectan el ejercicio. Precaución con deportes de contacto.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Estatinas:</strong> <span style="color:var(--text2)">Posible miopatía (0.1-0.5%). Reportar mialgias al médico.</span></div></div>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem;font-size:12.5px;padding:.5rem;background:var(--bg3);border-radius:var(--rs)"><span style="color:var(--amber);flex-shrink:0;font-size:10px;margin-top:3px">●</span><div><strong style="color:var(--text)">Amiodarona:</strong> <span style="color:var(--text2)">Fotosensibilidad, toxicidad pulmonar. Monitorizar disnea y tos seca.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Patologías CV — Consideraciones para Fisioterapia</div>
+      <div class="grid g2">
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+          <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.5rem">Insuficiencia Cardíaca (ICC)</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• FE reducida (&lt;40%): ejercicio aeróbico interválico de baja intensidad inicial</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• FE preservada (&gt;50%): ejercicio aeróbico moderado, mejor tolerado</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Monitorizar peso diario: aumento &gt;2 kg en 2 días = retención hídrica</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Evitar Valsalva durante ejercicio de fuerza</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+          <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.5rem">Cardiopatía Isquémica / Post-IAM</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Inicio RC Fase I a las 24-48h si estable (Killip I-II)</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Doble producto como guía: mantenerse bajo el umbral de isquemia</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Angina estable: ejercicio hasta Borg 13, sin angina ni cambios ST</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Post-cirugía cardíaca: precaución con MMSS primeras 6-8 semanas (esternón)</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+          <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.5rem">Hipertensión Arterial</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Ejercicio aeróbico reduce PAS 5-8 mmHg a largo plazo</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Contraindicación: PAS &gt;180 o PAD &gt;110 mmHg en reposo</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Evitar ejercicio isométrico intenso (aumenta postcarga)</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Betabloqueantes: usar Borg en lugar de % FCmáx</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--rs);padding:.875rem">
+          <div style="font-weight:600;color:var(--red);font-size:13px;margin-bottom:.5rem">Fibrilación Auricular</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• FA controlada (FC &lt;110 lpm en reposo): ejercicio moderado posible</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• FA no controlada: derivar antes de iniciar RC</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Anticoagulación: precaución con ejercicios de contacto</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">• Usar Borg como guía de intensidad (FC no es fiable en FA)</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mode-rehab -->
+
 </div>
 
 <script>
@@ -459,7 +543,7 @@ let simSpeed = 1; // multiplier: 1, 2, 5, 10
 function setMode(m){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.mode-section').forEach(s=>s.classList.remove('active'));
-  const modes=['sim','calc','interp','ref'];
+  const modes=['sim','calc','interp','ref','rehab'];
   document.querySelectorAll('.mode-btn')[modes.indexOf(m)].classList.add('active');
   document.getElementById('mode-'+m).classList.add('active');
   if(m==='calc') calcPredict();
