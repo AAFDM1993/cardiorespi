@@ -4,7 +4,7 @@ const CASES = [
 {
   id:'postiam', name:'Post-IAM — Rehabilitación Fase II',
   subtitle:'Hombre 58 años · Unidad coronaria · Día 5',
-  icon:'❤️', colorClass:'epoc', difficulty:3,
+  icon:'', colorClass:'epoc', difficulty:3,
   tags:['Post-IAM','Killip II','FEVI 40%','Fase II RC'],
   patient:{name:'Carlos Ibáñez',age:58,sex:'m',weight:82,height:175,
     dx:'IAM anterior extenso — FEVI 40%, Killip II. Día 5 post-IAM.',
@@ -122,13 +122,13 @@ const CASES = [
     prognosis:'Favorable con rehabilitación progresiva adecuada'
   },
   availableTechniques:[
-    {id:'resp_incentive',name:'Espirometría de incentivo',icon:'🌬️',
+    {id:'resp_incentive',name:'Espirometría de incentivo',icon:'',
      params:[{id:'vol',label:'Volumen objetivo',unit:'mL',type:'number',min:500,max:2500,default:1200},{id:'reps',label:'Reps/hora',unit:'reps',type:'number',min:5,max:20,default:10}],
      effects:(p,s)=>({spo2:+1,fr:-1,note:'Previene atelectasias. Esencial en fase aguda post-IAM.',isWarning:false}),weight:6},
-    {id:'passive_mob',name:'Movilización pasiva MMII',icon:'🦵',
+    {id:'passive_mob',name:'Movilización pasiva MMII',icon:'',
      params:[{id:'series',label:'Series',unit:'series',type:'number',min:1,max:3,default:2},{id:'reps',label:'Reps',unit:'reps',type:'number',min:10,max:20,default:15},{id:'ac',label:'Verificar anticoagulación',type:'select',options:['Sí — verificado','No verificado'],default:'Sí — verificado'}],
      effects:(p,s)=>{const v=(p.ac||'').includes('Sí');return{fc:+4,borg:+0.5,note:v?'Movilización segura. Anticoagulación verificada. Previene TVP.':'⚠ Sin verificar anticoagulación activa — riesgo de hematoma con HBPM.',isWarning:!v};},weight:8},
-    {id:'met_protocol',name:'Protocolo MET — Movilización Progresiva',icon:'🏃',
+    {id:'met_protocol',name:'Protocolo MET — Movilización Progresiva',icon:'',
      params:[
        {id:'fase',label:'Fase de inicio',type:'select',options:['Fase 1 (1-2 MET) — Ejercicios activos en cama','Fase 2 (2-3 MET) — Sedestación y caminata corta','Fase 3 (3-4 MET) — Caminata en corredor'],default:'Fase 2 (2-3 MET) — Sedestación y caminata corta'},
        {id:'sesiones',label:'Sesiones/día',unit:'ses',type:'number',min:1,max:3,default:2},
@@ -141,13 +141,13 @@ const CASES = [
        if(f.includes('Fase 3')&&s.killip>=2) return{fc:+18,pas:+22,borg:+3,borg_angina:+2,spo2:-2,note:'⚠ Fase 3 precoz en Killip II con FEVI 40%: angina funcional y taquicardia excesiva. Retroceder a Fase 1-2.',isWarning:true};
        if(fl>110) return{fc:+12,pas:+15,borg:+1.5,note:'⚠ FC límite alta para día 5 post-IAM. No superar 100-110 lpm en fase hospitalaria.',isWarning:true};
        return{fc:+10,borg:+1.5,pas:+10,note:`Protocolo MET ${f.includes('1')?'1-2':f.includes('2')?'2-3':'3-4'} bien tolerado. Progresión correcta.`,isWarning:false};},weight:14},
-    {id:'positioning',name:'Posicionamiento terapéutico',icon:'🛏️',
+    {id:'positioning',name:'Posicionamiento terapéutico',icon:'',
      params:[{id:'pos',label:'Posición',type:'select',options:['Semifowler 30-45°','Sedestación al borde de cama','Fowler 90°','Supino plano'],default:'Semifowler 30-45°'}],
      effects:(p,s)=>{if((p.pos||'').includes('Supino')) return{spo2:-2,fr:+3,note:'⚠ Supino plano en Killip II empeora congestión y aumenta precarga.',isWarning:true};return{spo2:+1,fr:-1,note:'Semifowler optimiza mecánica cardíaca y reduce congestión.',isWarning:false};},weight:6},
-    {id:'education_iam',name:'Educación cardiovascular',icon:'📋',
+    {id:'education_iam',name:'Educación cardiovascular',icon:'',
      params:[{id:'tema',label:'Tema',type:'select',options:['Factores de riesgo modificables','Señales de alarma post-alta','Plan RC ambulatoria','Todo lo anterior'],default:'Todo lo anterior'},{id:'dur',label:'Duración',unit:'min',type:'number',min:10,max:30,default:15}],
      effects:(p,s)=>({note:'Educación cardiovascular: reduce reingresos 30% y mejora adherencia a la RC.',isWarning:false}),weight:6},
-    {id:'aclaramiento_error',name:'Técnicas de aclaramiento bronquial',icon:'🌊',
+    {id:'aclaramiento_error',name:'Técnicas de aclaramiento bronquial',icon:'',
      params:[{id:'tec',label:'Técnica',type:'select',options:['Flutter','CATR','Drenaje postural'],default:'Flutter'}],
      effects:(p,s)=>({fc:+8,pas:+12,borg:+2,note:'⚠ ERROR: los crepitantes de Killip II son congestivos, NO de hipersecreción. El aclaramiento bronquial es inapropiado y genera esfuerzo cardíaco innecesario.',isWarning:true}),
      weight:-15,isError:true},
@@ -171,7 +171,7 @@ const CASES = [
 {
   id:'ic', name:'Insuficiencia Cardíaca Sistólica',
   subtitle:'Mujer 72 años · Ambulatorio · NYHA III',
-  icon:'💜', colorClass:'fpi', difficulty:3,
+  icon:'', colorClass:'fpi', difficulty:3,
   tags:['IC sistólica','FEVI 28%','NYHA III','Edema ++','Probable descompensación'],
   patient:{name:'Rosa Mendoza',age:72,sex:'f',weight:71,height:158,
     dx:'IC sistólica — FEVI 28%, etiología hipertensiva. NYHA III.',
@@ -289,16 +289,16 @@ const CASES = [
     prognosis:'Requiere ajuste médico antes de RC activa'
   },
   availableTechniques:[
-    {id:'comunicar',name:'Comunicar hallazgos a cardiología',icon:'📞',
+    {id:'comunicar',name:'Comunicar hallazgos a cardiología',icon:'',
      params:[{id:'urgencia',label:'Urgencia',type:'select',options:['Urgente — hoy mismo','Rutinario — próxima consulta'],default:'Urgente — hoy mismo'},{id:'info',label:'Información',type:'select',options:['Ganancia peso + edema + DPN + IY (completo)','Solo el edema','Solo la disnea'],default:'Ganancia peso + edema + DPN + IY (completo)'}],
      effects:(p,s)=>{const u=(p.urgencia||'').includes('Urgente'),c=(p.info||'').includes('Ganancia');if(!u||!c) return{note:'⚠ Comunicación insuficiente. Señales claras de descompensación activa — requiere comunicación urgente y completa.',isWarning:true};return{note:'Comunicación correcta. Cardiología ajustará diurético y definirá si la RC puede iniciarse.',isWarning:false};},weight:14},
-    {id:'educacion_ic',name:'Educación: control de peso y señales de alarma',icon:'📋',
+    {id:'educacion_ic',name:'Educación: control de peso y señales de alarma',icon:'',
      params:[{id:'tema',label:'Tema',type:'select',options:['Control peso diario + cuándo llamar al médico','Dieta hiposódica','Todo lo anterior'],default:'Todo lo anterior'},{id:'dur',label:'Duración',unit:'min',type:'number',min:10,max:30,default:20}],
      effects:(p,s)=>({note:'Educación: el automonitoreo diario de peso reduce reingresos hasta 40% en IC.',isWarning:false}),weight:10},
-    {id:'posicion_ic',name:'Posicionamiento y movilización suave',icon:'🛋️',
+    {id:'posicion_ic',name:'Posicionamiento y movilización suave',icon:'',
      params:[{id:'pos',label:'Posición',type:'select',options:['Sedestación a 90° — reduce precarga','Semifowler 45°','Decúbito lateral'],default:'Sedestación a 90° — reduce precarga'}],
      effects:(p,s)=>({spo2:+1,borg:-0.5,note:'Sedestación 90° reduce precarga venosa y mejora confort.',isWarning:false}),weight:8},
-    {id:'ejercicio_ic',name:'Ejercicio aeróbico supervisado',icon:'🚴',
+    {id:'ejercicio_ic',name:'Ejercicio aeróbico supervisado',icon:'',
      params:[{id:'mod',label:'Modalidad',type:'select',options:['Cicloergómetro sentado','Caminata supervisada','Ejercicio de brazos'],default:'Cicloergómetro sentado'},{id:'int',label:'Intensidad',type:'select',options:['40-50% FC reserva (muy suave)','50-60% FC reserva','60-70% FC reserva','>70% FC reserva (alta)'],default:'40-50% FC reserva (muy suave)'},{id:'dur',label:'Duración',unit:'min',type:'number',min:5,max:30,default:15}],
      effects:(p,s)=>{
        const alta=(p.int||'').includes('>70')||(p.int||'').includes('60-70');
@@ -306,7 +306,7 @@ const CASES = [
        if(dc) return{spo2:-5,fc:+25,borg:+4,pas:+30,note:'⚠ CRÍTICO: ejercicio con descompensación activa (+3 kg, IY presente) precipita deterioro hemodinámico. Comunicar a cardiología primero.',isWarning:true};
        if(alta) return{spo2:-4,fc:+22,borg:+3,note:'⚠ Intensidad excesiva para IC con FEVI 28%.',isWarning:true};
        return{fc:+12,borg:+2,spo2:-1.5,note:'Ejercicio de baja intensidad. Indicar en sesiones futuras tras compensación.',isWarning:false};},weight:8},
-    {id:'aclaramiento_ic_error',name:'Técnicas de aclaramiento bronquial',icon:'🌊',
+    {id:'aclaramiento_ic_error',name:'Técnicas de aclaramiento bronquial',icon:'',
      params:[{id:'tec',label:'Técnica',type:'select',options:['Flutter','CATR','Drenaje postural'],default:'Flutter'}],
      effects:(p,s)=>({fc:+10,borg:+3,pas:+15,note:'⚠ ERROR CRÍTICO: los crepitantes de IC son de CONGESTIÓN, no hipersecreción. El aclaramiento bronquial es ineficaz y genera esfuerzo cardíaco innecesario.',isWarning:true}),weight:-18,isError:true},
   ],
