@@ -1555,6 +1555,110 @@ const CASES = [
   goals:['Completar 8 semanas de RC Fase II (24 sesiones)','Mejorar VO₂ pico de 18 a ≥21 mL/kg/min','Reducir kinesofobia: Borg percibido vs. FC objetiva','Optimizar adherencia farmacológica y automonitoreo domiciliario'],
   interventions:['Ejercicio aeróbico 20-30 min, Borg 3-4, 3 sesiones/semana con progresión gradual','6MWT inicial y cada 8 semanas como medida de seguimiento','Psicoeducación sobre seguridad del ejercicio y mecanismos de beneficio','Educación: automonitoreo de FC, Borg y síntomas en ejercicio domiciliario','Coordinación con cardiología para ajuste de betabloqueante si FC pico <80 lpm limita la sesión']
 },
+/* ============================================================
+   CASO 13 — EPOC Post-Exacerbación: Rehabilitación Pulmonar
+   Nivel: Intermedio — Fisioterapia respiratoria
+============================================================*/
+{
+  id:13, name:'EPOC Post-Exacerbación — Rehabilitación Pulmonar', age:71, sex:'Femenino', sev:'mod',
+  dx:'EPOC estadio III GOLD — Post-exacerbación grave con VMNI — Candidata a Rehabilitación Pulmonar',
+  chief:'2 semanas post-alta tras exacerbación con VMNI. Disnea con esfuerzos moderados, tos productiva escasa residual. No requiere VMNI domiciliaria actualmente.',
+  hx:'Misma paciente que caso EPOC Exacerbación + VMNI. Fumadora 55 paq/año, exfumadora hace 2 años. VMNI domiciliaria nocturna hasta el ingreso, suspendida al alta por mejoría gasométrica. FEV₁ basal 38% predicho. 2ª exacerbación grave en 12 meses. Derivada a programa de Rehabilitación Pulmonar (RP). Recibe: indacaterol/glicopirronio, budesonida/formoterol, prednisona 10mg en pauta descendente (día 14 post-alta).',
+  baseVitals:{fc:82,fr:18,spo2:92,pas:128,pad:76,temp:36.7,borg:3},
+  spiroPattern:'obstructive-sev',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.42',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'44 mmHg',ref:'35–45 mmHg',status:'ok'},
+      {name:'PaO₂',val:'68 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'28 mEq/L',ref:'22–26 mEq/L',status:'hi'},
+      {name:'SaO₂',val:'92%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.21 (aire ambiente)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'FEV₁',val:'38% predicho',ref:'>80%',status:'lo'},
+      {name:'CVF',val:'52% predicho',ref:'>80%',status:'lo'},
+      {name:'FEV₁/CVF',val:'0.56',ref:'>0.70',status:'lo'},
+      {name:'6MWT',val:'280m',ref:'520m (predicho)',status:'lo'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Paciente en consulta de RP. Tos productiva escasa matutina. Sin uso de musculatura accesoria en reposo. Habla en frases completas. FR 18 rpm. ¿Evaluación de A y diferencia con la fase aguda?',
+      opts:[
+        {txt:'A permeable con tos productiva residual de baja intensidad. La diferencia clave con la fase aguda: ahora puede hablar en frases completas sin pausas, sin uso de musculatura accesoria en reposo. La tos productiva matutina en EPOC es normal — mecanismo de aclaramiento. Monitorizar si aumenta en volumen o cambia de características (señal de nueva exacerbación).',correct:true,
+          fb:'✓ Correcto. La tos productiva crónica en EPOC no es una alarma — es parte del fenotipo bronquítico. La diferencia con la fase aguda es cualitativa: menos frecuente, esputo blanquecino o mucoso (vs. purulento en exacerbación), sin trabajo respiratorio visible. El punto de alerta es el cambio: si el esputo se vuelve purulento, aumenta en volumen o cambia de color → posible nueva exacerbación. Educar a la paciente en automonitoreo de las características del esputo.',cls:'good'},
+        {txt:'Tos productiva = exacerbación activa. Posponer inicio de RP hasta tos completamente resuelta.',correct:false,
+          fb:'✗ Incorrecto. La tos productiva crónica es un síntoma permanente del fenotipo bronquítico del EPOC — no desaparece entre exacerbaciones. Esperar a que desaparezca la tos para iniciar la RP privaría a la paciente de la intervención más efectiva para reducir el riesgo de reexacerbación. El criterio de inicio de RP post-exacerbación es la estabilidad clínica (ausencia de fiebre, esputo no purulento, FR y SpO₂ en valores basales), no la ausencia de tos.',cls:'bad'},
+        {txt:'Habla en frases completas = sin limitación de A. Inicio de RP sin restricciones de intensidad.',correct:false,
+          fb:'⚠ Incompleto. Aunque A no tiene limitaciones activas, la capacidad de hablar en frases completas no determina la intensidad del ejercicio — eso lo determinan B y C. SpO₂ 92% AA, FEV₁ 38% y 6MWT 280m son los que condicionan la prescripción. La evaluación de A es favorable, pero la intensidad se decide con el cuadro completo.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 18 rpm, SpO₂ 92% AA. Sibilancias espiratorias leves. Hiperinflación residual (tórax en tonel). Expansión torácica reducida. Espiración prolongada espontánea (cociente I:E 1:3). ¿Plan fisioterapéutico para B al inicio de la RP?',
+      opts:[
+        {txt:'B estable con limitación obstructiva crónica. Intervención: (1) Técnicas de control respiratorio: respiración con labios fruncidos (alarga la espiración, reduce atrapamiento aéreo), respiración diafragmática con retroalimentación; (2) Aclaramiento bronquial de mantenimiento: ELTGOL o drenaje autógeno 1×/día; (3) El ejercicio aeróbico de la RP mejora la tolerancia al esfuerzo sin modificar el FEV₁ — el objetivo no es "curar" la obstrucción sino mejorar la eficiencia ventilatoria.',correct:true,
+          fb:'✓ Correcto. La respiración con labios fruncidos en EPOC tiene evidencia sólida: aumenta la presión intrabronquial durante la espiración, retrasa el colapso dinámico de la vía aérea y reduce el atrapamiento aéreo. No cambia el FEV₁ (la obstrucción es fija) pero mejora la mecánica ventilatoria durante el esfuerzo. El aclaramiento de mantenimiento está indicado en el fenotipo bronquítico (esputo crónico) — no en todos los EPOC. La RP mejora el VO₂ pico, la capacidad funcional y la calidad de vida en EPOC severo a través de adaptaciones musculares periféricas, no por cambios en la función pulmonar.',cls:'good'},
+        {txt:'Sibilancias = broncoespasmo activo. Inicias sesión con salbutamol nebulizado antes de cualquier técnica.',correct:false,
+          fb:'⚠ Parcialmente válido como rutina pero no como respuesta a las sibilancias per se. Las sibilancias leves en EPOC severo son parte del fenotipo crónico — no indican broncoespasmo agudo que requiera rescate. El salbutamol pre-ejercicio en RP es una práctica habitual (mejora el FEV₁ transitoriamente para la sesión), pero no es una "respuesta a las sibilancias" sino parte del protocolo estándar de RP. La indicación clínica de salbutamol de rescate es el empeoramiento agudo de las sibilancias con disnea súbita, no las sibilancias basales crónicas.',cls:'warn'},
+        {txt:'Hiperinflación + FEV₁ 38% = contraindicación de ejercicio aeróbico. Solo técnicas respiratorias pasivas.',correct:false,
+          fb:'✗ Incorrecto. La hiperinflación y el FEV₁ 38% son precisamente las indicaciones más fuertes para la RP, no contraindicaciones. Los ensayos de RP en EPOC severo (FEV₁ <50%) demuestran los mayores beneficios en reducción de disnea, mejora del 6MWT y calidad de vida. El ejercicio aeróbico supervisado es seguro con SpO₂ ≥88% y monitorización continua. Las "técnicas pasivas" no tienen evidencia en EPOC estable.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 82 lpm, PA 128/76. Sin edema periférico. Sin ingurgitación yugular. SpO₂ 92% AA en reposo. 6MWT 280m con SpO₂ nadir 88%. ¿Qué determinas en C y cómo prescripes el ejercicio?',
+      opts:[
+        {txt:'C sin cor pulmonale activo. SpO₂ 92% AA — en límite inferior para RP sin O₂ suplementario (umbral ≥88%). 6MWT 280m como línea de base. Prescripción: caminata al 80% de la velocidad del 6MWT, Borg 4-5 como guía de intensidad. Si SpO₂ cae <88% durante el ejercicio: añadir O₂ de esfuerzo 2L/min. FC no es guía fiable (betabloqueantes ausentes, pero LABA puede elevarla).',correct:true,
+          fb:'✓ Correcto. El 6MWT es la herramienta estándar para prescribir el ejercicio en RP: la velocidad de caminata al 80% de la prueba correlaciona con la intensidad del umbral anaeróbico. El Borg 4-5 (disnea moderada, tolerable) es el target habitual en RP para EPOC. La SpO₂ nadir 88% en el 6MWT indica que la paciente puede necesitar O₂ suplementario durante el ejercicio — esto se evalúa sesión a sesión. La ausencia de edema e IY descarta cor pulmonale activo.',cls:'good'},
+        {txt:'SpO₂ 92% AA = insuficiencia respiratoria en reposo. Contraindicada la RP sin O₂ domiciliario prescrito.',correct:false,
+          fb:'✗ Incorrecto. El criterio de O₂ domiciliario largo plazo (LTOT) en EPOC es PaO₂ ≤55 mmHg en reposo (o ≤60 mmHg con cor pulmonale). Esta paciente tiene PaO₂ 68 mmHg — no cumple criterios de LTOT. La RP puede iniciarse con SpO₂ 92% en reposo. Si durante el ejercicio cae <88%, se añade O₂ de esfuerzo sin que ello implique necesitar O₂ domiciliario permanente.',cls:'bad'},
+        {txt:'6MWT 280m = capacidad funcional muy reducida. Posponer RP hasta mejorar el 6MWT con fisioterapia domiciliaria previa.',correct:false,
+          fb:'⚠ Razonamiento circular. El 6MWT 280m (46% del predicho) es el resultado de la enfermedad y el desacondicionamiento — es la razón para iniciar la RP, no un prerequisito. Esperar a que mejore el 6MWT antes de la RP es esperar a que la situación mejore sola, lo que no sucederá sin intervención. La RP es la intervención que mejora el 6MWT.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientada. Ansiosa: "Después de lo que pasé, tengo miedo de hacer esfuerzo — la última vez que me fatigué tuve la exacerbación." Evita actividades físicas por miedo. ¿Cómo manejas D?',
+      opts:[
+        {txt:'Kinesofobia post-exacerbación. Intervención: (1) Diferenciar disnea de esfuerzo normal (esperada en RP, Borg 4-5) vs. señales de alarma reales (SpO₂ <88%, Borg >7, dolor torácico, cianosis); (2) La exacerbación no fue causada por el ejercicio — fue una infección respiratoria (correlación ≠ causalidad); (3) La RP reduce en un 25-30% el riesgo de nueva exacerbación — el ejercicio es protector, no desencadenante.',correct:true,
+          fb:'✓ Excelente. La kinesofobia post-exacerbación es una barrera terapéutica mayor en EPOC y uno de los predictores más potentes de abandono de la RP. El error cognitivo del paciente es la correlación temporal: "hice esfuerzo → tuve exacerbación". La exacerbación fue causada por la infección, no por el ejercicio. Corregir este error con psicoeducación basada en evidencia (la RP reduce exacerbaciones) y con exposición gradual y monitorizada al ejercicio es la intervención de D más efectiva.',cls:'good'},
+        {txt:'El miedo es comprensible. Reducir la intensidad del programa al 50% para no generar más ansiedad.',correct:false,
+          fb:'⚠ Inadecuado. Reducir la intensidad por el miedo valida la kinesofobia como señal real de peligro, reforzando el ciclo de evitación. La evidencia en fisioterapia del miedo al movimiento muestra que la exposición gradual y monitoriada (no la evitación) es la intervención efectiva. La intensidad se prescribe según la capacidad funcional (80% velocidad 6MWT, Borg 4-5), no según el nivel de ansiedad.',cls:'warn'},
+        {txt:'La ansiedad interfiere con la RP. Derivar a psiquiatría para manejo farmacológico antes de iniciar el programa.',correct:false,
+          fb:'✗ Excesivo como primera respuesta. La ansiedad anticipatoria en EPOC post-exacerbación es una respuesta adaptativa — no un trastorno psiquiátrico que requiera medicación. La intervención del fisioterapeuta (psicoeducación, exposición gradual, monitorización visible) es suficiente en la mayoría de los casos. Si persiste ansiedad grave que impide la participación tras varias sesiones, entonces la derivación a psicología (no psiquiatría) sería el paso siguiente.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Recibe: indacaterol/glicopirronio (LABA+LAMA), budesonida/formoterol (ICS+LABA), prednisona 10mg/día en pauta descendente (día 14 post-alta). Sin O₂ domiciliario. ¿Qué condiciona E a la prescripción de RP?',
+      opts:[
+        {txt:'Triple terapia inhalada + prednisona residual: (1) LABA puede elevar FC en reposo y durante ejercicio — usar Borg como guía primaria de intensidad; (2) Prednisona 10mg — riesgo de hiperglucemia durante ejercicio (monitorizar si DM concomitante), miopatía esteroidea con uso prolongado (relevante en exacerbaciones frecuentes); (3) Budesonida/formoterol como rescate en RP: tener disponible en sala; (4) Sin O₂ domiciliario — evaluar necesidad de O₂ de esfuerzo si SpO₂ <88% durante sesión.',correct:true,
+          fb:'✓ Correcto y completo. La miopatía esteroidea es un efecto secundario frecuentemente olvidado: el uso crónico de corticoides sistémicos (no inhalados) deteriora la masa y función muscular periférica — en EPOC exacerbadora frecuente, esto puede ser un factor limitante del 6MWT independiente de la obstrucción. El LABA (formoterol, indacaterol) puede generar taquicardia y temblor — la paciente puede sentir palpitaciones durante el ejercicio, que son secundarias al LABA y no a una arritmia. El Borg como guía de intensidad compensa la FC alterada por el LABA.',cls:'good'},
+        {txt:'Prednisona 10mg = corticoide sistémico. Contraindicado el ejercicio de fuerza por riesgo de fractura ósea.',correct:false,
+          fb:'⚠ Excesivo. La prednisona 10mg en pauta descendente (14 días) no contraindica el ejercicio de fuerza. La osteoporosis esteroidea se desarrolla con uso crónico (>3 meses) de dosis ≥7.5mg/día. Una pauta de 2-3 semanas post-exacerbación no genera riesgo de fractura inmediato. Si la paciente tiene uso crónico de corticoides sistémicos (historial de múltiples exacerbaciones), se debería evaluar la DMO, pero no es contraindicación del programa de RP.',cls:'warn'},
+        {txt:'Triple terapia inhalada = máximo tratamiento broncodilatador. No añadir salbutamol pre-ejercicio (ya está broncodilatada).',correct:false,
+          fb:'⚠ Incompleto. La triple terapia de mantenimiento (LABA+LAMA+ICS) no sustituye al salbutamol de acción corta pre-ejercicio. El salbutamol pre-RP tiene un efecto broncodilatador adicional y rápido que mejora el FEV₁ para la sesión. Las guías de RP recomiendan el broncodilatador de acción corta 15-20 min antes del ejercicio en EPOC severo, independientemente de la terapia de mantenimiento.',cls:'warn'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:14,
+    restVitals:{fc:82,fr:18,spo2:92,borg:3,pas:128},
+    phases:[
+      {name:'Calentamiento',pct:10,fc:86,fr:19,spo2:92,borg:3,pas:130,log:'Calentamiento 5 min — FC 86 lpm · FR 19 rpm · SpO₂ 92% · Borg 3 · PAS 130 mmHg · Respiración con labios fruncidos'},
+      {name:'Caminata 80% 6MWT',pct:30,fc:94,fr:21,spo2:90,borg:4,pas:134,log:'Caminata al 80% velocidad 6MWT — FC 94 lpm · FR 21 rpm · SpO₂ 90% · Borg 4 · PAS 134 mmHg · Intensidad objetivo'},
+      {name:'Pico tolerado',pct:50,fc:100,fr:23,spo2:88,borg:5,pas:138,log:'Pico tolerado — FC 100 lpm · FR 23 rpm · SpO₂ 88% · Borg 5 · PAS 138 mmHg · Límite — añadir O₂ si <88%'},
+      {name:'Vuelta a calma',pct:20,fc:90,fr:20,spo2:90,borg:4,pas:132,log:'Vuelta a calma — FC 90 lpm · FR 20 rpm · SpO₂ 90% · Borg 4 · PAS 132 mmHg · Respiración con labios fruncidos'},
+      {name:'Recuperación',pct:5,fc:84,fr:18,spo2:92,borg:3,pas:129,log:'Recuperación — FC 84 lpm · FR 18 rpm · SpO₂ 92% · Borg 3 · PAS 129 mmHg · Retorno a valores basales'}
+    ],
+    physiologyNotes:'En EPOC severo (FEV₁ 38%), la limitación al ejercicio es mixta: ventilatoria (hiperinflación dinámica → atrapamiento aéreo → aumento de la carga elástica inspiratoria) + muscular periférica (disfunción del músculo cuádriceps por desacondicionamiento y miopatía esteroidea). La RP actúa principalmente sobre el componente muscular periférico (no modifica el FEV₁) mejorando la eficiencia oxidativa muscular, reduciendo el lactato para el mismo nivel de esfuerzo y disminuyendo la ventilación requerida. Resultado: menor disnea para la misma carga de trabajo.'
+  },
+  goals:['Completar 8 semanas de RP (24 sesiones)','Mejorar 6MWT de 280m a ≥350m','Reducir kinesofobia post-exacerbación','Establecer programa domiciliario de aclaramiento y ejercicio autónomo'],
+  interventions:['Ejercicio aeróbico: caminata 80% velocidad 6MWT, Borg 4-5, 30-40 min, 3×/semana','Aclaramiento bronquial domiciliario: ELTGOL o drenaje autógeno 1×/día','Salbutamol 2 puff 15 min antes de cada sesión de RP','Educación: reconocimiento precoz de exacerbación (cambio color/volumen esputo, aumento disnea basal)','Plan de acción escrito: qué hacer si SpO₂ baja de 88% o Borg supera 7 en reposo']
+},
 ];
 
 /* ====================================================
