@@ -1763,6 +1763,110 @@ const CASES = [
   goals:['Establecer programa domiciliario de aclaramiento 2×/día (100% adherencia)','Mejorar capacidad aeróbica (VO₂ pico) con ejercicio regular','Prevenir exacerbaciones mediante aclaramiento + tobramicina nebulizada','Educación en reconocimiento precoz de exacerbación y plan de acción'],
   interventions:['Aclaramiento: ELTGOL en DL izquierdo + ACBT 2×/día (15-20 min/sesión)','Flutter o Aerobika como complemento del ACBT','Secuencia: salbutamol → aclaramiento → tobramicina nebulizada','Ejercicio aeróbico 30 min, Borg 3-4, 3-5×/semana (post-aclaramiento)','Educación en reconocimiento de exacerbación: cambio en esputo, aumento disnea, fiebre']
 },
+/* ============================================================
+   CASO 15 — Bronquiectasias FQ Adulto: Exacerbación Aguda
+   Nivel: Avanzado — Fisioterapia respiratoria
+============================================================*/
+{
+  id:15, name:'Bronquiectasias FQ — Exacerbación Aguda', age:26, sex:'Masculino', sev:'sev',
+  dx:'Fibrosis Quística del adulto (ΔF508/R117H) — Bronquiectasias quísticas bilaterales — Primera exacerbación grave hospitalaria',
+  chief:'Primer ingreso hospitalario por exacerbación grave. Aumento de disnea 7 días, esputo purulento verde abundante, fiebre 38.1°C, deterioro funcional significativo.',
+  hx:'Diagnóstico de FQ hace 8 meses (edad 25 años) tras investigación por bronquiectasias bilaterales en TC de tórax. Genotipo ΔF508/R117H (heterocigoto compuesto — fenotipo leve, función pancreática conservada). FEV₁ basal 52% predicho. Actualmente en antibióticos EV desde hace 3 días: tobramicina + linezolid (S. aureus MRSA en cultivo reciente; primer aislamiento de Pseudomonas aeruginosa en este ingreso). Recibe: ivacaftor/lumacaftor (modulator CFTR), dornasa alfa nebulizada 2.5mg/día, salbutamol, azitromicina. Soltero, estudiante universitario. Sin pareja.',
+  baseVitals:{fc:96,fr:22,spo2:91,pas:118,pad:72,temp:38.1,borg:5},
+  spiroPattern:'obstructive-sev',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.38',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'46 mmHg',ref:'35–45 mmHg',status:'hi'},
+      {name:'PaO₂',val:'62 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'27 mEq/L',ref:'22–26 mEq/L',status:'hi'},
+      {name:'SaO₂',val:'91%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.24 (2L/min gafas nasales)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'FEV₁',val:'42% predicho',ref:'>80%',status:'lo'},
+      {name:'PCR',val:'48 mg/L',ref:'<5 mg/L',status:'hi'},
+      {name:'Leucocitos',val:'14.200/µL',ref:'4.000–11.000',status:'hi'},
+      {name:'S. aureus MRSA',val:'Positivo',ref:'Negativo',status:'hi'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Tos intensa y frecuente con esputo purulento verde abundante. Sin hemoptisis activa (preguntar siempre en FQ). Sin estridor. Tos muy fatigante — el paciente refiere que "tose y tose y no sale nada". ¿Evaluación de A en exacerbación FQ?',
+      opts:[
+        {txt:'VA permeable con tos ineficaz por secreciones muy viscosas. Preguntar activamente por hemoptisis (frecuente en FQ, contraindicación relativa de algunas técnicas). La tos "improductiva" no es ineficacia del mecanismo de tos — es que las secreciones son tan viscosas (disfunción CFTR) que no se movilizan con la tos sola. La dornasa alfa reduce la viscosidad — clave administrarla ANTES del aclaramiento.',correct:true,
+          fb:'✓ Correcto. En FQ, la disfunción del CFTR genera secreciones extremadamente viscosas (alto contenido en ADN de neutrófilos muertos). La tos sola es insuficiente para movilizarlas. La dornasa alfa (DNasa recombinante) rompe el ADN extracelular, reduciendo la viscosidad — su administración 30 min antes del aclaramiento es la clave de la secuencia terapéutica. La hemoptisis en FQ es frecuente (30% tienen episodios a lo largo de su vida) y puede contraindicar temporalmente las técnicas de percusión manual. Preguntar activamente.',cls:'good'},
+        {txt:'Tos con esputo purulento verde = traqueobronquitis aguda. Posponer aclaramiento hasta resolución de la infección con antibióticos.',correct:false,
+          fb:'✗ Incorrecto y perjudicial. La exacerbación infecciosa en FQ es precisamente cuando MÁS necesario es el aclaramiento — las secreciones infectadas acumuladas en los bronquios dañan el epitelio y perpetúan la infección. El aclaramiento intensivo hospitalario es el tratamiento fisioterapéutico de la exacerbación FQ, no algo a posponer. Los antibióticos y el aclaramiento son sinérgicos: el aclaramiento elimina el biofilm donde se protege la bacteria del antibiótico.',cls:'bad'},
+        {txt:'Tos muy frecuente = riesgo de neumotórax. Limitar técnicas de aclaramiento hasta RX tórax de control.',correct:false,
+          fb:'⚠ Precaución válida pero desproporcionada como primera respuesta. El neumotórax es una complicación real de la FQ avanzada, pero es infrecuente en FEV₁ 42% y primer ingreso. Si hay dolor pleurítico súbito, enfisema subcutáneo o deterioro brusco de SpO₂ → RX urgente. Sin esos signos, la tos frecuente por exacerbación no requiere RX antes de iniciar el aclaramiento. El riesgo de no hacer aclaramiento (empeoramiento de la infección) supera el riesgo teórico de neumotórax en este caso.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 22 rpm, SpO₂ 91% con O₂ 2L. Crepitantes bilaterales extensos. Sibilancias espiratorias. Trabajo respiratorio aumentado. FEV₁ 42% (basal 52% — caída del 10%). ¿Plan fisioterapéutico B en exacerbación FQ hospitalaria?',
+      opts:[
+        {txt:'Aclaramiento intensivo hospitalario: (1) Dornasa alfa nebulizada 30 min antes del aclaramiento; (2) Salbutamol nebulizado inmediatamente antes del aclaramiento (broncodilatación + humidificación); (3) Aclaramiento: VEST (chaleco oscilante) o técnicas manuales ACBT + drenaje postural 3-4×/día; (4) El ejercicio activo está limitado hasta SpO₂ >92% estable — solo movilización activa-asistida. (5) Monitorizar SpO₂ continuo durante el aclaramiento.',correct:true,
+          fb:'✓ Correcto y con la secuencia exacta. La secuencia en FQ hospitalaria es: dornasa alfa (30-60 min antes) → salbutamol nebulizado → aclaramiento (VEST o ACBT+drenaje postural) → evaluación SpO₂. El VEST (High Frequency Chest Wall Oscillation) tiene eficacia equivalente a las técnicas manuales pero permite mayor independencia y es menos fatigante para el fisioterapeuta. En España, la mayoría de centros de FQ usan técnicas manuales (ACBT + drenaje postural) como primera opción. La frecuencia de 3-4×/día en exacerbación hospitalaria está basada en evidencia de FQ pediátrica y adulta.',cls:'good'},
+        {txt:'MRSA en cultivo = aislamiento estricto. El fisioterapeuta no puede entrar a la habitación sin equipo completo de aislamiento de contacto/aerosoles.',correct:false,
+          fb:'⚠ Parcialmente correcto en el procedimiento pero no en la conclusión. El MRSA SÍ requiere precauciones de aislamiento de contacto (bata + guantes) y el fisioterapeuta debe usarlas. PERO eso no impide la fisioterapia — impide hacerla sin EPI. La conclusión correcta es: "entro con equipo de protección adecuado". La fisioterapia con aclaramiento en FQ con MRSA es igualmente necesaria, con las precauciones de aislamiento correctas.',cls:'warn'},
+        {txt:'FEV₁ caído de 52% a 42% = deterioro grave. VMNI urgente antes de cualquier aclaramiento.',correct:false,
+          fb:'⚠ Prematuro. La VMNI en exacerbación FQ se indica cuando: SpO₂ <88% refractaria a O₂ convencional, hipercapnia progresiva (PaCO₂ >50 mmHg y subiendo), o trabajo respiratorio extremo. Este paciente tiene SpO₂ 91% con O₂ 2L y PaCO₂ 46 mmHg — en el límite pero manejable. La primera intervención es el aclaramiento intensivo + O₂ + antibióticos. Si en 24-48h no hay mejoría, entonces valorar VMNI como adyuvante del aclaramiento.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 96 lpm, PA 118/72 mmHg. Sin ingurgitación yugular. Sin edema periférico. Temperatura 38.1°C. ¿Evaluación cardiovascular y condicionantes para la movilización?',
+      opts:[
+        {txt:'C con taquicardia reactiva a fiebre e hipoxemia — no arritmia patológica. Sin compromiso hemodinámico. La FC 96 lpm en contexto de fiebre 38.1°C y SpO₂ 91% es una respuesta fisiológica esperada. Ejercicio activo limitado en exacerbación (SpO₂ <92%) — solo movilización activa-asistida en cama y sedestación controlada. El objetivo C en exacerbación FQ es prevenir el desacondicionamiento, no mejorar la capacidad aeróbica.',correct:true,
+          fb:'✓ Correcto. La regla general: por cada 1°C de fiebre, la FC sube ~10 lpm. FC 96 con fiebre 38.1°C es esperable (FC "corregida" sin fiebre ~86 lpm). No indica arritmia ni compromiso hemodinámico. La limitación del ejercicio activo en exacerbación FQ se basa en: (1) SpO₂ <92% con O₂ convencional, (2) fiebre activa, (3) trabajo respiratorio aumentado — todos presentes. La movilización activa-asistida (cambios posturales, sedestación) mantiene la masa muscular y previene el desacondicionamiento sin sobrecargar el sistema cardiorrespiratorio.',cls:'good'},
+        {txt:'FC 96 = taquicardia sinusal patológica en un paciente de 26 años. ECG urgente antes de cualquier movilización.',correct:false,
+          fb:'✗ Incorrecto. La taquicardia sinusal en contexto infeccioso con fiebre 38.1°C e hipoxemia es una respuesta fisiológica completamente esperada y no patológica. Un ECG urgente no está indicado en este contexto — no cambiaría el manejo. La taquicardia se resolverá con el control de la infección (antibióticos), la mejora de la SpO₂ y la defervescencia.',cls:'bad'},
+        {txt:'Sin ingurgitación yugular ni edema = C completamente normal. Ejercicio aeróbico completo indicado para combatir el desacondicionamiento del ingreso.',correct:false,
+          fb:'✗ Incorrecto. La ausencia de signos de fallo cardíaco derecho (IY, edema) no equivale a "C completamente normal" en el contexto de SpO₂ 91% con O₂, FR 22 rpm y fiebre. El ejercicio aeróbico intenso está contraindicado en exacerbación activa (SpO₂ <92%, fiebre). El riesgo de desaturación brusca durante el ejercicio aeróbico con SpO₂ basal 91% es real y potencialmente peligroso.',cls:'bad'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientado. Muy angustiado: "¿Esto quiere decir que voy a ir empeorando toda mi vida? Nadie me había dicho lo que significa tener FQ de verdad." Diagnóstico hace 8 meses. Primera hospitalización. Sin pareja ni hijos. ¿Cómo manejas D?',
+      opts:[
+        {txt:'Impacto psicológico del diagnóstico tardío FQ en adulto — proceso de duelo activo. El fisioterapeuta NO es el terapeuta, pero SÍ pasa más tiempo con el paciente que ningún otro profesional. Intervención: (1) Escucha activa sin minimizar; (2) Responder solo lo que se sabe con certeza: "La FQ es crónica, pero su evolución varía mucho según el genotipo — el tuyo es más leve. Los tratamientos actuales han cambiado radicalmente el pronóstico"; (3) Derivación activa a psicólogo especializado en FQ y asociación de pacientes.',correct:true,
+          fb:'✓ Correcto y con la actitud apropiada. El diagnóstico tardío de FQ en adulto tiene un impacto psicológico específico y complejo: el paciente ha vivido 25 años sin saber que tenía una enfermedad crónica grave, y de repente toda su historia de síntomas respiratorios cobra un significado nuevo. El proceso de duelo (negación → rabia → negociación → depresión → aceptación) es el mismo que en cualquier diagnóstico de enfermedad crónica. El fisioterapeuta es a menudo el primer interlocutor de confianza — no tiene que resolver el duelo, pero puede contener y derivar activamente.',cls:'good'},
+        {txt:'El paciente está muy angustiado. Posponer el aclaramiento para esta sesión — priorizar el apoyo emocional.',correct:false,
+          fb:'⚠ Inadecuado. El aclaramiento en exacerbación FQ es la intervención fisioterapéutica más urgente — posponerlo tiene consecuencias clínicas reales (acumulación de secreciones, empeoramiento de la infección). El apoyo emocional y el aclaramiento no son excluyentes: se puede crear un espacio de escucha breve (5-10 min) mientras se preparan los nebulizadores, hacer el aclaramiento, y continuar el diálogo emocional durante la sesión. La técnica de ACBT permite comunicación durante los ciclos de expansión torácica.',cls:'warn'},
+        {txt:'El pronóstico de la FQ es grave. Informar con honestidad completa sobre la esperanza de vida y la progresión esperada.',correct:false,
+          fb:'✗ Inapropiado en este momento. Una información honesta pero no contextualizada sobre el pronóstico en el momento de la primera hospitalización de un paciente de 26 años con diagnóstico de 8 meses puede ser devastadora y contraproducente. Además, el pronóstico en FQ ha cambiado radicalmente con los moduladores CFTR (ivacaftor/lumacaftor) — este paciente tiene un genotipo leve. La información sobre pronóstico debe darse de forma gradual, contextualizada y con el apoyo del equipo multidisciplinar (neumólogo, psicólogo, trabajador social).',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Tobramicina EV (monitorizar nefrotoxicidad), linezolid EV (monitorizar trombopenia), dornasa alfa 2.5mg nebulizada/día, ivacaftor/lumacaftor (con alimento graso), azitromicina. ¿Qué condiciona E al plan fisioterapéutico?',
+      opts:[
+        {txt:'Análisis farmacológico completo: (1) Tobramicina EV — nefrotóxica: monitorizar creatinina y diuresis; si diuresis reducida → consultar antes de la sesión; (2) Linezolid — trombopenia: vigilar petequias, hematomas (si aparecen → avisar); (3) Dornasa alfa — administrar 30-60 min ANTES del aclaramiento (no después); (4) Ivacaftor/lumacaftor — tomar con alimentos grasos para absorción; no condiciona directamente el aclaramiento; (5) Secuencia correcta de nebulizaciones: salbutamol → (30-60 min después: dornasa alfa) → aclaramiento → antibiótico nebulizado si hubiera.',correct:true,
+          fb:'✓ Análisis farmacológico correcto. El punto más importante es la secuencia de dornasa alfa: administrada antes del aclaramiento, tiene tiempo de actuar sobre el ADN extracelular y reducir la viscosidad del esputo — el aclaramiento posterior es más eficaz. Administrada después, el moco ya fue movilizado (o no) sin el beneficio de la menor viscosidad. La tobramicina EV es nefrotóxica especialmente en combinación con otros nefrotóxicos — el fisioterapeuta no gestiona el antibiótico, pero debe conocer los signos de toxicidad (reducción de diuresis, confusión, edemas) porque pasa tiempo con el paciente.',cls:'good'},
+        {txt:'Tobramicina EV + linezolid = doble antibiótico. Riesgo de sobreinfección por hongos. Suspender el aclaramiento para no diseminar.',correct:false,
+          fb:'✗ Incorrecto en mecanismo y conclusión. La sobreinfección fúngica puede ocurrir con antibióticos de amplio espectro, pero no se previene suspendiendo el aclaramiento — al contrario, las secreciones acumuladas favorecen el crecimiento fúngico. El riesgo de sobreinfección fúngica se monitoriza con cultivos periódicos y la decisión de tratamiento antifúngico es médica. El aclaramiento continúa independientemente.',cls:'bad'},
+        {txt:'Ivacaftor/lumacaftor = modulator CFTR. Mejora la función del canal de cloro → la dornasa alfa ya no es necesaria durante el tratamiento con moduladores.',correct:false,
+          fb:'⚠ Razonamiento parcialmente fundamentado pero incorrecto en la conclusión. Los moduladores CFTR mejoran la función del canal y reducen la producción de secreciones anómalas a largo plazo, pero no eliminan las secreciones ya existentes ni revierten la inflamación bronquial establecida. En exacerbación activa con secreciones abundantes, la dornasa alfa sigue siendo necesaria. A largo plazo (meses-años con moduladores), la cantidad de aclaramiento puede reducirse, pero no se elimina.',cls:'warn'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:11,
+    restVitals:{fc:96,fr:22,spo2:91,borg:5,pas:118},
+    phases:[
+      {name:'Dornasa alfa + nebulización',pct:5,fc:96,fr:22,spo2:91,borg:5,pas:118,log:'Dornasa alfa + salbutamol nebulizados — FC 96 lpm · FR 22 rpm · SpO₂ 91% · Borg 5 · PAS 118 mmHg · Preparación para aclaramiento'},
+      {name:'Aclaramiento ACBT',pct:20,fc:98,fr:23,spo2:90,borg:5,pas:120,log:'Aclaramiento ACBT 20 min — FC 98 lpm · FR 23 rpm · SpO₂ 90% · Borg 5 · PAS 120 mmHg · Expectoración abundante'},
+      {name:'Movilización activa-asistida',pct:10,fc:100,fr:23,spo2:90,borg:5,pas:121,log:'Movilización activa-asistida MMII — FC 100 lpm · FR 23 rpm · SpO₂ 90% · Borg 5 · PAS 121 mmHg · Prevención desacondicionamiento'},
+      {name:'Sedestación controlada',pct:15,fc:98,fr:22,spo2:91,borg:5,pas:119,log:'Sedestación borde cama 15 min — FC 98 lpm · FR 22 rpm · SpO₂ 91% · Borg 5 · PAS 119 mmHg · Tolerable con O₂ 2L'},
+      {name:'Aclaramiento post + reposo',pct:5,fc:96,fr:21,spo2:91,borg:4,pas:118,log:'2° sesión aclaramiento breve + reposo — FC 96 lpm · FR 21 rpm · SpO₂ 91% · Borg 4 · PAS 118 mmHg · Consolidar drenaje'}
+    ],
+    physiologyNotes:'En exacerbación FQ (FEV₁ caído de 52% a 42%), el VO₂ pico está severamente comprometido (~11 mL/kg/min) por la combinación de hipoxemia, trabajo respiratorio aumentado y fiebre. El objetivo fisioterapéutico no es mejorar el VO₂ pico (imposible en exacerbación activa) sino: (1) aclaramiento máximo para eliminar el biofilm bacteriano, (2) prevenir el desacondicionamiento muscular con movilización mínima. La dornasa alfa reduce la viscosidad del esputo, haciendo el aclaramiento más eficaz: sin ella, la ACBT mueve secreciones de alta viscosidad con mucho mayor esfuerzo ventilatorio.'
+  },
+  goals:['Aclaramiento intensivo 3-4×/día hasta mejoría clínica (FEV₁ retorno a basal)','Prevenir desacondicionamiento con movilización progresiva','Apoyo psicológico activo — derivación a psicólogo FQ y asociación de pacientes','Educación en secuencia nebulización→aclaramiento para el alta'],
+  interventions:['Dornasa alfa 30-60 min antes + salbutamol inmediatamente antes del aclaramiento','Aclaramiento ACBT 3-4×/día (20 min/sesión) con drenaje postural si tolera','Movilización activa-asistida en cama + sedestación progresiva (SpO₂ ≥88%)','Precauciones MRSA: bata + guantes en cada sesión de fisioterapia','Conexión con psicólogo especializado en FQ y Asociación Española de Fibrosis Quística']
+},
 ];
 
 /* ====================================================
