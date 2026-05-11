@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evaluación CV — Fisioterapia Cardiorrespiratoria</title>
+<link rel="stylesheet" href="../assets/css/fisioresp.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../index.html" onclick="if(window.parent!==window){window.parent.closeModule();return false;}" class="nav-back">← Inicio</a>
+  <span class="nav-title">Evaluación Cardiovascular</span>
+</nav>
+
+<main class="container" style="padding-top:1.25rem">
+
+  <div style="margin-bottom:1.25rem">
+    <h2 style="font-family:var(--fh);font-size:1.3rem;margin-bottom:.35rem">Evaluación Cardiovascular en Fisioterapia</h2>
+    <p style="color:var(--text2);font-size:13px;max-width:700px;line-height:1.7">
+      Parámetros de seguridad, criterios de suspensión del ejercicio y reconocimiento de patrones ECG de alarma que el fisioterapeuta debe conocer.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:1.25rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Signos Vitales Cardiovasculares</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:5px 4px;color:var(--text3);font-weight:600">Parámetro</th><th style="padding:5px 4px;color:var(--text3);font-weight:600">Normal</th><th style="padding:5px 4px;color:var(--text3);font-weight:600">Alarma</th></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">FC reposo</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">60–100 lpm</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;50 o &gt;110 lpm</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">PAS</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">90–139 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;90 o &gt;180 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">PAD</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">60–89 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;60 o &gt;110 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">Presión de pulso</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">30–50 mmHg</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;20 o &gt;80 mmHg</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">FCmáx ejercicio</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">220 − edad</td><td style="padding:5px 4px;color:var(--red);text-align:center">Arritmia, angina, mareo</td></tr>
+        <tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 4px;color:var(--text)">Recuperación FC (HRR)</td><td style="padding:5px 4px;color:var(--green);font-family:var(--fm);text-align:center">≥12 lpm al min 1</td><td style="padding:5px 4px;color:var(--red);text-align:center">&lt;12 lpm = riesgo CV</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Criterios de Suspensión del Ejercicio</div>
+      <div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--rs);padding:.75rem;font-size:12.5px;color:var(--red);margin-bottom:.75rem">Detener inmediatamente si aparece cualquiera de estos signos:</div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Angina o dolor torácico típico (opresivo, irradiado)</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Descenso de PAS &gt;10 mmHg con aumento de carga</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">PAS &gt;220 mmHg o PAD &gt;110 mmHg</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">FC &gt;FCmáx predicha con síntomas</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Arritmia ventricular sostenida (TV, FV)</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Bloqueo AV de 2° o 3° grado de nueva aparición</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Signos de bajo gasto: palidez, diaforesis, confusión</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Desaturación SpO₂ &lt;85% sin respuesta a O₂</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:5px;font-size:12.5px"><span style="color:var(--red);flex-shrink:0">⚠</span><span style="color:var(--text2)">Solicitud del paciente de detener el ejercicio</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:1.25rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Clasificación Funcional NYHA</div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--green);min-width:2rem;text-align:center">I</div>
+        <div style="font-size:13px;color:var(--text2)">Sin limitación. Actividad ordinaria sin síntomas.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--teal);min-width:2rem;text-align:center">II</div>
+        <div style="font-size:13px;color:var(--text2)">Limitación leve. Síntomas con actividad moderada (subir escaleras, caminar rápido).</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--amber);min-width:2rem;text-align:center">III</div>
+        <div style="font-size:13px;color:var(--text2)">Limitación marcada. Síntomas con actividad mínima (vestirse, caminar en llano).</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--rs)">
+        <div style="font-family:var(--fh);font-size:1.6rem;color:var(--red);min-width:2rem;text-align:center">IV</div>
+        <div style="font-size:13px;color:var(--text2)">Síntomas en reposo. Incapacidad de actividad sin síntomas.</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem">
+      <div style="font-family:var(--fh);font-size:1rem;color:var(--red);margin-bottom:.75rem">Patrones ECG de Alarma — Reconocer y Actuar</div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Fibrilación Auricular</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">Ausencia de onda P, RR irregular. FC variable 100-180 lpm.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Suspender ejercicio si FC &gt;110 lpm o inestabilidad hemodinámica.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Taquicardia Ventricular</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">QRS ancho (&gt;0.12s), FC &gt;100 lpm, disociación AV.</div>
+        <div style="font-size:12px;color:var(--amber)">→ EMERGENCIA. Suspender inmediatamente. Llamar equipo de emergencias.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Bloqueo AV 3° grado</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">Disociación completa P-QRS. FC ventricular 30-50 lpm.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Contraindicación absoluta de ejercicio. Derivación urgente.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Elevación ST</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">ST elevado &gt;1mm en 2 derivaciones contiguas.</div>
+        <div style="font-size:12px;color:var(--amber)">→ EMERGENCIA. Posible IAM. Suspender, O₂, llamar emergencias.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem;border-left:3px solid var(--red)">
+        <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:3px">Depresión ST</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:3px">ST deprimido &gt;1mm durante el ejercicio. Isquemia subendocárdica.</div>
+        <div style="font-size:12px;color:var(--amber)">→ Suspender ejercicio. Reposo. Notificar médico.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../assets/js/ui.js"></script>
+</body>
+</html>
