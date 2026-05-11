@@ -1659,6 +1659,110 @@ const CASES = [
   goals:['Completar 8 semanas de RP (24 sesiones)','Mejorar 6MWT de 280m a ≥350m','Reducir kinesofobia post-exacerbación','Establecer programa domiciliario de aclaramiento y ejercicio autónomo'],
   interventions:['Ejercicio aeróbico: caminata 80% velocidad 6MWT, Borg 4-5, 30-40 min, 3×/semana','Aclaramiento bronquial domiciliario: ELTGOL o drenaje autógeno 1×/día','Salbutamol 2 puff 15 min antes de cada sesión de RP','Educación: reconocimiento precoz de exacerbación (cambio color/volumen esputo, aumento disnea basal)','Plan de acción escrito: qué hacer si SpO₂ baja de 88% o Borg supera 7 en reposo']
 },
+/* ============================================================
+   CASO 14 — Bronquiectasias Post-infecciosas: Estable
+   Nivel: Intermedio — Fisioterapia respiratoria
+============================================================*/
+{
+  id:14, name:'Bronquiectasias Post-infecciosas — Estable', age:45, sex:'Femenino', sev:'mild',
+  dx:'Bronquiectasias cilíndricas en LID post-neumonía por Klebsiella — Colonización crónica Pseudomonas aeruginosa — Fase estable',
+  chief:'Consulta ambulatoria de seguimiento. Tos productiva matutina crónica con expectoración mucopurulenta escasa. Sin signos de exacerbación activa. Refiere que hace el aclaramiento "cuando se acuerda".',
+  hx:'Neumonía grave por Klebsiella pneumoniae hace 3 años con hospitalización en UCI. TC tórax: bronquiectasias cilíndricas en segmentos basales de LID. Cultivos semestrales: Pseudomonas aeruginosa sensible a tobramicina. Sin exacerbaciones en últimos 8 meses. Trabaja media jornada como administrativa. Vive sola. No fuma. Recibe: azitromicina 500mg 3×/semana, salbutamol PRN, tobramicina nebulizada 28 días on/28 días off (actualmente en ciclo ON).',
+  baseVitals:{fc:74,fr:16,spo2:95,pas:118,pad:74,temp:36.5,borg:1},
+  spiroPattern:'obstructive-mild',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.41',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'38 mmHg',ref:'35–45 mmHg',status:'ok'},
+      {name:'PaO₂',val:'78 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'24 mEq/L',ref:'22–26 mEq/L',status:'ok'},
+      {name:'SaO₂',val:'95%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.21 (aire ambiente)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'FEV₁',val:'68% predicho',ref:'>80%',status:'lo'},
+      {name:'CVF',val:'78% predicho',ref:'>80%',status:'lo'},
+      {name:'FEV₁/CVF',val:'0.68',ref:'>0.70',status:'lo'},
+      {name:'Pseudomonas',val:'Colonización crónica',ref:'Negativo',status:'hi'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Paciente en consulta. Tos productiva matutina abundante con esputo mucopurulento amarillento escaso (su "normal" crónico). Sin hemoptisis. Sin estridor. ¿Evaluación de A en bronquiectasias estables?',
+      opts:[
+        {txt:'VA permeable. La tos productiva crónica con esputo mucopurulento escaso es el fenotipo habitual de las bronquiectasias con colonización por Pseudomonas — no indica exacerbación activa. La diferencia entre estable y exacerbación es el CAMBIO: aumento de volumen de esputo, esputo más purulento (verde intenso), aumento de disnea, fiebre. Sin esos cambios, este es el estado estable de la paciente.',correct:true,
+          fb:'✓ Correcto. La evaluación de A en bronquiectasias estables es confirmatoria: VA permeable, tos funcional (mecanismo de aclaramiento natural). El concepto clave es que la tos crónica con esputo en bronquiectasias NO es una alarma — es el síntoma cardinal de la enfermedad. La alarma es el CAMBIO respecto al basal: más esputo, más purulento, más disnea, fiebre. Educar a la paciente en reconocer su "normal" vs. una exacerbación es parte de la intervención A.',cls:'good'},
+        {txt:'Esputo mucopurulento = infección activa. Suspender tobramicina nebulizada y derivar a neumología urgente.',correct:false,
+          fb:'✗ Incorrecto. La tobramicina nebulizada es precisamente el tratamiento para la colonización crónica por Pseudomonas — suspenderla ante esputo crónico sería lo contrario de lo indicado. El esputo mucopurulento en bronquiectasias con Pseudomonas es el estado basal de la paciente con colonización crónica. La derivación urgente no está indicada sin signos de exacerbación (fiebre, aumento brusco de esputo, empeoramiento funcional).',cls:'bad'},
+        {txt:'Sin hemoptisis = A sin riesgo. Tos crónica en bronquiectasias no requiere evaluación específica — es el estado normal.',correct:false,
+          fb:'⚠ Parcialmente correcto pero incompleto. La ausencia de hemoptisis es un dato tranquilizador, pero "no requiere evaluación específica" es impreciso. A en bronquiectasias sí requiere evaluación: ¿es el esputo el habitual de la paciente (estable) o ha cambiado (exacerbación)? ¿Hay algún grado de hemoptisis que la paciente minimiza? La evaluación de A es rápida pero no trivial en bronquiectasias.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 16 rpm, SpO₂ 95% AA. Crepitantes en LID (base derecha), leve reducción de murmullo en esa zona. Expansión torácica asimétrica (LID reducida). Espirometría: obstrucción leve. ¿Plan B y diseño del programa de aclaramiento?',
+      opts:[
+        {txt:'B con afectación localizada en LID. Programa de aclaramiento domiciliario: (1) ELTGOL en decúbito lateral izquierdo (drena LID por gravedad) 10-15 min; (2) Ciclo ACBT (respiración controlada → expansiones torácicas → técnica de espiración forzada TEF); (3) Dispositivo oscilante (Flutter o Aerobika) tras ELTGOL para movilizar secreciones residuales. Secuencia completa: 15-20 min/sesión, 2×/día (mañana obligatoria + tarde opcional).',correct:true,
+          fb:'✓ Correcto y clínicamente fundamentado. El ELTGOL (Espiración Lenta Total con Glotis abierta en infralateral) en decúbito lateral izquierdo aprovecha la gravedad para drenar el LID: el pulmón afecto queda en posición inferior, favoreciendo el drenaje por gravedad de las secreciones hacia los bronquios principales. El ACBT es la técnica más versátil y autoadministrable: respiración controlada (relaja los bronquios) + expansiones torácicas (moviliza secreciones periféricas) + TEF (las expulsa a vías proximales). El Flutter/Aerobika añade oscilación a la presión espiratoria, reduciendo la viscosidad del moco.',cls:'good'},
+        {txt:'Obstrucción leve en espirometría = poca secreción. El aclaramiento 2×/día es excesivo para una paciente estable. 1×/semana es suficiente.',correct:false,
+          fb:'✗ Incorrecto. La frecuencia del aclaramiento no depende del grado de obstrucción espirométrica sino del volumen de secreciones y la colonización bacteriana. Con Pseudomonas aeruginosa en colonización crónica, el aclaramiento 2×/día (mínimo 1×/día) es el estándar para mantener la vía aérea libre y reducir la carga bacteriana. El aclaramiento 1×/semana en bronquiectasias con colonización crónica es insuficiente — la Pseudomonas se reproduce cada 20 minutos en ese entorno.',cls:'bad'},
+        {txt:'Crepitantes localizados en LID = posible neumonía sobreañadida. RX tórax urgente antes de iniciar aclaramiento.',correct:false,
+          fb:'⚠ Los crepitantes en LID son el hallazgo crónico de las bronquiectasias en esa zona — no indican neumonía sobreañadida en ausencia de fiebre, cambio en el esputo, deterioro funcional o nueva consolidación. La RX tórax está indicada si hay signos de exacerbación o nueva semiología. Pedir una RX urgente ante los crepitantes crónicos en bronquiectasias estables generaría radiaciones innecesarias y demoraría el tratamiento real (inicio del aclaramiento).',cls:'warn'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 74 lpm, PA 118/74. Sin edema. Sin ingurgitación yugular. SpO₂ 95% AA estable. Sin antecedentes cardiovasculares. ¿Evaluación de C y condicionantes para el ejercicio aeróbico?',
+      opts:[
+        {txt:'C completamente normal. Sin limitaciones cardiovasculares para el ejercicio aeróbico. Prescripción: ejercicio aeróbico moderado (caminata, bicicleta) 30 min, 3-5×/semana, Borg 3-4. Punto clave: el ejercicio aeróbico mejora el aclaramiento mucociliar en bronquiectasias — es sinérgico con las técnicas de aclaramiento, no alternativo.',correct:true,
+          fb:'✓ Correcto. El ejercicio aeróbico en bronquiectasias tiene un doble beneficio: (1) mejora la capacidad funcional general (igual que en cualquier enfermedad respiratoria crónica), (2) la hiperpnea del ejercicio aumenta el flujo espiratorio y la oscilación de la pared bronquial, mejorando el transporte mucociliar. En pacientes con bronquiectasias leves-moderadas (FEV₁ 68%), la prescripción de ejercicio es similar a la población general con enfermedad respiratoria crónica leve.',cls:'good'},
+        {txt:'Colonización por Pseudomonas = riesgo de bacteriemia durante ejercicio intenso. Limitar a ejercicio muy leve.',correct:false,
+          fb:'✗ Incorrecto. La colonización bronquial crónica por Pseudomonas no aumenta el riesgo de bacteriemia con el ejercicio en bronquiectasias estables. La Pseudomonas en bronquiectasias es un patógeno de colonización de la vía aérea — no una bacteriemia sistémica. El ejercicio moderado es seguro y beneficioso. La restricción del ejercicio por colonización bacteriana no tiene base clínica ni evidencia.',cls:'bad'},
+        {txt:'Sin antecedentes CV y SpO₂ 95% = sin restricciones. Puede hacer ejercicio de alta intensidad sin monitorización.',correct:false,
+          fb:'⚠ Excesivo en la falta de monitorización. Aunque la capacidad funcional es relativamente conservada (SpO₂ 95%), el ejercicio de alta intensidad sin monitorización en bronquiectasias con obstrucción leve no es prudente. La SpO₂ puede caer con esfuerzo intenso. La monitorización inicial (al menos las primeras sesiones) garantiza que la prescripción es segura. El ejercicio sin supervisión puede indicarse una vez establecida la tolerancia.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientada. Verbaliza: "Hago el aclaramiento cuando tengo tiempo, que no es siempre. Además tampoco noto mucha diferencia." ¿Cómo abordas la falta de adherencia al aclaramiento?',
+      opts:[
+        {txt:'Baja adherencia por fatiga de adherencia y baja efectividad percibida. Intervención: (1) Identificar barreras reales: tiempo (cuánto tarda la técnica actual), comodidad (¿le resulta incómoda alguna posición?), efectividad percibida (¿qué cantidad de esputo produce?); (2) Simplificar: ¿puede sustituir 3 técnicas distintas por 1 técnica eficaz (ACBT + Flutter) en 15 min?; (3) Conectar con beneficio concreto: sin aclaramiento diario, la Pseudomonas acumula biofilm → más riesgo de exacerbación → hospitalización.',correct:true,
+          fb:'✓ Correcto. La fatiga de adherencia en bronquiectasias es el problema clínico más prevalente: la enfermedad es crónica, el tratamiento es diario, y la "recompensa" (ausencia de exacerbación) es invisible. Las intervenciones más efectivas son: (1) simplificación del régimen (menos técnicas, mismo resultado), (2) rutinización (anclar el aclaramiento a una actividad existente: ducha matutina → aclaramiento → desayuno), (3) educación sobre el beneficio invisible (la no-exacerbación como resultado positivo). El Flutter o el Aerobika son atractivos porque el paciente ve y oye el efecto inmediatamente.',cls:'good'},
+        {txt:'La falta de adherencia es responsabilidad del paciente. Informar de las consecuencias y que ella decida.',correct:false,
+          fb:'✗ Reductivo e ineficaz. La adherencia terapéutica en enfermedades crónicas es un proceso multifactorial que el fisioterapeuta puede y debe abordar activamente. "Informar y que decida" ignora las barreras reales (tiempo, complejidad, efectividad percibida) y transfiere toda la responsabilidad a la paciente. La evidencia en cronicidad muestra que la adherencia mejora con simplificación del régimen, rutinización y seguimiento activo — no con información pasiva.',cls:'bad'},
+        {txt:'No hace el aclaramiento = pulmón lleno de secreciones. Hospitalización para aclaramiento intensivo urgente.',correct:false,
+          fb:'✗ Innecesario y desproporcionado. La paciente está en fase ESTABLE (sin exacerbación en 8 meses, SpO₂ 95%, sin fiebre). La baja adherencia al aclaramiento domiciliario en fase estable requiere intervención educativa y simplificación del régimen — no hospitalización. La hospitalización por aclaramiento se reserva para exacerbaciones que no responden al tratamiento ambulatorio o complicaciones (hemoptisis significativa, deterioro funcional agudo).',cls:'bad'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Azitromicina 500mg 3×/semana (profilaxis), salbutamol PRN, tobramicina nebulizada 28 días on/28 off (actualmente en ciclo ON — día 18). ¿Qué condiciona E al programa de aclaramiento y ejercicio?',
+      opts:[
+        {txt:'Secuencia farmacológica correcta: (1) Salbutamol 15 min antes del aclaramiento (broncodilata para facilitar la salida de secreciones); (2) Tobramicina nebulizada DESPUÉS del aclaramiento (la vía aérea limpia mejora la penetración del antibiótico hasta las zonas distales); (3) Azitromicina 3×/semana: efecto antiinflamatorio + antibacteriano crónico — no es tratamiento de exacerbación, no subirla ante empeoramiento leve. (4) Ejercicio aeróbico post-aclaramiento completo.',correct:true,
+          fb:'✓ Correcto y con el concepto clave: la SECUENCIA de nebulizaciones importa. El orden óptimo es: broncodilatador → aclaramiento → antibiótico nebulizado. La tobramicina aplicada antes del aclaramiento queda parcialmente atrapada en las secreciones y se elimina durante la técnica, reduciendo su eficacia. Aplicada después, penetra en la vía aérea limpia y llega a las zonas colonizadas. Este concepto aplica a cualquier antibiótico nebulizado (colistina, tobramicina, aztreonam). La azitromicina profiláctica 3×/semana en bronquiectasias con colonización por Pseudomonas tiene evidencia de reducción de exacerbaciones.',cls:'good'},
+        {txt:'Tobramicina nebulizada = antibiótico activo. El ejercicio está contraindicado durante el ciclo ON para no favorecer la diseminación bacteriana.',correct:false,
+          fb:'✗ Incorrecto. La tobramicina nebulizada actúa localmente en la vía aérea — no es una antibioterapia sistémica. No existe riesgo de "diseminación bacteriana" con el ejercicio durante el ciclo ON. El ejercicio aeróbico está indicado durante los ciclos ON y OFF — el tratamiento antibiótico nebulizado no contraindica el ejercicio.',cls:'bad'},
+        {txt:'Azitromicina 3×/semana = antibiótico de amplio espectro activo. No añadir salbutamol (ya hay cobertura antibiótica suficiente).',correct:false,
+          fb:'✗ Confusión de mecanismos. La azitromicina en bronquiectasias actúa como antiinflamatorio e inmunomodulador (no principalmente como antibiótico ante la Pseudomonas, que es resistente a macrólidos). No tiene efecto broncodilatador. El salbutamol actúa sobre los receptores β2 del músculo liso bronquial — mecanismo completamente distinto. Ambos son complementarios.',cls:'bad'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:22,
+    restVitals:{fc:74,fr:16,spo2:95,borg:1,pas:118},
+    phases:[
+      {name:'Aclaramiento pre-ejercicio',pct:5,fc:76,fr:17,spo2:95,borg:2,pas:119,log:'Aclaramiento ACBT + Flutter — FC 76 lpm · FR 17 rpm · SpO₂ 95% · Borg 2 · PAS 119 mmHg · Expectoración de secreciones LID'},
+      {name:'Calentamiento',pct:10,fc:80,fr:17,spo2:95,borg:2,pas:121,log:'Calentamiento 5 min caminata lenta — FC 80 lpm · FR 17 rpm · SpO₂ 95% · Borg 2 · PAS 121 mmHg'},
+      {name:'Fase aeróbica',pct:40,fc:104,fr:20,spo2:94,borg:3,pas:128,log:'Caminata moderada 30 min — FC 104 lpm · FR 20 rpm · SpO₂ 94% · Borg 3 · PAS 128 mmHg · SpO₂ estable'},
+      {name:'Vuelta a calma',pct:20,fc:88,fr:18,spo2:95,borg:2,pas:122,log:'Vuelta a calma — FC 88 lpm · FR 18 rpm · SpO₂ 95% · Borg 2 · PAS 122 mmHg'},
+      {name:'Evaluación SpO₂ final',pct:5,fc:76,fr:16,spo2:95,borg:1,pas:119,log:'Evaluación SpO₂ post-ejercicio — FC 76 lpm · FR 16 rpm · SpO₂ 95% · Borg 1 · PAS 119 mmHg · Recuperación completa'}
+    ],
+    physiologyNotes:'En bronquiectasias leves-moderadas (FEV₁ 68%), la capacidad aeróbica está conservada (VO₂ pico estimado ~22 mL/kg/min). La limitación principal no es ventilatoria sino la acumulación de secreciones que aumenta la resistencia de la vía aérea. El aclaramiento pre-ejercicio reduce esta resistencia, permitiendo una sesión de mayor calidad. La hiperpnea del ejercicio aeróbico tiene efecto mucocinético adicional: el flujo espiratorio elevado durante el ejercicio actúa como una "técnica de aclaramiento pasiva" que complementa las técnicas formales.'
+  },
+  goals:['Establecer programa domiciliario de aclaramiento 2×/día (100% adherencia)','Mejorar capacidad aeróbica (VO₂ pico) con ejercicio regular','Prevenir exacerbaciones mediante aclaramiento + tobramicina nebulizada','Educación en reconocimiento precoz de exacerbación y plan de acción'],
+  interventions:['Aclaramiento: ELTGOL en DL izquierdo + ACBT 2×/día (15-20 min/sesión)','Flutter o Aerobika como complemento del ACBT','Secuencia: salbutamol → aclaramiento → tobramicina nebulizada','Ejercicio aeróbico 30 min, Borg 3-4, 3-5×/semana (post-aclaramiento)','Educación en reconocimiento de exacerbación: cambio en esputo, aumento disnea, fiebre']
+},
 ];
 
 /* ====================================================
