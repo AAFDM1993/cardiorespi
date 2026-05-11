@@ -1867,6 +1867,110 @@ const CASES = [
   goals:['Aclaramiento intensivo 3-4×/día hasta mejoría clínica (FEV₁ retorno a basal)','Prevenir desacondicionamiento con movilización progresiva','Apoyo psicológico activo — derivación a psicólogo FQ y asociación de pacientes','Educación en secuencia nebulización→aclaramiento para el alta'],
   interventions:['Dornasa alfa 30-60 min antes + salbutamol inmediatamente antes del aclaramiento','Aclaramiento ACBT 3-4×/día (20 min/sesión) con drenaje postural si tolera','Movilización activa-asistida en cama + sedestación progresiva (SpO₂ ≥88%)','Precauciones MRSA: bata + guantes en cada sesión de fisioterapia','Conexión con psicólogo especializado en FQ y Asociación Española de Fibrosis Quística']
 },
+/* ============================================================
+   CASO 16 — Bronquiectasias Post-TBC: Avanzadas
+   Nivel: Avanzado — Fisioterapia respiratoria
+============================================================*/
+{
+  id:16, name:'Bronquiectasias Post-TBC — Avanzadas', age:67, sex:'Masculino', sev:'sev',
+  dx:'Bronquiectasias saculares bilaterales post-tuberculosis — Insuficiencia respiratoria crónica — O₂ domiciliario — Candidato a trasplante pulmonar',
+  chief:'Control ambulatorio mensual. Disnea con mínimos esfuerzos (hablar, vestirse). O₂ domiciliario 2L/min. Muy decondicionado. Colonización Pseudomonas aeruginosa multirresistente. En lista de trasplante pulmonar.',
+  hx:'Tuberculosis pulmonar bilateral tratada a los 35 años (tratamiento completo, curación microbiológica). Secuelas: bronquiectasias saculares en lóbulos superiores bilaterales + fibrosis parenquimatosa. Diagnóstico de IR crónica hace 3 años (LTOT). FEV₁ basal 29% predicho. TC: bronquiectasias saculares bilaterales + atrapamiento aéreo + bandas fibrosas en LSI y LSD. Eco: HTP leve (PSAP 38 mmHg), FE 58%, VD dilatado. 6MWT basal: 185m (predicho 550m). En lista de trasplante bipulmonar hace 6 meses. Recibe: tiotropio, formoterol, fluticasona, colistina nebulizada 1 MUI/12h (en sala de aislamiento), O₂ domiciliario 2L/min (aumentar a 4L durante ejercicio). No anticoagulación. 2 episodios de hemoptisis leve (esputos hemoptoicos) en el último año.',
+  baseVitals:{fc:88,fr:20,spo2:90,pas:138,pad:84,temp:36.8,borg:4},
+  spiroPattern:'obstructive-sev',
+  labs:{
+    gsa:[
+      {name:'pH',val:'7.40',ref:'7.35–7.45',status:'ok'},
+      {name:'PaCO₂',val:'50 mmHg',ref:'35–45 mmHg',status:'hi'},
+      {name:'PaO₂',val:'60 mmHg',ref:'80–100 mmHg',status:'lo'},
+      {name:'HCO₃⁻',val:'31 mEq/L',ref:'22–26 mEq/L',status:'hi'},
+      {name:'SaO₂',val:'90%',ref:'>95%',status:'lo'},
+      {name:'FiO₂',val:'0.28 (2L/min gafas nasales)',ref:'—',status:'ok'}
+    ],
+    hem:[
+      {name:'FEV₁',val:'29% predicho',ref:'>80%',status:'lo'},
+      {name:'6MWT',val:'185m',ref:'550m (predicho)',status:'lo'},
+      {name:'PSAP eco',val:'38 mmHg',ref:'<25 mmHg',status:'hi'},
+      {name:'Pseudomonas XDR',val:'Multirresistente',ref:'Negativo',status:'hi'}
+    ]
+  },
+  abcdeScenarios:[
+    {
+      letter:'A', color:'#f87171', bg:'rgba(248,113,113,.15)',
+      context:'Tos débil con secreciones espesas difíciles de expectorar. El paciente refiere que "intenta toser pero no tiene fuerza". Antecedente de 2 episodios de hemoptisis leve en el último año. Sin hemoptisis activa hoy. ¿Evaluación de A en bronquiectasias avanzadas?',
+      opts:[
+        {txt:'VA permeable con tos ineficaz por debilidad muscular respiratoria (músculos espiratorios debilitados por desacondicionamiento y enfermedad crónica). Preguntar activamente por hemoptisis: ¿color?, ¿cantidad?, ¿igual que los episodios anteriores? Sin hemoptisis activa → continuar. Antecedente de hemoptisis → técnicas de percusión manual contraindicadas (usar técnicas de baja presión: ELTGOL, PEP baja, Flutter en posición suave). Tos asistida (compresión abdominal suave) para mejorar eficacia expectorante.',correct:true,
+          fb:'✓ Correcto. La tos ineficaz en bronquiectasias avanzadas no es porque el reflejo tusígeno esté ausente — es porque los músculos espiratorios (intercostales, abdominales) están debilitados por el desacondicionamiento y la enfermedad crónica. El pico de flujo espiratorio de la tos (PEF tos) puede estar muy reducido (<160 L/min = tos ineficaz). La tos asistida (compresión abdominal manual en la fase espiratoria) puede duplicar el flujo espiratorio. El antecedente de hemoptisis contraindica la percusión manual (riesgo de desencadenar nuevo episodio) pero no las técnicas de presión positiva espiratoria suave (Flutter, ELTGOL).',cls:'good'},
+        {txt:'Antecedente de hemoptisis = contraindicación de toda fisioterapia respiratoria hasta evaluación de broncoscopia.',correct:false,
+          fb:'✗ Excesivo. La hemoptisis activa MASIVA contraindica la fisioterapia. El antecedente de hemoptisis leve (esputos hemoptoicos) en los últimos meses NO contraindica el aclaramiento — contraindica las técnicas de percusión manual y el drenaje postural con cabeza baja. Las técnicas de baja presión (ELTGOL, PEP baja, Flutter) son seguras. La broncoscopia se indica para localizar la fuente de hemoptisis activa severa, no como criterio previo al aclaramiento de mantenimiento.',cls:'bad'},
+        {txt:'Tos débil = músculos respiratorios débiles. Iniciar entrenamiento muscular inspiratorio (IMT) intensivo para fortalecer los músculos.',correct:false,
+          fb:'⚠ El IMT tiene evidencia en EPOC y bronquiectasias, pero no está indicado en fase avanzada con IR crónica y candidato a trasplante como primera intervención. El objetivo del fortalecimiento muscular pre-trasplante en este paciente es el ejercicio aeróbico de baja-moderada intensidad para mantener la masa muscular periférica — no el IMT, que podría fatigar músculos ya comprometidos. Además, la tos débil en este contexto se aborda con tos asistida, no con IMT (que trabaja la inspiración, no la espiración).',cls:'warn'}
+      ]
+    },
+    {
+      letter:'B', color:'#fbbf24', bg:'rgba(251,191,36,.15)',
+      context:'FR 20 rpm, SpO₂ 90% con O₂ 2L. Crepitantes bilaterales. Matidez en vértices (fibrosis post-TBC). PaCO₂ 50 mmHg (hipercapnia crónica compensada, HCO₃⁻ 31). ¿Intervención B y manejo del O₂ en hipercapnia crónica?',
+      opts:[
+        {txt:'B con IR crónica hipercápnica. O₂ objetivo 88-92% (NO buscar 95-98% — riesgo de reducir el drive ventilatorio hipóxico en hipercapnicos). Aclaramiento adaptado a baja reserva: sesiones cortas 10-15 min máximo (fatiga muscular), Flutter en decúbito lateral o sentado (no Trendelenburg — empeora la mecánica ventilatoria). PEP baja (5-10 cmH₂O) para evitar atrapamiento aéreo. Aumentar O₂ a 4L durante el aclaramiento si SpO₂ <88%.',correct:true,
+          fb:'✓ Correcto y con el matiz crítico del O₂. La hipercapnia crónica compensada (PaCO₂ 50, HCO₃⁻ 31) indica que el centro respiratorio se ha "acostumbrado" a niveles elevados de CO₂ — el principal estímulo ventilatorio es ahora la HIPOXIA (drive hipóxico). Si se administra O₂ en exceso y la SpO₂ sube >95%, se elimina el drive hipóxico y el centro respiratorio "descansa" → hipoventilación → más hipercapnia → narcosis por CO₂. Objetivo SpO₂ 88-92% en hipercapnicos es la recomendación estándar. Las sesiones de aclaramiento cortas evitan la fatiga muscular.',cls:'good'},
+        {txt:'SpO₂ 90% con O₂ 2L = hipoxemia activa. Aumentar O₂ a 5L para SpO₂ >95% antes de cualquier intervención.',correct:false,
+          fb:'✗ Contraindicado en hipercapnia crónica. Aumentar el O₂ hasta SpO₂ >95% en un paciente con PaCO₂ 50 mmHg y HCO₃⁻ 31 (hipercápnico crónico) puede suprimir el drive hipóxico y precipitar narcosis por CO₂. El objetivo de SpO₂ 88-92% no es una negligencia — es el manejo correcto de la IR hipercápnica crónica. Esta es la diferencia fundamental entre hipoxemia aguda (target SpO₂ >94%) e IR hipercápnica crónica (target SpO₂ 88-92%).',cls:'bad'},
+        {txt:'Hipercapnia crónica + bronquiectasias = indicación de VMNI domiciliaria. Derivar urgente a neumología para VMNI antes de continuar la RP.',correct:false,
+          fb:'⚠ La VMNI domiciliaria puede estar indicada en hipercapnia crónica con PaCO₂ >55 mmHg o sintomática. PaCO₂ 50 mmHg está en zona gris. PERO la derivación "urgente" no es lo apropiado en un paciente que ya tiene seguimiento neumológico activo (en lista de trasplante). La valoración de VMNI domiciliaria es parte del seguimiento regular de neumología en este paciente — no es una urgencia en la visita de fisioterapia. Lo urgente aquí es no superar el umbral de SpO₂ con O₂ excesivo.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'C', color:'#4ade80', bg:'rgba(74,222,128,.15)',
+      context:'FC 88 lpm, PA 138/84. Cor pulmonale compensado (PSAP 38 mmHg, VD dilatado en eco). Sin edema activo. SpO₂ 90% con O₂ 2L. 6MWT 185m con SpO₂ nadir 84% sin O₂ suplementario. ¿Qué determinas en C y cómo prescripes el ejercicio pre-trasplante?',
+      opts:[
+        {txt:'Cor pulmonale compensado. La HTP leve (PSAP 38 mmHg) impone restricciones al ejercicio: evitar esfuerzos isométricos (Valsalva) que aumentan la postcarga del VD. Prescripción pre-trasplante: ejercicio aeróbico de baja-moderada intensidad, Borg 3-4 máximo, SpO₂ objetivo 88-92% (aumentar O₂ a 4L durante ejercicio). 6MWT con O₂ 4L como herramienta de prescripción y seguimiento. Objetivo: mantener la masa muscular periférica para mejorar el pronóstico post-trasplante.',correct:true,
+          fb:'✓ Correcto y con la lógica fisiopatológica del trasplante. El estado físico pre-trasplante es uno de los predictores más potentes del resultado post-trasplante. Los pacientes que entran al trasplante con mayor masa muscular y capacidad funcional tienen menor mortalidad post-quirúrgica y mejor recuperación. La prescripción de ejercicio pre-trasplante no busca "curar" la enfermedad — busca que el paciente llegue al trasplante en el mejor estado muscular posible. El Valsalva (levantamiento de pesos con apnea) está contraindicado porque aumenta bruscamente la postcarga del VD ya comprometido.',cls:'good'},
+        {txt:'6MWT 185m = capacidad funcional crítica. Contraindicado el ejercicio — riesgo de muerte súbita durante el esfuerzo.',correct:false,
+          fb:'✗ Incorrecto. La indicación del ejercicio pre-trasplante es precisamente para pacientes con capacidad funcional muy reducida — no existe un umbral de 6MWT por debajo del cual el ejercicio esté contraindicado. La muerte súbita durante el ejercicio supervisado en programas de RP es extremadamente rara incluso en pacientes con enfermedad avanzada. El riesgo de NO hacer ejercicio (mayor desacondicionamiento, peor pronóstico post-trasplante) supera ampliamente el riesgo del ejercicio supervisado y monitorizado.',cls:'bad'},
+        {txt:'PSAP 38 mmHg = HTP significativa. Derivar a cardiología antes de cualquier prescripción de ejercicio.',correct:false,
+          fb:'⚠ Excesivo. HTP leve (PSAP 25-40 mmHg) en el contexto de enfermedad pulmonar crónica avanzada es una complicación esperada (HTP del grupo 3 — secundaria a hipoxia crónica). No requiere derivación cardiológica urgente en un paciente ya en seguimiento multidisciplinar para trasplante. La restricción de ejercicio isométrico (Valsalva) y el objetivo de SpO₂ 88-92% son las adaptaciones correctas a la HTP leve en este contexto.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'D', color:'#a78bfa', bg:'rgba(167,139,250,.15)',
+      context:'Alerta, orientado. Resignado: "Llevo 30 años con esto. Ya no espero mejorar — solo que no empeore." Ha reducido su actividad al mínimo ("para qué si me fatigo con todo"). ¿Cómo abordas D?',
+      opts:[
+        {txt:'Baja autoeficacia y resignación crónica — barrera terapéutica mayor en enfermedad crónica avanzada. Intervención: (1) Validar la experiencia ("30 años con esta enfermedad es agotador"); (2) Redirigir el objetivo: no "mejorar" sino "llegar al trasplante en el mejor estado posible" — el ejercicio es preparación quirúrgica; (3) El estado físico pre-trasplante predice directamente la supervivencia post-trasplante: "el ejercicio es la preparación para la operación, como un deportista antes de la competición".',correct:true,
+          fb:'✓ Excelente. La baja autoeficacia en enfermedad crónica avanzada es comprensible y respetable — el paciente ha tenido razón muchas veces en que las cosas empeoran. La clave no es contradecirlo ("¡claro que puede mejorar!") sino redirigir el objetivo a algo concreto y motivador: el trasplante como horizonte real. El encuadre del ejercicio como "preparación quirúrgica" (comparable a la fisioterapia pre-operatoria) cambia la narrativa de "ejercicio para mejorar la enfermedad" (que él sabe que no es posible) a "prepararse para la operación que sí puede cambiar todo".',cls:'good'},
+        {txt:'La resignación es una respuesta adaptativa a la enfermedad crónica. Respetar su actitud y no insistir con el ejercicio.',correct:false,
+          fb:'✗ Inadecuado. Respetar la autonomía del paciente es fundamental, pero la resignación que lleva a la inactividad total en un candidato a trasplante es clínicamente perjudicial: el desacondicionamiento progresivo empeora el pronóstico post-trasplante. La intervención del fisioterapeuta no es "insistir" contra su voluntad, sino explorar y modificar la narrativa que le lleva a la inactividad. Si tras una intervención educativa bien hecha el paciente sigue rechazando el ejercicio, entonces sí respetar su autonomía.',cls:'bad'},
+        {txt:'Resignación en enfermedad terminal = depresión mayor. Derivar a psiquiatría para tratamiento antes de continuar la RP.',correct:false,
+          fb:'⚠ La resignación crónica en enfermedad avanzada no es automáticamente una depresión mayor que requiere psiquiatría. Es una respuesta comprensible a décadas de enfermedad. Los criterios de depresión mayor (anhedonia, insomnio, pérdida de apetito, ideación suicida, llanto frecuente) deben evaluarse activamente — si están presentes, la derivación es apropiada. Pero etiquetar la resignación directamente como depresión mayor e indicar psiquiatría sin evaluación puede medicalizar una respuesta adaptativa.',cls:'warn'}
+      ]
+    },
+    {
+      letter:'E', color:'#38bdf8', bg:'rgba(56,189,248,.15)',
+      context:'Tiotropio, formoterol/fluticasona, colistina nebulizada 1 MUI/12h (requiere sala de aislamiento), O₂ domiciliario 2L/min (4L durante ejercicio). 2 episodios de hemoptisis leve previos. ¿Qué condiciona E?',
+      opts:[
+        {txt:'Puntos críticos de E: (1) Colistina nebulizada — requiere sala/cabina de aislamiento para la nebulización (aerosol infeccioso con Pseudomonas XDR — riesgo para otros pacientes y personal); (2) O₂ de ejercicio 4L/min — objetivo SpO₂ 88-92%, NO superar; (3) Antecedente de hemoptisis → contraindicación de percusión manual, Trendelenburg y técnicas de alta presión espiratoria; (4) Sin anticoagulación — no modifica el plan; (5) Tiotropio + formoterol — broncodilatación de mantenimiento, no ajustar.',correct:true,
+          fb:'✓ Correcto. El punto más crítico es la colistina nebulizada con Pseudomonas XDR: este antibiótico nebulizado genera aerosoles con la bacteria multirresistente. La administración en sala abierta expone a otros pacientes y al personal sanitario a la Pseudomonas XDR. El protocolo correcto es una sala individual o cabina de aislamiento de presión negativa con filtro HEPA. El fisioterapeuta que realiza fisioterapia inmediatamente después de la nebulización de colistina en la misma habitación sin ventilación adecuada puede estar expuesto. Este es un conocimiento de seguridad laboral que el fisioterapeuta debe tener.',cls:'good'},
+        {txt:'Colistina nebulizada = antibiótico tópico. No genera aerosoles infecciosos — no requiere precauciones especiales.',correct:false,
+          fb:'✗ Incorrecto y potencialmente peligroso. La colistina nebulizada SÍ genera aerosoles con la bacteria en el esputo del paciente durante y después de la nebulización. Con Pseudomonas aeruginosa XDR (extremadamente resistente), la diseminación aérea a otros pacientes o personal es un riesgo real. Las guías de control de infecciones en FQ (y aplicables a bronquiectasias con Pseudomonas XDR) establecen protocolos de aislamiento específicos para las nebulizaciones.',cls:'bad'},
+        {txt:'O₂ 4L durante ejercicio = O₂ alto flujo. Contraindicado en hipercápnico crónico — riesgo de narcosis por CO₂.',correct:false,
+          fb:'⚠ El razonamiento sobre el riesgo de narcosis es correcto en general, pero la conclusión de "contraindicado" es incorrecta. El O₂ 4L durante el ejercicio está prescrito por el neumólogo precisamente para compensar la mayor demanda durante el esfuerzo. El objetivo SpO₂ 88-92% se mantiene también con 4L — no se administra O₂ para llevar SpO₂ a 98%. El riesgo de narcosis existe si SpO₂ sube >95% de forma sostenida con el O₂ suplementario, por eso la monitorización continua de SpO₂ durante el ejercicio es obligatoria.',cls:'warn'}
+      ]
+    }
+  ],
+  exerciseParams:{
+    vo2peak:10,
+    restVitals:{fc:88,fr:20,spo2:90,borg:4,pas:138},
+    phases:[
+      {name:'Aclaramiento adaptado',pct:10,fc:90,fr:21,spo2:89,borg:5,pas:140,log:'Aclaramiento corto 10 min (ELTGOL + Flutter) — FC 90 lpm · FR 21 rpm · SpO₂ 89% · Borg 5 · PAS 140 mmHg · Con O₂ 4L'},
+      {name:'Conservación energía',pct:5,fc:88,fr:20,spo2:90,borg:4,pas:138,log:'Técnicas conservación energía — FC 88 lpm · FR 20 rpm · SpO₂ 90% · Borg 4 · PAS 138 mmHg · Descanso activo'},
+      {name:'Marcha 50m con O₂ 4L',pct:30,fc:96,fr:22,spo2:88,borg:5,pas:144,log:'Marcha 50m con O₂ 4L/min — FC 96 lpm · FR 22 rpm · SpO₂ 88% · Borg 5 · PAS 144 mmHg · LÍMITE — SpO₂ objetivo 88-92%'},
+      {name:'Recuperación sentado',pct:8,fc:90,fr:21,spo2:89,borg:4,pas:140,log:'Recuperación sentado — FC 90 lpm · FR 21 rpm · SpO₂ 89% · Borg 4 · PAS 140 mmHg · Lenta normalización'},
+      {name:'Reposo supervisado',pct:5,fc:88,fr:20,spo2:90,borg:4,pas:138,log:'Reposo supervisado — FC 88 lpm · FR 20 rpm · SpO₂ 90% · Borg 4 · PAS 138 mmHg · Retorno a valores basales'}
+    ],
+    physiologyNotes:'En bronquiectasias avanzadas post-TBC (FEV₁ 29%, HTP leve, O₂ domiciliario), el VO₂ pico está muy severamente reducido (~10 mL/kg/min, similar a NYHA IV). La limitación es mixta: ventilatoria (obstrucción severa + fibrosis + hiperinflación), vascular (HTP reduce el gasto cardíaco en ejercicio) y muscular periférica (desacondicionamiento severo). El objetivo del ejercicio pre-trasplante no es mejorar el VO₂ pico (imposible con esta función pulmonar) sino mantener la masa muscular periférica: los pacientes con mayor masa muscular en el momento del trasplante tienen menor mortalidad a 1 año y menor tiempo en UCI post-trasplante.'
+  },
+  goals:['Mantener masa muscular periférica pre-trasplante (evitar mayor desacondicionamiento)','Aclaramiento de mantenimiento adaptado a baja reserva (prevenir exacerbaciones)','Educación en técnicas de conservación de energía para actividades de vida diaria','Preparación psicológica para el trasplante: ejercicio como "entrenamiento pre-quirúrgico"'],
+  interventions:['Aclaramiento corto 10-15 min: ELTGOL + Flutter en posición suave — 2×/día','Tos asistida (compresión abdominal) — SIN percusión manual (antecedente hemoptisis)','Marcha supervisada con O₂ 4L/min, SpO₂ objetivo 88-92%, Borg máximo 5','Técnicas de conservación de energía: fraccionamiento de tareas, planificación de actividades','Colistina nebulizada en sala de aislamiento — fisioterapia 60 min después de la nebulización']
+},
 ];
 
 /* ====================================================
