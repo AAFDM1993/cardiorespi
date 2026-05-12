@@ -363,6 +363,26 @@
   }
 }
 
+/* ════════════════════════════════
+   HUD CONTROLS (Pause / Zoom)
+════════════════════════════════ */
+.hud-controls{display:flex;align-items:center;gap:5px;margin:0 .5rem}
+.hud-btn{
+  padding:3px 10px;
+  border-radius:var(--rs);
+  background:rgba(74,158,255,.1);
+  border:1px solid rgba(74,158,255,.25);
+  color:#4a9eff;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:var(--fh);
+  transition:all .2s;
+  white-space:nowrap;
+}
+.hud-btn:hover{background:rgba(74,158,255,.2)}
+.hud-btn.active{background:rgba(74,158,255,.25);border-color:rgba(74,158,255,.5)}
+
 </style>
 </head>
 <body>
@@ -390,8 +410,12 @@
       <div class="ecg-wrap" id="sim-ecg-wrap">
         <div class="ecg-hud">
           <div class="ecg-hud-left">
-            <div class="ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-meta" id="sim-ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
             <div class="ecg-rhythm-name" id="sim-rhythm-label">Ritmo Sinusal Normal</div>
+          </div>
+          <div class="hud-controls">
+            <button class="hud-btn" id="simPauseBtn" onclick="toggleSimPause()">⏸ Pausar</button>
+            <button class="hud-btn" id="simZoomBtn" onclick="cycleSimZoom()">1×</button>
           </div>
           <div class="ecg-bpm-display" id="sim-hr-badge">72<sub>lpm</sub></div>
         </div>
@@ -471,8 +495,12 @@
       <div class="ecg-wrap" id="learn-ecg-wrap">
         <div class="ecg-hud">
           <div class="ecg-hud-left">
-            <div class="ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
+            <div class="ecg-meta" id="learn-ecg-meta">DII &nbsp;·&nbsp; 25 mm/s &nbsp;·&nbsp; 10 mm/mV</div>
             <div class="ecg-rhythm-name" id="learn-rhythm-label">Ritmo Sinusal Normal</div>
+          </div>
+          <div class="hud-controls">
+            <button class="hud-btn" id="learnPauseBtn" onclick="toggleLearnPause()">⏸</button>
+            <button class="hud-btn" id="learnZoomBtn" onclick="cycleLearnZoom()">1×</button>
           </div>
           <div class="ecg-meta" style="font-size:.65rem">Modo estudio</div>
         </div>
