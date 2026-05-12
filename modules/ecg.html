@@ -1187,10 +1187,28 @@ function setMode(m, btn) {
   activeMode = m;
 
   if (m === 'sim') {
+    simPaused = false;
+    simZoomIdx = 0;
+    simRenderer.setZoom(1);
+    const pb = document.getElementById('simPauseBtn');
+    if (pb) { pb.textContent = '⏸ Pausar'; pb.classList.remove('active'); }
+    const zb = document.getElementById('simZoomBtn');
+    if (zb) zb.textContent = '1×';
+    const mb = document.getElementById('sim-ecg-meta');
+    if (mb) mb.textContent = 'DII  ·  25 mm/s  ·  10 mm/mV';
     const r = RHYTHMS.find(r => r.id === simRhythmId) || RHYTHMS[0];
     engine.reset(r.id, simHR);
     simRenderer.start(engine);
   } else if (m === 'learn') {
+    learnPaused = false;
+    learnZoomIdx = 0;
+    learnRenderer.setZoom(1);
+    const pb = document.getElementById('learnPauseBtn');
+    if (pb) { pb.textContent = '⏸'; pb.classList.remove('active'); }
+    const zb = document.getElementById('learnZoomBtn');
+    if (zb) zb.textContent = '1×';
+    const mb = document.getElementById('learn-ecg-meta');
+    if (mb) mb.textContent = 'DII  ·  25 mm/s  ·  10 mm/mV';
     const r = RHYTHMS.find(r => r.id === learnRhythmId) || RHYTHMS[0];
     engine.reset(r.id, r.hrDefault);
     learnRenderer.start(engine);
