@@ -1097,6 +1097,68 @@ class ECGRenderer {
 }
 
 /* ══════════════════════════════════════════════════════
+   PAUSE + ZOOM CONTROLS
+═══════════════════════════════════════════════════════ */
+const ZOOM_LEVELS = [1, 2, 4];
+const ZOOM_SPEEDS = ['25 mm/s', '12.5 mm/s', '6.25 mm/s'];
+
+let simPaused = false;
+let simZoomIdx = 0;
+
+function toggleSimPause() {
+  simPaused = !simPaused;
+  const btn = document.getElementById('simPauseBtn');
+  if (simPaused) {
+    simRenderer.stop();
+    btn.textContent = '▶ Reanudar';
+    btn.classList.add('active');
+  } else {
+    const r = RHYTHMS.find(r => r.id === simRhythmId) || RHYTHMS[0];
+    engine.reset(r.id, simHR);
+    simRenderer.start(engine);
+    btn.textContent = '⏸ Pausar';
+    btn.classList.remove('active');
+  }
+}
+
+function cycleSimZoom() {
+  simZoomIdx = (simZoomIdx + 1) % ZOOM_LEVELS.length;
+  const n = ZOOM_LEVELS[simZoomIdx];
+  simRenderer.setZoom(n);
+  document.getElementById('simZoomBtn').textContent = n + '×';
+  document.getElementById('sim-ecg-meta').textContent =
+    'DII  ·  ' + ZOOM_SPEEDS[simZoomIdx] + '  ·  10 mm/mV';
+}
+
+let learnPaused = false;
+let learnZoomIdx = 0;
+
+function toggleLearnPause() {
+  learnPaused = !learnPaused;
+  const btn = document.getElementById('learnPauseBtn');
+  if (learnPaused) {
+    learnRenderer.stop();
+    btn.textContent = '▶';
+    btn.classList.add('active');
+  } else {
+    const r = RHYTHMS.find(r => r.id === learnRhythmId) || RHYTHMS[0];
+    engine.reset(r.id, r.hrDefault);
+    learnRenderer.start(engine);
+    btn.textContent = '⏸';
+    btn.classList.remove('active');
+  }
+}
+
+function cycleLearnZoom() {
+  learnZoomIdx = (learnZoomIdx + 1) % ZOOM_LEVELS.length;
+  const n = ZOOM_LEVELS[learnZoomIdx];
+  learnRenderer.setZoom(n);
+  document.getElementById('learnZoomBtn').textContent = n + '×';
+  document.getElementById('learn-ecg-meta').textContent =
+    'DII  ·  ' + ZOOM_SPEEDS[learnZoomIdx] + '  ·  10 mm/mV';
+}
+
+/* ══════════════════════════════════════════════════════
    THREE RENDERERS (one per canvas)
 ═══════════════════════════════════════════════════════ */
 let simRenderer, learnRenderer, evalRenderer;
