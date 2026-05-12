@@ -972,7 +972,8 @@ class ECGRenderer {
     this.ctx = this.canvas.getContext('2d');
     this.h = h;
     this.resize();
-    this.bufLen = Math.round(this.canvas.width / PPS) + 10;
+    this.pps = PPS;
+    this.bufLen = Math.round(this.canvas.width / this.pps) + 10;
     this.buf = new Float32Array(this.bufLen).fill(0);
     this.writePos = 0;
     this.readPos = 0;
@@ -987,6 +988,13 @@ class ECGRenderer {
     this.canvas.width = this.canvas.offsetWidth || 760;
     this.canvas.height = this.h;
     this.baseline = this.h * 0.55;
+  }
+  setZoom(multiplier) {
+    this.pps = PPS * multiplier;
+    this.bufLen = Math.round((this.canvas.width || 760) / this.pps) + 10;
+    this.buf = new Float32Array(this.bufLen).fill(0);
+    this.writePos = 0;
+    this.readPos = 0;
   }
   start(eng) {
     this.engineRef = eng;
@@ -1059,7 +1067,7 @@ class ECGRenderer {
     ctx.setLineDash([]);
 
     /* waveform — compute how many samples fit on screen */
-    const samplesOnScreen = Math.ceil(W / PPS);
+    const samplesOnScreen = Math.ceil(W / this.pps);
     const total = this.writePos;
     if (total < 2) return;
 
@@ -1075,7 +1083,7 @@ class ECGRenderer {
     ctx.beginPath();
     let started = false;
     for (let px = 0; px < W; px++) {
-      const sIdx = Math.floor((total - 1) - (W - 1 - px) / PPS);
+      const sIdx = Math.floor((total - 1) - (W - 1 - px) / this.pps);
       if (sIdx < 0) continue;
       const v = this.buf[((sIdx % this.bufLen) + this.bufLen) % this.bufLen];
       const x = px;
@@ -1404,7 +1412,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('resize', () => {
   [simRenderer, learnRenderer, evalRenderer].forEach(r => {
-    if (r) { r.resize(); r.bufLen = Math.round(r.canvas.width / PPS) + 10; r.buf = new Float32Array(r.bufLen).fill(0); }
+    if (r) { r.resize(); r.bufLen = Math.round(r.canvas.width / r.pps) + 10; r.buf = new Float32Array(r.bufLen).fill(0); }
   });
 });
 </script>
