@@ -476,6 +476,89 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
     </div><!-- /calc-wrap -->
   </div><!-- /tab-qrisk -->
 
+  <div class="panel" id="tab-acsm">
+
+    <p style="color:var(--text2);font-size:13px;max-width:720px;line-height:1.75;margin-bottom:1rem">
+      <strong>Estratificación ACSM</strong> (Guidelines for Exercise Testing and Prescription) — no calcula un % de riesgo, sino una <strong>categoría</strong> (Bajo/Moderado/Alto) según el conteo de factores de riesgo, usada para decidir la necesidad de evaluación médica antes de un programa de ejercicio.
+    </p>
+
+    <div class="calc-wrap">
+      <div class="form-col">
+
+        <div class="toggle-group">
+          <button class="tbtn on" id="acsm-btn-M" onclick="setSexAcsm('M')">♂ Hombre</button>
+          <button class="tbtn" id="acsm-btn-F" onclick="setSexAcsm('F')">♀ Mujer</button>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Edad</span><span class="sl-val" id="acsm-v-age">50 años</span></div>
+          <input type="range" id="acsm-sl-age" min="20" max="79" value="50" oninput="state.acsm.age=+this.value;document.getElementById('acsm-v-age').textContent=this.value+' años';updateAcsm()">
+          <div class="sl-ticks"><span>20</span><span>50</span><span>79</span></div>
+          <div style="font-size:10.5px;color:var(--text3);margin-top:.3rem">Factor positivo si edad ≥45 (hombre) o ≥55 (mujer) — se calcula automáticamente.</div>
+        </div>
+
+        <div class="group-label" style="margin-top:1.25rem">Factores de riesgo positivos</div>
+
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-famhist" onchange="state.acsm.famHist=this.checked;updateAcsm()">
+          Historia familiar: IAM/revascularización/muerte súbita &lt;55a (familiar 1er grado masculino) o &lt;65a (femenino)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-smoke" onchange="state.acsm.smoking=this.checked;updateAcsm()">
+          Tabaquismo actual, cesación &lt;6 meses, o exposición pasiva
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-sedentary" onchange="state.acsm.sedentary=this.checked;updateAcsm()">
+          Sedentarismo (&lt;30 min actividad moderada ≥3 días/sem, ≥3 meses)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-obesity" onchange="state.acsm.obesity=this.checked;updateAcsm()">
+          Obesidad (IMC ≥30, o cintura &gt;102cm H / &gt;88cm M)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-htn" onchange="state.acsm.htn=this.checked;updateAcsm()">
+          Hipertensión (PAS ≥130 o PAD ≥80, o tratamiento antihipertensivo)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-dyslipidemia" onchange="state.acsm.dyslipidemia=this.checked;updateAcsm()">
+          Dislipidemia (LDL ≥130, HDL &lt;40, tratamiento, o CT ≥200 si no hay LDL)
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-prediabetes" onchange="state.acsm.prediabetes=this.checked;updateAcsm()">
+          Prediabetes (glucosa ayunas 100-125 mg/dL o HbA1c 5.7-6.4%)
+        </label>
+
+        <div class="group-label" style="margin-top:1.25rem">Factor negativo</div>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-highhdl" onchange="state.acsm.highHdl=this.checked;updateAcsm()">
+          HDL ≥60 mg/dL (resta 1 factor)
+        </label>
+
+        <div class="group-label" style="margin-top:1.25rem">Enfermedad o síntomas (anulan el conteo → Alto)</div>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-knowndisease" onchange="state.acsm.knownDisease=this.checked;updateAcsm()">
+          Enfermedad cardiovascular/pulmonar/metabólica conocida
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="acsm-ck-symptoms" onchange="state.acsm.symptoms=this.checked;updateAcsm()">
+          Presenta signos/síntomas sugestivos (dolor torácico, disnea anormal, síncope, ortopnea/DPN, edema de tobillo, palpitaciones, claudicación intermitente, soplo conocido, fatiga inusual)
+        </label>
+
+      </div><!-- /form-col -->
+
+      <div class="output-col">
+        <div id="acsm-cat-wrap" style="text-align:center">
+          <div id="acsm-cat-badge" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010;font-size:14px;padding:8px 18px">—</div>
+        </div>
+
+        <div class="pts-box">
+          <h4>Factores marcados</h4>
+          <div id="acsm-factor-list" style="font-size:12px;color:var(--text2);line-height:1.6">Ningún factor marcado.</div>
+        </div>
+      </div><!-- /output-col -->
+    </div><!-- /calc-wrap -->
+  </div><!-- /tab-acsm -->
+
   <!-- ── KILLIP ── -->
   <div class="group-label">Clasificación Killip-Kimball · Solo si el paciente es post-IAM</div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:.9rem">Si el paciente NO tiene IAM previo, deja sin seleccionar. La prescripción se basa solo en el score Framingham.</div>
@@ -497,6 +580,7 @@ const state = {
   score2: { sex:'M', age:55, sbp:140, tc:200, hdl:50, smoking:false, region:'low' },
   assign: { sex:'M', age:50, sbp:135, tc:210, hdl:48, smoking:false, cigsPerDay:10, famHist:false, diabetes:false, ses:4 },
   qrisk: { sex:'M', age:55, ethnicity:'white', bmi:26, sbp:135, tc:200, hdl:50, smokingCat:0, diabetes:'none', famHist:false, afib:false, ckd:false },
+  acsm: { sex:'M', age:50, famHist:false, smoking:false, sedentary:false, obesity:false, htn:false, dyslipidemia:false, prediabetes:false, highHdl:false, knownDisease:false, symptoms:false },
   killip: null,
 };
 
@@ -782,6 +866,45 @@ function updateQrisk(){
     const n=bd[k];
     el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
     el.textContent=(n>0?'+':'')+n;
+  }
+  renderFITT();
+}
+
+// ── ACSM — estratificacion de factores de riesgo ────────────────────────
+function setSexAcsm(s){
+  state.acsm.sex=s;
+  document.getElementById('acsm-btn-M').className='tbtn'+(s==='M'?' on':'');
+  document.getElementById('acsm-btn-F').className='tbtn'+(s==='F'?' on-pink':'');
+  updateAcsm();
+}
+
+function calcAcsm(s){
+  if (s.knownDisease || s.symptoms) return { category: 'alto', count: null };
+  const ageFactor = (s.sex === 'M' && s.age >= 45) || (s.sex === 'F' && s.age >= 55);
+  const labels = ['Edad','Hist. familiar','Tabaquismo','Sedentarismo','Obesidad','Hipertensión','Dislipidemia','Prediabetes'];
+  const flags = [ageFactor, s.famHist, s.smoking, s.sedentary, s.obesity, s.htn, s.dyslipidemia, s.prediabetes];
+  let count = flags.filter(Boolean).length;
+  if (s.highHdl) count = Math.max(0, count - 1);
+  const activeLabels = labels.filter((_,i)=>flags[i]);
+  return { category: count >= 2 ? 'moderado' : 'bajo', count, activeLabels };
+}
+
+function updateAcsm(){
+  const { category, activeLabels } = calcAcsm(state.acsm);
+  const badge = document.getElementById('acsm-cat-badge');
+  const {color,label,bg} =
+    category==='bajo'     ? {color:'#4ade80',label:'Riesgo bajo',bg:'#4ade8010'} :
+    category==='moderado' ? {color:'#fbbf24',label:'Riesgo moderado',bg:'#fbbf2410'} :
+                             {color:'#ef4444',label:'Riesgo alto',bg:'#ef444410'};
+  badge.style.color=color; badge.style.borderColor=color+'44'; badge.style.background=bg; badge.textContent=label;
+
+  const list = document.getElementById('acsm-factor-list');
+  if (state.acsm.knownDisease || state.acsm.symptoms) {
+    list.textContent = 'Enfermedad conocida o síntomas presentes — clasificación Alto independiente del conteo.';
+  } else if (!activeLabels || activeLabels.length === 0) {
+    list.textContent = 'Ningún factor marcado.';
+  } else {
+    list.textContent = activeLabels.join(', ') + (state.acsm.highHdl ? ' (HDL alto resta 1 factor)' : '');
   }
   renderFITT();
 }
