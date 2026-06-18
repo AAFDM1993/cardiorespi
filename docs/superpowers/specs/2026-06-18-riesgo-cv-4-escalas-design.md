@@ -335,7 +335,7 @@ const RIESGO_CV_CASES = [
 ];
 ```
 
-Campos `knownDisease`/`symptoms` de ACSM se omiten (quedan `false`) en los 10 casos: las 5 escalas asumen prevención primaria (sin ECV establecida), igual que ya aclara el texto introductorio del módulo.
+`symptoms` de ACSM se omite (queda `false`) en los 10 casos — ninguno presenta síntomas activos. `knownDisease` se deriva de `diabetes`/`ckd` (ver nota de fidelidad ACSM más abajo), no de una "ECV establecida": las 5 escalas siguen asumiendo prevención primaria (sin IAM/ACV/revascularización previa), igual que ya aclara el texto introductorio del módulo.
 
 ### Mapeo a las 5 pestañas
 
@@ -363,7 +363,8 @@ function applyCaseToScales(c) {
 
   state.acsm = { sex:c.sex, age:c.age, famHist:c.famHist, smoking:acsmSmoking, sedentary:c.sedentary,
     obesity:c.bmi>=30, htn:c.sbp>=130||c.bpTreated, dyslipidemia:c.hdl<40||c.dyslipidemiaTx||c.tc>=200,
-    prediabetes:!!c.prediabetic, highHdl:c.hdl>=60, knownDisease:false, symptoms:false };
+    prediabetes:!!c.prediabetic, highHdl:c.hdl>=60,
+    knownDisease:(c.diabetes!=='none')||c.ckd, symptoms:false };
 
   syncAllInputsFromState();  // posiciona sliders/checkboxes de las 5 pestañas según el state actualizado
   updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm();
@@ -372,6 +373,8 @@ function applyCaseToScales(c) {
 ```
 
 `syncAllInputsFromState()` es una función nueva (no existía) que, para cada pestaña, recorre sus inputs y aplica `.value`/`.checked` + actualiza los spans de texto (`v-age`, `v-tc`, etc.) a partir del `state` correspondiente — necesaria porque hoy los inputs solo se actualizan vía el evento `oninput`/`onchange` del usuario, nunca programáticamente.
+
+**Nota de fidelidad ACSM:** diabetes mellitus (tipo 1 o 2) y enfermedad renal crónica son "enfermedad metabólica conocida" en el esquema ACSM real — disparan automáticamente la categoría Alto (vía `knownDisease`), no solo suman al conteo de factores. `symptoms` se mantiene en `false` para los 10 casos (ninguno presenta síntomas activos). Esto solo afecta a los casos 5 y 7 (los únicos con diabetes/ERC), y no interfiere con los casos de contraste diseñados (#7, #8, #9 comparan las 4 escalas numéricas entre sí, no involucran la categoría ACSM; #10 no tiene diabetes ni ERC).
 
 ---
 
