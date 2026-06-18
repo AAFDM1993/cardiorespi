@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mecánica Respiratoria — Simulador</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/fisioresp.css">
+<style id="anim-style"></style>
+<style>
+:root { --dc:#fb923c; }
+
+/* ── TABS ── */
+.mode-nav { display:flex; gap:.4rem; padding:1rem 1.5rem .6rem; border-bottom:1px solid var(--border); background:var(--bg2); position:sticky; top:0; z-index:10; }
+.mode-tab { padding:.45rem 1.1rem; border-radius:100px; font-size:12.5px; font-weight:600; font-family:var(--fb); cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text2); transition:all .2s; }
+.mode-tab:hover { color:var(--text); border-color:var(--dc); }
+.mode-tab.active { background:var(--dc); border-color:var(--dc); color:#000; }
+
+/* ── MAIN GRID ── */
+.lb-grid { display:grid; grid-template-columns:288px 1fr 272px; gap:1rem; max-width:1420px; margin:0 auto; padding:1rem 1.5rem; align-items:start; }
+@media(max-width:980px){ .lb-grid{ grid-template-columns:1fr; } }
+
+/* ── PANEL BASE ── */
+/* override fisioresp.css .panel{display:none} usando selector más específico */
+.panel { background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; border-top:3px solid var(--dc); }
+section .panel { display:block; }
+.panel-sep { height:1px; background:var(--border); }
+.sect-lbl { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:var(--text3); padding:.65rem 1rem .3rem; }
+
+/* ── DISEASE SELECTOR ── */
+.dis-groups { padding:.5rem .9rem .7rem; display:flex; flex-direction:column; gap:.3rem; }
+.dis-group-hd { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:var(--text3); padding:.35rem 0 .2rem; border-top:1px solid rgba(255,255,255,.05); margin-top:.25rem; }
+.dis-group-hd:first-child { border-top:none; margin-top:0; }
+.dis-pills { display:flex; flex-wrap:wrap; gap:.3rem; }
+.dis-btn { display:flex; align-items:center; gap:.35rem; padding:.38rem .75rem; border-radius:100px; background:var(--bg3); border:1px solid var(--border); color:var(--text2); font-size:11.5px; font-family:var(--fb); cursor:pointer; transition:all .18s; white-space:nowrap; }
+.dis-btn:hover { border-color:var(--dc); color:var(--text); }
+.dis-btn.active { border-color:var(--dc); background:rgba(255,255,255,.05); color:var(--text); font-weight:600; box-shadow:0 0 0 1px var(--dc) inset; }
+.dis-btn .dis-icon { font-size:13px; line-height:1; }
+
+/* ── PATIENT CARD ── */
+.pat-sect { padding:.85rem 1rem; display:flex; align-items:flex-start; gap:.8rem; }
+.pat-ava { width:42px; height:42px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0; }
+.pat-info { flex:1; min-width:0; }
+.pat-name { font-weight:700; font-size:14px; color:var(--text); }
+.pat-meta { font-size:10.5px; color:var(--text3); margin-top:1px; }
+.pat-dx   { font-size:11.5px; color:var(--dc); margin-top:2px; font-weight:500; }
+.pat-tag  { font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.35px; padding:2px 8px; border-radius:100px; flex-shrink:0; margin-top:3px; }
+.pat-tag.obst { background:rgba(251,146,60,.12); color:#fb923c; border:1px solid rgba(251,146,60,.28); }
+.pat-tag.rest { background:rgba(167,139,250,.12); color:#a78bfa; border:1px solid rgba(167,139,250,.28); }
+.pat-clinical-wrap { padding:.5rem 1rem .8rem; }
+.pat-clinical { font-size:11.5px; color:var(--text2); line-height:1.65; background:var(--bg3); border-radius:var(--rs); padding:.55rem .8rem; border-left:2px solid rgba(255,255,255,.07); }
+
+/* ── PARAMS ── */
+.params-list { padding:.4rem 1rem .8rem; display:flex; flex-direction:column; gap:.05rem; }
+.param-item { padding:.42rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.param-row1 { display:flex; align-items:center; gap:.4rem; }
+.param-name { font-size:11px; color:var(--text2); flex:1; }
+.param-abbr { font-family:var(--fm); font-size:9px; color:var(--text3); }
+.param-num  { font-family:var(--fm); font-size:12px; color:var(--text); min-width:50px; text-align:right; }
+.param-arrow { font-size:11px; font-weight:700; min-width:24px; text-align:center; }
+.param-arrow.ok  { color:#4ade80; }
+.param-arrow.u1  { color:#fbbf24; }
+.param-arrow.u2  { color:#f97316; }
+.param-arrow.u3  { color:#ef4444; }
+.param-arrow.d1  { color:#fbbf24; }
+.param-arrow.d2  { color:#f97316; }
+.param-arrow.d3  { color:#ef4444; }
+.param-bar-wrap { margin-top:4px; height:4px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
+.param-bar { height:100%; border-radius:2px; transition:width .5s, background .5s; }
+
+/* ── SVG THORAX ── */
+.svg-wrap { background:linear-gradient(160deg,rgba(15,23,42,.9),rgba(8,15,30,.9)); border:1px solid var(--border); border-radius:var(--r); padding:.75rem; display:flex; align-items:center; justify-content:center; min-height:310px; }
+.thorax-svg { width:100%; max-width:410px; height:auto; display:block; }
+
+/* ── VITALS ── */
+.vitals-wrap { padding:.65rem .9rem .75rem; }
+.vitals-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.38rem; }
+@media(min-width:980px){ .vitals-grid{ grid-template-columns:repeat(6,1fr); } }
+.vcard { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:.55rem .7rem .7rem; position:relative; overflow:hidden; transition:all .4s; }
+.vcard::after { content:''; position:absolute; bottom:0; left:6px; right:6px; height:2px; border-radius:2px; transition:all .4s; }
+.vcard.ok    { border-color:rgba(74,222,128,.3);  } .vcard.ok::after    { background:#4ade80; }
+.vcard.warn  { border-color:rgba(251,191,36,.35); } .vcard.warn::after  { background:#fbbf24; }
+.vcard.alarm { border-color:rgba(248,113,113,.4); } .vcard.alarm::after { background:#f87171; }
+.vcard-lbl { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:var(--text3); margin-bottom:3px; }
+.vcard-val { font-family:var(--fm); font-size:1.5rem; line-height:1; font-weight:500; transition:all .4s; }
+.vcard.ok   .vcard-val { color:#4ade80; text-shadow:0 0 14px rgba(74,222,128,.4); }
+.vcard.warn .vcard-val { color:#fbbf24; text-shadow:0 0 14px rgba(251,191,36,.4); }
+.vcard.alarm .vcard-val{ color:#f87171; text-shadow:0 0 14px rgba(248,113,113,.4); }
+.vcard-val small { font-size:.52rem; color:var(--text3); font-family:var(--fb); margin-left:1px; }
+/* WoB dots */
+.wob-dots { display:flex; gap:4px; margin-top:4px; }
+.wob-dot  { width:11px; height:11px; border-radius:50%; background:var(--bg2); border:1px solid var(--border); transition:all .35s; }
+.wob-dot.on  { background:var(--dc); border-color:var(--dc); box-shadow:0 0 6px var(--dc); }
+.wob-dot.red { background:#f87171; border-color:#f87171; box-shadow:0 0 6px #f87171; }
+
+/* ── PHYSIOPATH ── */
+.physio-wrap { padding:.5rem 1rem .8rem; }
+.physio-text { font-size:11px; color:var(--text3); line-height:1.7; }
+
+/* ── TECHNIQUE BUTTONS ── */
+.tech-groups { padding:.5rem .9rem .7rem; display:flex; flex-direction:column; gap:.6rem; }
+.tech-group-hd { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:var(--text3); padding:.3rem 0 .15rem; display:flex; align-items:center; gap:.4rem; border-bottom:1px solid rgba(255,255,255,.05); }
+.tech-btns { display:flex; flex-direction:column; gap:.3rem; margin-top:.25rem; }
+.tech-btn { display:flex; align-items:center; gap:.6rem; padding:.5rem .75rem; border-radius:var(--rs); background:var(--bg3); border:1px solid var(--border); border-left:2.5px solid var(--tb,rgba(255,255,255,.1)); color:var(--text2); font-size:12px; font-family:var(--fb); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
+.tech-btn:hover { background:var(--bg2); color:var(--text); }
+.tech-btn.active { background:rgba(255,255,255,.04); color:var(--text); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset; }
+.tech-btn .t-icon { font-size:14px; line-height:1; flex-shrink:0; }
+.tech-btn .t-name { flex:1; font-size:11.5px; }
+.tech-btn .t-badge { font-size:8px; padding:2px 6px; border-radius:100px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; flex-shrink:0; white-space:nowrap; }
+.badge-best    { background:rgba(56,189,248,.15);  color:#38bdf8; }
+.badge-good    { background:rgba(74,222,128,.12);  color:#4ade80; }
+.badge-warn    { background:rgba(251,191,36,.15);  color:#fbbf24; }
+.badge-bad     { background:rgba(248,113,113,.12); color:#f87171; }
+.badge-neutral { background:rgba(100,116,139,.15); color:#94a3b8; }
+
+/* ── TECHNIQUE POPUP ── */
+.tech-popup { margin:.3rem .9rem .6rem; padding:.7rem .9rem; background:var(--bg3); border-radius:var(--rs); border-left:3px solid var(--tb-pop,var(--dc)); display:none; }
+.tech-popup.show { display:block; }
+.tp-head { display:flex; align-items:center; gap:.5rem; margin-bottom:.45rem; }
+.tp-name { font-size:13px; font-weight:700; color:var(--text); flex:1; }
+.tp-deltas { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:.45rem; }
+.tp-delta  { font-family:var(--fm); font-size:10px; padding:2px 7px; border-radius:100px; background:rgba(255,255,255,.06); color:var(--text2); }
+.tp-exp { font-size:11.5px; color:var(--text2); line-height:1.65; }
+
+/* ── HISTORY ── */
+.hist-list { padding:.3rem .9rem .7rem; display:flex; flex-direction:column; gap:.3rem; max-height:180px; overflow-y:auto; }
+.hist-item { display:flex; align-items:flex-start; gap:.5rem; font-size:11px; color:var(--text2); padding:.35rem .5rem; background:var(--bg3); border-radius:5px; }
+.hist-n { font-family:var(--fm); font-size:9px; color:var(--text3); flex-shrink:0; }
+.hist-empty { font-size:11px; color:var(--text3); text-align:center; padding:.6rem; }
+
+/* ── RESET BTN ── */
+.reset-row { padding:.5rem .9rem; }
+.reset-btn { width:100%; padding:.42rem; border-radius:var(--rs); background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.2); color:#f87171; font-size:11.5px; font-family:var(--fb); cursor:pointer; transition:all .2s; font-weight:600; }
+.reset-btn:hover { background:rgba(248,113,113,.15); }
+
+/* ── LEARN MODE ── */
+.learn-paths { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.8rem; padding:1.25rem 1.5rem; max-width:1000px; margin:0 auto; }
+.lpath-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.1rem 1.25rem; cursor:pointer; transition:all .22s; border-top:3px solid var(--lc,var(--dc)); }
+.lpath-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
+.lp-icon { font-size:1.8rem; margin-bottom:.6rem; }
+.lp-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:.3rem; }
+.lp-desc  { font-size:11.5px; color:var(--text2); line-height:1.55; }
+.lp-count { font-size:10px; color:var(--text3); margin-top:.5rem; }
+
+.learn-content { padding:1rem 1.5rem; max-width:900px; margin:0 auto; display:none; }
+.learn-content.show { display:block; }
+.lc-back { display:flex; align-items:center; gap:.4rem; cursor:pointer; color:var(--text2); font-size:12.5px; font-family:var(--fb); margin-bottom:1rem; background:none; border:none; padding:0; }
+.lc-back:hover { color:var(--dc); }
+.lc-step { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.25rem 1.4rem; margin-bottom:.8rem; }
+.lc-step-hd { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--dc); margin-bottom:.5rem; font-weight:700; }
+.lc-step-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:.6rem; }
+.lc-step-body { font-size:13px; color:var(--text2); line-height:1.75; }
+.lc-diagram { background:var(--bg3); border-radius:var(--rs); padding:.8rem 1rem; margin:.7rem 0; }
+.lc-param-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.5rem; margin:.7rem 0; }
+.lc-param-box { background:var(--bg3); border-radius:var(--rs); padding:.6rem .8rem; }
+.lc-pb-label { font-size:9px; text-transform:uppercase; letter-spacing:.4px; color:var(--text3); }
+.lc-pb-val { font-family:var(--fm); font-size:1.1rem; color:var(--text); }
+.lc-pb-arrow { font-size:11px; margin-top:1px; }
+
+/* ── EVAL MODE ── */
+.eval-wrap { padding:1rem 1.5rem; max-width:820px; margin:0 auto; }
+.eval-cases-row { display:flex; gap:.4rem; margin-bottom:1.2rem; flex-wrap:wrap; }
+.eval-pill { padding:.4rem 1rem; border-radius:100px; background:var(--bg3); border:1px solid var(--border); font-size:12px; font-family:var(--fb); color:var(--text2); cursor:pointer; transition:all .2s; }
+.eval-pill:hover { border-color:var(--dc); color:var(--text); }
+.eval-pill.active { border-color:var(--dc); background:rgba(255,255,255,.04); color:var(--text); font-weight:600; }
+.eval-case { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.2rem 1.4rem; }
+.eval-hd { font-size:14px; font-weight:700; color:var(--text); margin-bottom:.35rem; }
+.eval-clinical { font-size:12.5px; color:var(--text2); line-height:1.7; background:var(--bg3); border-radius:var(--rs); padding:.7rem .9rem; margin-bottom:1rem; border-left:2px solid rgba(255,255,255,.07); }
+.eval-vitals { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+.eval-v { padding:.3rem .8rem; background:var(--bg3); border-radius:100px; font-family:var(--fm); font-size:12px; color:var(--text); border:1px solid var(--border); }
+.eval-q { margin-bottom:1rem; }
+.eval-q-text { font-size:13px; font-weight:600; color:var(--text); margin-bottom:.5rem; }
+.eval-opts { display:flex; flex-direction:column; gap:.3rem; }
+.eval-opt { display:flex; align-items:flex-start; gap:.6rem; padding:.55rem .8rem; border-radius:var(--rs); background:var(--bg3); border:1px solid var(--border); cursor:pointer; font-size:12px; color:var(--text2); transition:all .2s; text-align:left; width:100%; }
+.eval-opt:hover:not(:disabled) { border-color:var(--dc); color:var(--text); }
+.eval-opt.correct { border-color:#4ade80; background:rgba(74,222,128,.08); color:#4ade80; }
+.eval-opt.wrong   { border-color:#f87171; background:rgba(248,113,113,.08); color:#f87171; }
+.eval-opt-key { font-family:var(--fm); font-size:10px; min-width:18px; color:var(--text3); flex-shrink:0; }
+.eval-exp { margin-top:.5rem; padding:.6rem .8rem; background:rgba(74,222,128,.06); border-radius:var(--rs); border-left:2px solid #4ade80; font-size:11.5px; color:var(--text2); line-height:1.65; display:none; }
+.eval-exp.show { display:block; }
+.eval-score { margin-top:1.2rem; padding:1rem 1.2rem; background:var(--bg3); border-radius:var(--r); border-top:3px solid var(--dc); text-align:center; display:none; }
+.eval-score.show { display:block; }
+.eval-score-val { font-family:var(--fm); font-size:2.5rem; color:var(--dc); }
+.eval-score-lbl { font-size:12px; color:var(--text2); margin-top:.3rem; }
+.eval-next { margin-top:.8rem; padding:.5rem 1.2rem; background:var(--dc); border:none; border-radius:100px; font-family:var(--fb); font-size:12.5px; font-weight:700; color:#000; cursor:pointer; transition:all .2s; }
+.eval-next:hover { opacity:.85; }
+
+/* ── IDLE STATE ── */
+.idle-msg { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:280px; gap:.6rem; color:var(--text3); }
+.idle-msg .idle-icon { font-size:2.5rem; opacity:.4; }
+.idle-msg p { font-size:13px; text-align:center; max-width:220px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<!-- ── MODE TABS ── -->
+<nav class="mode-nav">
+  <button class="mode-tab active" onclick="switchMode('libre')">Simulador Libre</button>
+  <button class="mode-tab" onclick="switchMode('learn')">Aprendizaje</button>
+  <button class="mode-tab" onclick="switchMode('eval')">Evaluación</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     MODO LIBRE
+══════════════════════════════════════════════════════════════════════ -->
+<section id="m-libre">
+<div class="lb-grid">
+
+  <!-- LEFT PANEL -->
+  <div style="display:flex;flex-direction:column;gap:.8rem;">
+
+    <!-- Disease Selector -->
+    <div class="panel" style="--dc:var(--dc)">
+      <div class="sect-lbl">Seleccionar patología</div>
+      <div class="dis-groups" id="dis-groups"></div>
+    </div>
+
+    <!-- Patient + Params (shown after disease selected) -->
+    <div class="panel" id="patient-panel" style="display:none;">
+      <div id="pat-sect"></div>
+      <div class="panel-sep"></div>
+      <div class="sect-lbl">Mecánica respiratoria</div>
+      <div class="params-list" id="params-list"></div>
+      <div class="panel-sep"></div>
+      <div class="sect-lbl" style="padding-bottom:.5rem;">Fisiopatología</div>
+      <div class="physio-wrap"><div class="physio-text" id="physio-text"></div></div>
+    </div>
+
+  </div>
+
+  <!-- CENTER PANEL -->
+  <div style="display:flex;flex-direction:column;gap:.8rem;">
+
+    <!-- SVG -->
+    <div class="svg-wrap" id="svg-wrap">
+      <div class="idle-msg">
+        <div class="idle-icon">🫁</div>
+        <p>Selecciona una patología para iniciar la simulación</p>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="panel" id="vitals-panel" style="display:none;">
+      <div class="vitals-wrap">
+        <div class="sect-lbl" style="padding-top:.3rem;">Signos vitales</div>
+        <div class="vitals-grid" id="vitals-grid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div style="display:flex;flex-direction:column;gap:.8rem;">
+
+    <div class="panel" id="tech-panel" style="display:none;">
+      <div class="sect-lbl">Técnicas fisioterapéuticas</div>
+      <div class="tech-groups" id="tech-groups"></div>
+      <div class="tech-popup" id="tech-popup"></div>
+      <div class="panel-sep"></div>
+      <div class="sect-lbl">Historial</div>
+      <div class="hist-list" id="hist-list">
+        <div class="hist-empty">Sin intervenciones aplicadas</div>
+      </div>
+      <div class="reset-row">
+        <button class="reset-btn" onclick="resetDisease()">↺ Reiniciar al estado basal</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     MODO APRENDIZAJE
+══════════════════════════════════════════════════════════════════════ -->
+<section id="m-learn" hidden>
+  <div class="learn-paths" id="learn-paths"></div>
+  <div class="learn-content" id="learn-content">
+    <button class="lc-back" onclick="exitLearnPath()">← Volver a rutas</button>
+    <div id="learn-steps"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     MODO EVALUACIÓN
+══════════════════════════════════════════════════════════════════════ -->
+<section id="m-eval" hidden>
+  <div class="eval-wrap">
+    <div class="eval-cases-row" id="eval-pills"></div>
+    <div id="eval-case-content"></div>
+  </div>
+</section>
+
+<script src="../data/cases-fisio-resp.js"></script>
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════════════
+const state = {
+  disId: null,
+  params: null,       // current physiological params (modified by techniques)
+  baseParams: null,   // disease baseline params
+  vitals: null,       // current displayed vitals
+  baseVitals: null,
+  visual: null,       // current visual (secretions etc can change)
+  baseVisual: null,
+  activeTechs: new Set(),
+  history: [],
+  evalCase: null,
+  evalAnswered: {},
+  evalScore: 0,
+  animEpoch: null,     // breathing-animation phase reference (see updateBreathCSS)
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// SVG SHAPE DATA
+// ════════════════════════════════════════════════════════════════════════════
+const SHAPES = {
+  normal: {
+    ribs: [[68,82,92],[94,110,120],[118,138,148],[142,165,173],[164,191,198],[184,214,220]],
+    xOutL:52, xOutR:348,
+    lungL:'M 200,55 C 183,57 62,80 52,137 C 44,190 49,244 57,268 C 68,280 148,282 200,280 Z',
+    lungR:'M 200,55 C 217,57 338,80 348,137 C 356,190 351,244 343,268 C 332,280 252,282 200,280 Z',
+    diagY:280, diagPeak:296, diagXL:52, diagXR:348,
+    spineX: y => 200,
+  },
+  barrel: {
+    ribs: [[62,68,77],[84,92,101],[105,115,123],[125,138,145],[144,160,167],[162,182,188]],
+    xOutL:42, xOutR:358,
+    lungL:'M 200,52 C 178,54 46,78 36,138 C 28,192 34,252 44,282 C 56,296 140,297 200,295 Z',
+    lungR:'M 200,52 C 222,54 354,78 364,138 C 372,192 366,252 356,282 C 344,296 260,297 200,295 Z',
+    diagY:295, diagPeak:306, diagXL:44, diagXR:356,
+    spineX: y => 200,
+  },
+  scoliosis: {
+    ribs: [[68,82,92],[94,110,120],[118,138,148],[142,165,173],[164,191,198],[184,214,220]],
+    xOutL:70, xOutR:342,
+    lungL:'M 200,55 C 190,57 80,80 70,135 C 62,185 67,238 75,260 C 84,270 155,273 200,271 Z',
+    lungR:'M 200,55 C 214,57 330,78 340,132 C 348,185 344,240 336,265 C 326,277 256,280 200,276 Z',
+    diagY:275, diagPeak:290, diagXL:70, diagXR:336,
+    spineX: y => 200 + Math.sin(((y - 68) / 152) * Math.PI) * 18,
+  },
+  rigid: {
+    ribs: [[68,82,92],[94,110,120],[118,138,148],[142,165,173],[164,191,198],[184,214,220]],
+    xOutL:52, xOutR:348,
+    lungL:'M 200,55 C 183,57 62,80 52,137 C 44,190 49,244 57,268 C 68,280 148,282 200,280 Z',
+    lungR:'M 200,55 C 217,57 338,80 348,137 C 356,190 351,244 343,268 C 332,280 252,282 200,280 Z',
+    diagY:280, diagPeak:296, diagXL:52, diagXR:348,
+    spineX: y => 200,
+  },
+  kyphosis: {
+    ribs: [[72,85,95],[98,115,125],[122,142,152],[145,169,177],[167,195,201]],
+    xOutL:60, xOutR:340,
+    lungL:'M 200,56 C 186,58 68,80 58,135 C 50,186 55,240 63,262 C 73,274 148,276 200,274 Z',
+    lungR:'M 200,56 C 214,58 332,80 342,135 C 350,186 345,240 337,262 C 327,274 252,276 200,274 Z',
+    diagY:274, diagPeak:288, diagXL:62, diagXR:338,
+    spineX: y => 200,
+  },
+  small: {
+    ribs: [[78,90,99],[103,119,128],[126,146,154],[148,172,179],[168,196,202]],
+    xOutL:66, xOutR:334,
+    lungL:'M 200,58 C 187,60 73,82 63,136 C 55,186 60,238 68,258 C 78,268 149,270 200,268 Z',
+    lungR:'M 200,58 C 213,60 327,82 337,136 C 345,186 340,238 332,258 C 322,268 251,270 200,268 Z',
+    diagY:268, diagPeak:282, diagXL:66, diagXR:334,
+    spineX: y => 200,
+  },
+  consolidation: {
+    ribs: [[68,82,92],[94,110,120],[118,138,148],[142,165,173],[164,191,198],[184,214,220]],
+    xOutL:52, xOutR:348,
+    lungL:'M 200,55 C 183,57 62,80 52,137 C 44,190 49,244 57,268 C 68,280 148,282 200,280 Z',
+    lungR:'M 200,55 C 217,57 338,80 348,137 C 356,190 351,244 343,268 C 332,280 252,282 200,280 Z',
+    diagY:280, diagPeak:296, diagXL:52, diagXR:348,
+    spineX: y => 200,
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// SVG BUILDING
+// ════════════════════════════════════════════════════════════════════════════
+function buildThoraxSVG(disId, params, visual) {
+  const { Raw, CL, CW, Pmax, FRC } = params;
+  const { chestShape, secretions, bronchospasm, airTrap, pleural } = visual;
+  const sh = SHAPES[chestShape] || SHAPES.normal;
+  const phys = calcPhysFromParams(params);
+
+  // Derived visual scalars
+  const ribAnimAmpl  = chestShape === 'rigid' ? 0.08 : Math.min(1.0, CW / 0.20);
+  const lungAnimAmpl = Math.min(1.0, phys.lungAmpl);
+  const diagAnimAmpl = Math.min(1.0, phys.diagAmpl);
+  const isParadox    = phys.isParadox;
+
+  // Airway main stroke-width (wider when Raw low, narrower when high)
+  const aw = Math.max(0.5, Math.min(4.2, 4.2 - (Raw - 1.8) * 0.53));
+
+  // FRC shifts diaphragm (1.0 = normal, 1.4 = low/flat, 0.6 = high)
+  const diagShiftY = (FRC - 1.0) * 22;
+
+  // Lung color
+  const LC = disId === 'fpi' ? '#c4b5fd' : disId === 'neumonia' ? '#d4d4d8' : '#fca5a5';
+
+  // Inject CSS animation
+  updateBreathCSS(phys, ribAnimAmpl, lungAnimAmpl, diagAnimAmpl, isParadox, sh.diagY + diagShiftY);
+
+  return `<svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" class="thorax-svg">
+<defs>
+  <linearGradient id="lgL" x1="1" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="${LC}" stop-opacity=".45"/>
+    <stop offset="100%" stop-color="${LC}" stop-opacity=".82"/>
+  </linearGradient>
+  <linearGradient id="lgR" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="${LC}" stop-opacity=".45"/>
+    <stop offset="100%" stop-color="${LC}" stop-opacity=".82"/>
+  </linearGradient>
+  ${pleural ? buildEffusionClip(sh, pleural) : ''}
+</defs>
+
+<!-- Trachea label -->
+<text x="200" y="13" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.3)" font-family="monospace">TRÁQUEA</text>
+
+<!-- Spine -->
+${buildSpine(sh, chestShape)}
+
+<!-- Sternum -->
+<line x1="200" y1="50" x2="200" y2="215" stroke="rgba(255,255,255,.15)" stroke-width="2.5" stroke-linecap="round"/>
+
+<!-- LUNGS (breathing animation) -->
+<g class="lung-anim" style="transform-origin:200px ${(sh.diagY + diagShiftY).toFixed(0)}px">
+  ${buildLungs(sh, LC, diagShiftY, pleural)}
+  <!-- Airways (inside lung-anim so they scale together) -->
+  ${buildAirways(sh, aw, secretions, bronchospasm, Raw)}
+</g>
+
+<!-- RIBS (breathing animation) -->
+<g class="rib-anim" style="transform-origin:200px 155px">
+  ${buildRibs(sh, chestShape)}
+</g>
+
+<!-- DIAPHRAGM (breathing animation) -->
+<g class="diag-anim">
+  ${buildDiaphragm(sh, diagShiftY)}
+</g>
+
+<!-- Disease overlays -->
+${buildOverlays(chestShape, disId, visual, params)}
+
+<!-- Parameter labels -->
+${buildParamLabels(params, chestShape)}
+</svg>`;
+}
+
+function buildSpine(sh, shape) {
+  if (shape === 'scoliosis') {
+    const pts = [68, 95, 125, 155, 185, 215, 250, 275].map(y =>
+      `${sh.spineX(y).toFixed(1)},${y}`
+    ).join(' ');
+    return `<polyline points="${pts}" stroke="rgba(255,255,255,.18)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  return `<line x1="200" y1="40" x2="200" y2="${sh.diagY - 5}" stroke="rgba(255,255,255,.18)" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+
+function buildRibs(sh, shape) {
+  let s = '';
+  const isScol = shape === 'scoliosis';
+  sh.ribs.forEach(([y1, ym, y2]) => {
+    const sx = isScol ? sh.spineX(y1) : 200;
+    // Left rib
+    s += `<path d="M ${sx},${y1} C ${sx-35},${y1} ${sh.xOutL},${ym-5} ${sh.xOutL},${ym} C ${sh.xOutL},${ym+5} ${sx-35},${y2} ${sx},${y2}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2.5" stroke-linecap="round"/>`;
+    // Right rib
+    s += `<path d="M ${sx},${y1} C ${sx+35},${y1} ${sh.xOutR},${ym-5} ${sh.xOutR},${ym} C ${sh.xOutR},${ym+5} ${sx+35},${y2} ${sx},${y2}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2.5" stroke-linecap="round"/>`;
+  });
+  return s;
+}
+
+function buildLungs(sh, LC, diagShift, pleural) {
+  // For effusion: clip the lung on the affected side
+  const leftFill = `fill="url(#lgL)"`;
+  const rightFill = pleural && pleural.type === 'effusion' && pleural.side === 'R'
+    ? `fill="url(#lgR)" clip-path="url(#effusion-clip)"`
+    : `fill="url(#lgR)"`;
+
+  // Adjust path if FRC shifted (translate the lung paths)
+  const t = diagShift !== 0 ? ` style="transform:translateY(${diagShift.toFixed(1)}px)"` : '';
+
+  return `<path d="${sh.lungL}" ${leftFill} opacity="1"${t}/>
+<path d="${sh.lungR}" ${rightFill} opacity="1"${t}/>`;
+}
+
+function buildEffusionClip(sh, pleural) {
+  const level = pleural.level || 0.5;
+  const clipY  = sh.diagY - (sh.diagY - sh.ribs[0][0]) * (1 - level);
+  return `<clipPath id="effusion-clip">
+    <rect x="200" y="0" width="200" height="${clipY.toFixed(0)}"/>
+  </clipPath>`;
+}
+
+function buildAirways(sh, aw, secretions, bronchospasm, Raw) {
+  const maw = aw;          // main airway width
+  const saw = aw * 0.62;   // secondary
+  const taw = aw * 0.38;   // tertiary
+  const col = bronchospasm >= 3 ? '#c084fc' : bronchospasm >= 2 ? '#a78bfa' : bronchospasm >= 1 ? '#e9b872' : 'rgba(220,170,140,.8)';
+
+  let s = `
+<!-- Trachea -->
+<path d="M 200,15 L 200,55" fill="none" stroke="${col}" stroke-width="${(maw*1.1).toFixed(1)}" stroke-linecap="round"/>
+<!-- Main bronchi -->
+<path d="M 200,55 C 190,60 160,65 150,75" fill="none" stroke="${col}" stroke-width="${maw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 200,55 C 210,60 240,65 250,75" fill="none" stroke="${col}" stroke-width="${maw.toFixed(1)}" stroke-linecap="round"/>
+<!-- Secondary left -->
+<path d="M 150,75 C 138,83 114,90 106,102" fill="none" stroke="${col}" stroke-width="${saw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 150,75 C 145,90 140,110 137,125" fill="none" stroke="${col}" stroke-width="${saw.toFixed(1)}" stroke-linecap="round"/>
+<!-- Secondary right -->
+<path d="M 250,75 C 262,83 286,90 294,102" fill="none" stroke="${col}" stroke-width="${saw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 250,75 C 255,90 260,110 263,125" fill="none" stroke="${col}" stroke-width="${saw.toFixed(1)}" stroke-linecap="round"/>
+<!-- Tertiary left -->
+<path d="M 106,102 C 98,110 84,116 76,128" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 106,102 C 110,118 108,138 106,152" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 137,125 C 128,140 120,160 117,178" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>
+<!-- Tertiary right -->
+<path d="M 294,102 C 302,110 316,116 324,128" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 294,102 C 290,118 292,138 294,152" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>
+<path d="M 263,125 C 272,140 280,160 283,178" fill="none" stroke="${col}" stroke-width="${taw.toFixed(1)}" stroke-linecap="round"/>`;
+
+  // Bronchospasm visual: thick wavy walls alongside airways
+  if (bronchospasm >= 2) {
+    s += `<circle cx="150" cy="75" r="${(3.5+bronchospasm*0.5).toFixed(1)}" fill="${col}" opacity=".4"/>
+<circle cx="250" cy="75" r="${(3.5+bronchospasm*0.5).toFixed(1)}" fill="${col}" opacity=".4"/>`;
+  }
+
+  // Secretion plugs
+  if (secretions >= 1) {
+    s += secretionPlugs(secretions, Raw);
+  }
+
+  return s;
+}
+
+function secretionPlugs(sec, Raw) {
+  const col = '#86efac';
+  let s = '';
+  if (sec >= 1) {
+    // Peripheral (tertiary) plugs
+    s += `<ellipse cx="76" cy="128" rx="4.5" ry="3" fill="${col}" opacity=".8"/>
+<ellipse cx="324" cy="128" rx="4.5" ry="3" fill="${col}" opacity=".8"/>
+<ellipse cx="106" cy="152" rx="4" ry="2.8" fill="${col}" opacity=".75"/>`;
+  }
+  if (sec >= 2) {
+    // Secondary bronchi plugs
+    s += `<ellipse cx="106" cy="102" rx="6" ry="3.5" fill="${col}" opacity=".85"/>
+<ellipse cx="294" cy="102" rx="6" ry="3.5" fill="${col}" opacity=".85"/>
+<ellipse cx="117" cy="178" rx="5" ry="3" fill="${col}" opacity=".8"/>
+<ellipse cx="283" cy="178" rx="5" ry="3" fill="${col}" opacity=".8"/>`;
+  }
+  if (sec >= 3) {
+    // Main bronchi plugs
+    s += `<ellipse cx="150" cy="75" rx="8" ry="4.5" fill="${col}" opacity=".9"/>
+<ellipse cx="250" cy="75" rx="8" ry="4.5" fill="${col}" opacity=".9"/>`;
+  }
+  return s;
+}
+
+function buildDiaphragm(sh, diagShift) {
+  const y  = sh.diagY + diagShift;
+  const yp = sh.diagPeak + diagShift;
+  return `<path d="M ${sh.diagXL},${y.toFixed(0)} C ${(sh.diagXL+80).toFixed(0)},${yp.toFixed(0)} ${(sh.diagXR-80).toFixed(0)},${yp.toFixed(0)} ${sh.diagXR},${y.toFixed(0)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/>`;
+}
+
+function buildOverlays(shape, disId, visual, params) {
+  let s = '';
+
+  // Air trapping (obstructive): amber zones in lower lobes
+  if (visual.airTrap && params.FRC > 1.1) {
+    const intensity = Math.min(0.35, (params.FRC - 1.0) * 0.5);
+    s += `<ellipse cx="100" cy="230" rx="55" ry="28" fill="#fbbf24" opacity="${intensity.toFixed(2)}"/>
+<ellipse cx="300" cy="230" rx="55" ry="28" fill="#fbbf24" opacity="${intensity.toFixed(2)}"/>`;
+  }
+
+  // FPI / fibrosis: honeycombing dots in lower zones
+  if (disId === 'fpi') {
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) {
+      s += `<circle cx="${68 + c*22}" cy="${215 + r*16}" r="4.5" fill="none" stroke="#a78bfa" stroke-width="1" opacity=".5"/>`;
+      s += `<circle cx="${222 + c*22}" cy="${215 + r*16}" r="4.5" fill="none" stroke="#a78bfa" stroke-width="1" opacity=".5"/>`;
+    }
+  }
+
+  // Neumonía: consolidation (gray zone lower right)
+  if (shape === 'consolidation') {
+    s += `<path d="M 208,190 C 225,188 318,195 340,215 C 350,235 345,268 332,278 C 290,282 215,280 206,268 C 198,252 198,215 208,190 Z" fill="rgba(148,163,184,.45)" opacity=".9"/>`;
+    // Bronchogram lines (white lines in consolidated area)
+    s += `<line x1="240" y1="195" x2="252" y2="268" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
+<line x1="268" y1="198" x2="275" y2="272" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+<line x1="296" y1="205" x2="298" y2="270" stroke="rgba(255,255,255,.3)" stroke-width="1"/>`;
+  }
+
+  // Derrame pleural: fluid on right side
+  if (visual.pleural && visual.pleural.type === 'effusion') {
+    const { side, level } = visual.pleural;
+    const sh = SHAPES[shape] || SHAPES.normal;
+    const topY = sh.diagY - (sh.diagY - sh.ribs[0][0]) * (1 - level);
+    if (side === 'R') {
+      s += `<path d="M 204,${topY.toFixed(0)} C 240,${(topY+8).toFixed(0)} 340,${(topY+10).toFixed(0)} ${sh.diagXR},${sh.diagY} C ${(sh.diagXR-70).toFixed(0)},${(sh.diagPeak-2).toFixed(0)} 240,${(sh.diagPeak-2).toFixed(0)} 204,${(sh.diagPeak).toFixed(0)} Z" fill="#38bdf8" opacity=".28"/>`;
+      // Meniscus line
+      s += `<path d="M 204,${topY.toFixed(0)} C 240,${(topY-8).toFixed(0)} 320,${(topY-8).toFixed(0)} ${sh.diagXR},${topY.toFixed(0)}" fill="none" stroke="#38bdf8" stroke-width="1.8" opacity=".7"/>`;
+    }
+  }
+
+  // Scoliosis indicator: compressed left side visual
+  if (shape === 'scoliosis') {
+    // Already handled by asymmetric lung paths and curved spine
+    // Add a compression indicator
+    s += `<text x="78" y="160" font-size="9" fill="rgba(192,132,252,.65)" font-family="monospace" text-anchor="middle">comp.</text>`;
+  }
+
+  // Rigid thorax: visual "lock" bars on ribs
+  if (shape === 'rigid') {
+    [82, 110, 138, 165].forEach(y => {
+      s += `<line x1="52" y1="${y}" x2="80" y2="${y}" stroke="rgba(167,139,250,.5)" stroke-width="2.5"/>
+<line x1="320" y1="${y}" x2="348" y2="${y}" stroke="rgba(167,139,250,.5)" stroke-width="2.5"/>`;
+    });
+  }
+
+  // Kyphosis indicator: spine curvature silhouette
+  if (shape === 'kyphosis') {
+    s += `<path d="M 200,40 C 208,80 212,140 200,185" fill="none" stroke="rgba(129,140,248,.4)" stroke-width="3" stroke-dasharray="5,3"/>`;
+  }
+
+  // Paradoxical breathing indicator (neuromuscular severe)
+  if (visual.paradoxical || params.Pmax < 28) {
+    s += `<text x="200" y="308" text-anchor="middle" font-size="9" fill="rgba(244,114,182,.75)" font-family="monospace">↕ PARADÓJICO</text>`;
+  }
+
+  return s;
+}
+
+function buildParamLabels(params, shape) {
+  const { Raw, CL, CW, Pmax, FRC } = params;
+  const labels = [];
+
+  // Raw label
+  const rawLbl = Raw > 6 ? '↑↑↑ Raw' : Raw > 4 ? '↑↑ Raw' : Raw > 2.8 ? '↑ Raw' : Raw < 1.9 ? '↓ Raw' : '';
+  const rawCol = Raw > 6 ? '#ef4444' : Raw > 4 ? '#f97316' : Raw > 2.8 ? '#fbbf24' : '#38bdf8';
+  if (rawLbl) labels.push({ x:200, y:295, text:rawLbl, col:rawCol });
+
+  // CL
+  const clLbl = CL < 0.12 ? '↓↓ CL' : CL > 0.28 ? '↑↑ CL' : '';
+  const clCol = CL < 0.12 ? '#f97316' : '#fbbf24';
+  if (clLbl) labels.push({ x:88, y:24, text:clLbl, col:clCol });
+
+  // CW
+  if (CW < 0.10) labels.push({ x:320, y:24, text:'↓↓↓ CW', col:'#ef4444' });
+  else if (CW < 0.15) labels.push({ x:320, y:24, text:'↓↓ CW', col:'#f97316' });
+
+  // Pmax
+  if (Pmax < 30) labels.push({ x:66, y:295, text:'↓↓↓ Pmax', col:'#ef4444' });
+  else if (Pmax < 55) labels.push({ x:66, y:295, text:'↓↓ Pmax', col:'#f97316' });
+
+  // FRC
+  const frcLbl = FRC > 1.25 ? '↑ FRC' : FRC < 0.72 ? '↓ FRC' : '';
+  if (frcLbl) labels.push({ x:335, y:295, text:frcLbl, col: FRC > 1.25 ? '#fbbf24' : '#38bdf8' });
+
+  return labels.map(l =>
+    `<text x="${l.x}" y="${l.y}" text-anchor="middle" font-size="8.5" fill="${l.col}" font-family="monospace" font-weight="bold" opacity=".85">${l.text}</text>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// BREATHING ANIMATION
+// ════════════════════════════════════════════════════════════════════════════
+function updateBreathCSS(phys, ribAmpl, lungAmpl, diagAmpl, paradox, diagBaseY) {
+  const periodNum = phys.period;
+  const p   = periodNum.toFixed(2);
+  const ip  = (phys.inspFrac * 100).toFixed(0);
+  const rs  = (1 + 0.028 * ribAmpl).toFixed(3);
+  const lsx = (1 + 0.018 * lungAmpl).toFixed(3);
+  const lsy = (1 + 0.060 * lungAmpl).toFixed(3);
+  const dy  = ((paradox ? -1 : 1) * 13 * diagAmpl).toFixed(1);
+  const ry  = (-3.5 * ribAmpl).toFixed(1);
+  const db  = (diagBaseY || 280).toFixed(0);
+
+  // Rewriting the @keyframes rule below restarts any animation using it. To avoid
+  // a visible snap back to 0% every time a technique is toggled mid-breath, keep a
+  // fixed phase reference (animEpoch) and re-apply the elapsed phase as a negative
+  // animation-delay, so the cycle continues smoothly even as the period changes.
+  // selectDisease()/resetDisease() clear animEpoch to start a fresh cycle instead.
+  if (state.animEpoch === null) state.animEpoch = performance.now();
+  const elapsedSec = (performance.now() - state.animEpoch) / 1000;
+  const delay = (-(elapsedSec % periodNum)).toFixed(2);
+
+  document.getElementById('anim-style').textContent = `
+@keyframes breathe-rib {
+  0%,100%{ transform:scaleX(1) translateY(0); }
+  ${ip}% { transform:scaleX(${rs}) translateY(${ry}px); }
+}
+@keyframes breathe-lung {
+  0%,100%{ transform:scale(1); }
+  ${ip}% { transform:scaleX(${lsx}) scaleY(${lsy}); }
+}
+@keyframes breathe-diag {
+  0%,100%{ transform:translateY(0); }
+  ${ip}% { transform:translateY(${dy}px); }
+}
+.rib-anim  { animation:breathe-rib  ${p}s ease-in-out infinite; animation-delay:${delay}s; transform-origin:200px 155px; }
+.lung-anim { animation:breathe-lung ${p}s ease-in-out infinite; animation-delay:${delay}s; transform-origin:200px ${db}px; }
+.diag-anim { animation:breathe-diag ${p}s ease-in-out infinite; animation-delay:${delay}s; }`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// VITALS
+// ════════════════════════════════════════════════════════════════════════════
+function vStatus(param, val) {
+  if (param === 'spo2') return val >= 95 ? 'ok' : val >= 90 ? 'warn' : 'alarm';
+  if (param === 'hr')   return val <= 100 ? 'ok' : val <= 120 ? 'warn' : 'alarm';
+  if (param === 'rr')   return val <= 20 ? 'ok' : val <= 26 ? 'warn' : 'alarm';
+  if (param === 'paco2')return val <= 45 ? 'ok' : val <= 55 ? 'warn' : 'alarm';
+  return 'ok';
+}
+
+function renderVitals(v) {
+  const wob = calcWoB(state.params);
+  document.getElementById('vitals-grid').innerHTML = `
+${vcardHTML('SpO₂','spo2',v.spo2,'%')}
+${vcardHTML('FC','hr',v.hr,'lpm')}
+${vcardHTML('FR','rr',v.rr,'rpm')}
+${vcardHTML('PA','bp',v.bp,'')}
+${vcardHTML('PaCO₂','paco2',v.paco2,'mmHg')}
+<div class="vcard ${wob>=4?'alarm':wob>=3?'warn':'ok'}">
+  <div class="vcard-lbl">Trab. Resp.</div>
+  <div class="wob-dots">${[1,2,3,4,5].map(i=>`<div class="wob-dot ${i<=wob?(wob>=4?'red':'on'):''}"></div>`).join('')}</div>
+</div>`;
+}
+
+function vcardHTML(lbl, key, val, unit) {
+  const cls = key === 'bp' ? 'ok' : vStatus(key, val);
+  return `<div class="vcard ${cls}">
+  <div class="vcard-lbl">${lbl}</div>
+  <div class="vcard-val">${val}<small>${unit}</small></div>
+</div>`;
+}
+
+function calcWoB(p) {
+  const { Raw, CL, CW, Pmax } = p;
+  const w = (Raw/2-1)*1.5 + Math.max(0,(0.2/CL-1)*1.0) + Math.max(0,(0.2/CW-1)*1.2) + Math.max(0,(80/Pmax-1)*0.6);
+  return Math.round(Math.max(1, Math.min(5, 1 + w)));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PARAMETER DISPLAY
+// ════════════════════════════════════════════════════════════════════════════
+const PARAM_META = {
+  Raw:  { name:'Resistencia', abbr:'Raw',  unit:'cmH₂O/L/s', min:1.0, max:10.0, norm:2.0, highBad:true },
+  CL:   { name:'Compliance pulm.', abbr:'CL', unit:'L/cmH₂O', min:0.05, max:0.45, norm:0.20, highBad:false },
+  CW:   { name:'Compliance torácica', abbr:'CW', unit:'L/cmH₂O', min:0.03, max:0.30, norm:0.20, highBad:false },
+  Pmax: { name:'Fuerza muscular', abbr:'Pmax', unit:'cmH₂O', min:10, max:100, norm:80, highBad:false },
+  FRC:  { name:'Vol. reposo', abbr:'FRC',  unit:'relativo', min:0.3, max:1.8, norm:1.0, highBad:false },
+};
+
+function renderParams(params) {
+  const { Raw, CL, CW, Pmax, FRC } = params;
+  const vals = { Raw, CL, CW, Pmax, FRC };
+  let html = '';
+  for (const [key, meta] of Object.entries(PARAM_META)) {
+    const v = vals[key];
+    const norm = meta.norm;
+    const { cls, arrow } = paramArrow(v, norm);
+    const barPct = Math.max(0, Math.min(100, (v - meta.min) / (meta.max - meta.min) * 100)).toFixed(1);
+    const barCol = cls === 'ok' ? '#4ade80' : cls === 'u1' || cls === 'd1' ? '#fbbf24' : cls === 'u2' || cls === 'd2' ? '#f97316' : '#ef4444';
+    html += `<div class="param-item">
+  <div class="param-row1">
+    <span class="param-name">${meta.name} <span class="param-abbr">${meta.abbr}</span></span>
+    <span class="param-num">${typeof v === 'number' ? v.toFixed(2) : v} <span style="font-size:9px;color:var(--text3)">${meta.unit}</span></span>
+    <span class="param-arrow ${cls}">${arrow}</span>
+  </div>
+  <div class="param-bar-wrap"><div class="param-bar" style="width:${barPct}%;background:${barCol}"></div></div>
+</div>`;
+  }
+  document.getElementById('params-list').innerHTML = html;
+}
+
+function paramArrow(v, norm) {
+  const r = (v - norm) / norm;
+  const high = r > 0;
+  const abs = Math.abs(r);
+  let level = abs < 0.15 ? 0 : abs < 0.40 ? 1 : abs < 0.70 ? 2 : 3;
+  if (level === 0) return { cls:'ok', arrow:'→' };
+  const cls = high ? `u${level}` : `d${level}`;
+  const arrow = high ? (level===3?'↑↑↑':level===2?'↑↑':'↑') : (level===3?'↓↓↓':level===2?'↓↓':'↓');
+  return { cls, arrow };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DISEASE SELECTOR
+// ════════════════════════════════════════════════════════════════════════════
+const DIS_GROUPS = [
+  { label:'Obstructivas', ids:['epoc','asma','bronquitis','bronquiectasias'] },
+  { label:'Restrictivas — Caja torácica', ids:['escoliosis','torax_rigido','cifosis'] },
+  { label:'Restrictivas — Neuromuscular', ids:['neuromuscular'] },
+  { label:'Restrictivas — Pleural', ids:['derrame'] },
+  { label:'Restrictivas — Parenquimatosa', ids:['fpi','neumonia'] },
+];
+
+function renderDiseaseSelector() {
+  document.getElementById('dis-groups').innerHTML = DIS_GROUPS.map(g => `
+<div class="dis-group-hd">${g.label}</div>
+<div class="dis-pills">
+  ${g.ids.map(id => {
+    const d = FISIO_DISEASES[id];
+    return `<button class="dis-btn" id="dbtn-${id}" onclick="selectDisease('${id}')" style="--dc:${d.color}">
+      <span class="dis-icon">${d.icon}</span>${d.name}
+    </button>`;
+  }).join('')}
+</div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SELECT DISEASE
+// ════════════════════════════════════════════════════════════════════════════
+function selectDisease(disId) {
+  const dis = FISIO_DISEASES[disId];
+  state.disId   = disId;
+  state.animEpoch = null;
+  state.params  = { ...dis.params };
+  state.baseParams = { ...dis.params };
+  state.vitals  = { ...dis.baseVitals };
+  state.baseVitals = { ...dis.baseVitals };
+  state.visual  = { ...dis.visual };
+  state.baseVisual = { ...dis.visual };
+  state.activeTechs.clear();
+  state.history = [];
+
+  // Update disease color
+  document.documentElement.style.setProperty('--dc', dis.color);
+
+  // Highlight button
+  document.querySelectorAll('.dis-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(`dbtn-${disId}`);
+  if (btn) btn.classList.add('active');
+
+  // Render patient card
+  const tc = dis.group.includes('obstr') ? 'obst' : 'rest';
+  const tl = dis.group.includes('obstr') ? 'Obstructiva' : 'Restrictiva';
+  document.getElementById('pat-sect').innerHTML = `
+<div class="pat-sect">
+  <div class="pat-ava">${dis.icon}</div>
+  <div class="pat-info">
+    <div class="pat-name">${dis.patient.name}</div>
+    <div class="pat-meta">${dis.patient.age} años · ${dis.patient.sex === 'M' ? 'Masculino' : 'Femenino'}</div>
+    <div class="pat-dx">${dis.patient.dx}</div>
+  </div>
+  <span class="pat-tag ${tc}">${tl}</span>
+</div>`;
+  document.getElementById('physio-text').textContent = dis.physiopath;
+  document.getElementById('patient-panel').style.display = 'block';
+
+  // Render params
+  renderParams(state.params);
+
+  // Render SVG
+  document.getElementById('svg-wrap').innerHTML = buildThoraxSVG(disId, state.params, state.visual);
+
+  // Render vitals
+  renderVitals(state.vitals);
+  document.getElementById('vitals-panel').style.display = 'block';
+
+  // Render techniques
+  renderTechBtns(disId);
+  document.getElementById('tech-panel').style.display = 'block';
+
+  // Reset history
+  renderHistory();
+  hideTechPopup();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TECHNIQUE BUTTONS
+// ════════════════════════════════════════════════════════════════════════════
+const TB_COLOR = { best:'#38bdf8', good:'#4ade80', warn:'#fbbf24', bad:'#f87171', neutral:'rgba(100,116,139,.5)' };
+
+function renderTechBtns(disId) {
+  const dis = FISIO_DISEASES[disId];
+  document.getElementById('tech-groups').innerHTML = TECH_GROUPS.map(g => `
+<div>
+  <div class="tech-group-hd"><span>${g.icon}</span>${g.label}</div>
+  <div class="tech-btns">
+    ${g.ids.map(id => {
+      const tech = FISIO_TECHNIQUES.find(t => t.id === id);
+      const eff  = dis.techniques[id];
+      const cls  = eff ? eff.cls : 'neutral';
+      const lbl  = eff ? eff.label : '—';
+      const tbCol = TB_COLOR[cls] || TB_COLOR.neutral;
+      return `<button class="tech-btn" id="tbtn-${id}" style="--tb:${tbCol}"
+        onclick="applyTech('${id}')">
+        <span class="t-icon">${tech.icon}</span>
+        <span class="t-name">${tech.name}</span>
+        <span class="t-badge badge-${cls}">${lbl}</span>
+      </button>`;
+    }).join('')}
+  </div>
+</div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// APPLY TECHNIQUE
+// ════════════════════════════════════════════════════════════════════════════
+// Recomputes params/vitals/visual from the disease baseline plus every
+// currently-active technique's deltas, then clamps once. Recomputing from
+// scratch (instead of incrementally adding/subtracting per toggle) keeps
+// toggling a technique on/off always symmetric, even when a clamp bound
+// would otherwise truncate an intermediate step.
+function recomputeFromActiveTechs() {
+  const dis = FISIO_DISEASES[state.disId];
+  const params = { ...state.baseParams };
+  let secretions  = state.baseVisual.secretions;
+  let bronchospasm = state.baseVisual.bronchospasm;
+  const vitals = { ...state.baseVitals };
+
+  for (const techId of state.activeTechs) {
+    const eff = dis.techniques[techId];
+    if (!eff) continue;
+    if (eff.paramDeltas) {
+      for (const [k, delta] of Object.entries(eff.paramDeltas)) {
+        if (k === 'sec') secretions += delta;
+        else if (k === 'bronch') bronchospasm += delta;
+        else if (params[k] !== undefined) params[k] += delta;
+      }
+    }
+    if (eff.vitalDeltas) {
+      for (const [k, delta] of Object.entries(eff.vitalDeltas)) {
+        if (typeof vitals[k] === 'number') vitals[k] += delta;
+      }
+    }
+  }
+
+  for (const [key, meta] of Object.entries(PARAM_META)) {
+    params[key] = Math.max(meta.min, Math.min(meta.max, params[key]));
+  }
+  state.visual.secretions   = Math.max(0, Math.min(3, secretions));
+  state.visual.bronchospasm = Math.max(0, Math.min(3, bronchospasm));
+  state.params = params;
+
+  vitals.spo2  = Math.round(Math.max(70, Math.min(99, vitals.spo2)));
+  vitals.hr    = Math.round(Math.max(40, Math.min(180, vitals.hr)));
+  vitals.rr    = Math.round(Math.max(8,  Math.min(45,  vitals.rr)));
+  vitals.paco2 = Math.round(Math.max(20, Math.min(80,  vitals.paco2)));
+  state.vitals = vitals;
+}
+
+function applyTech(techId) {
+  if (!state.disId) return;
+  const dis  = FISIO_DISEASES[state.disId];
+  const eff  = dis.techniques[techId];
+  const tech = FISIO_TECHNIQUES.find(t => t.id === techId);
+  if (!eff) return;
+
+  const isActive = state.activeTechs.has(techId);
+  const sign = isActive ? -1 : 1;
+
+  // Toggle button style
+  document.getElementById(`tbtn-${techId}`)?.classList.toggle('active', !isActive);
+  if (isActive) state.activeTechs.delete(techId);
+  else          state.activeTechs.add(techId);
+
+  recomputeFromActiveTechs();
+
+  // Re-render
+  renderParams(state.params);
+  renderVitals(state.vitals);
+  document.getElementById('svg-wrap').innerHTML = buildThoraxSVG(state.disId, state.params, state.visual);
+
+  // Show popup (deltas for the technique just toggled, not the cumulative state)
+  showTechPopup(tech, eff, sign);
+
+  // History
+  if (!isActive) {
+    state.history.unshift({ tech: tech.name, label: eff.label, cls: eff.cls });
+    renderHistory();
+  }
+}
+
+function showTechPopup(tech, eff, sign) {
+  const popup = document.getElementById('tech-popup');
+  const deltas = [];
+  if (eff.paramDeltas) {
+    for (const [k, v] of Object.entries(eff.paramDeltas)) {
+      const d = sign * v;
+      deltas.push(`${k} ${d>0?'+':''}${d.toFixed ? d.toFixed(2) : d}`);
+    }
+  }
+  if (eff.vitalDeltas) {
+    for (const [k, v] of Object.entries(eff.vitalDeltas)) {
+      const d = sign * v;
+      deltas.push(`${k.toUpperCase()} ${d>0?'+':''}${d}`);
+    }
+  }
+  const col = TB_COLOR[eff.cls] || TB_COLOR.neutral;
+  popup.style.setProperty('--tb-pop', col);
+  popup.innerHTML = `
+<div class="tp-head">
+  <span class="tp-name">${tech.name}</span>
+  <span class="t-badge badge-${eff.cls}">${eff.label}</span>
+</div>
+<div class="tp-deltas">${deltas.map(d=>`<span class="tp-delta">${d}</span>`).join('')}</div>
+<div class="tp-exp">${eff.explanation}</div>`;
+  popup.classList.add('show');
+}
+
+function hideTechPopup() {
+  document.getElementById('tech-popup')?.classList.remove('show');
+}
+
+function renderHistory() {
+  const list = document.getElementById('hist-list');
+  if (state.history.length === 0) {
+    list.innerHTML = '<div class="hist-empty">Sin intervenciones aplicadas</div>';
+    return;
+  }
+  list.innerHTML = state.history.map((h, i) => `
+<div class="hist-item">
+  <span class="hist-n">#${state.history.length - i}</span>
+  <span style="flex:1">${h.tech}</span>
+  <span class="t-badge badge-${h.cls}">${h.label}</span>
+</div>`).join('');
+}
+
+function resetDisease() {
+  if (!state.disId) return;
+  state.animEpoch = null;
+  state.activeTechs.clear();
+  state.history = [];
+  recomputeFromActiveTechs();
+  document.querySelectorAll('.tech-btn').forEach(b => b.classList.remove('active'));
+  renderParams(state.params);
+  renderVitals(state.vitals);
+  document.getElementById('svg-wrap').innerHTML = buildThoraxSVG(state.disId, state.params, state.visual);
+  renderHistory();
+  hideTechPopup();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// LEARN MODE
+// ════════════════════════════════════════════════════════════════════════════
+const LEARN_PATHS = [
+  {
+    id:'obst', title:'Patrón Obstructivo', icon:'💨', color:'#fb923c',
+    desc:'Resistencia, colapso dinámico, hiperinsuflación. EPOC y Asma.',
+    steps:[
+      { title:'¿Qué es la obstrucción?',
+        body:'El patrón obstructivo se caracteriza por <strong>dificultad para sacar el aire</strong>. La causa es una resistencia aumentada de la vía aérea (Raw ↑), lo que genera colapso dinámico espiratorio y atrapamiento aéreo.',
+        params:{ Raw:'↑↑ (2→5)', CL:'↑ (hiperinflación)', FRC:'↑↑ (atrapamiento)' }
+      },
+      { title:'Mecanismo en el SVG',
+        body:'Observa en el simulador: <ul><li>Las vías aéreas son más <strong>angostas</strong> (Raw ↑)</li><li>Los pulmones están <strong>más grandes al reposo</strong> (FRC ↑)</li><li>El diafragma aparece <strong>aplanado</strong></li><li>La espiración es prolongada (relación I:E 1:3 o 1:4)</li></ul>',
+        params:{ Raw:'↑↑↑ Asma', CL:'↑ EPOC', FRC:'↑↑ hiperinflación' }
+      },
+      { title:'Técnicas y efectos',
+        body:'<ul><li><strong>PLB</strong>: crea back-pressure → evita colapso espiratorio → Raw efectiva ↓</li><li><strong>Nebulización</strong>: broncodilatador → Raw ↓↓↓ (PRIMERA LÍNEA en crisis)</li><li><strong>ACBT</strong>: control ventilatorio + clearance → secreciones ↓ + Raw ↓</li><li><strong>FET forzado</strong>: CONTRAINDICADO en EPOC → agrava colapso</li></ul>',
+        params:{ Raw:'PLB → ↓0.4', CL:'Nebuliz. → bronch↓', FRC:'PLB → ↓ levemente' }
+      },
+    ]
+  },
+  {
+    id:'rest-chest', title:'Restrictivo — Caja Torácica', icon:'🦴', color:'#c084fc',
+    desc:'CW reducida: escoliosis, tórax rígido, cifosis.',
+    steps:[
+      { title:'¿Qué es la restricción de la pared?',
+        body:'La restricción extrapulmonar ocurre cuando la <strong>caja torácica no puede expandirse</strong> normalmente. La compliance torácica (CW) está reducida. El pulmón en sí puede ser normal.',
+        params:{ CW:'↓↓ a ↓↓↓', CL:'Normal', Raw:'Normal' }
+      },
+      { title:'Escoliosis, Cifosis, Tórax Rígido',
+        body:'<ul><li><strong>Escoliosis</strong>: curvatura lateral → expansión asimétrica, un pulmón comprimido</li><li><strong>Tórax rígido</strong>: anquilosis costal → CW casi cero, solo diafragma</li><li><strong>Cifosis</strong>: diámetro AP reducido, compresión anterior</li></ul>En el SVG observa: <strong>costillas apenas se mueven</strong> (CW ↓), pero el diafragma trabaja más.',
+        params:{ CW:'↓↓ → ribAmpl ↓↓', Pmax:'Normal → diaf. compensa', FRC:'↓' }
+      },
+      { title:'Técnicas clave',
+        body:'<ul><li><strong>Movilización torácica</strong>: mejora CW → costillas se mueven más</li><li><strong>Entrenamiento diafragmático</strong>: potencia el único motor disponible (Pmax ↑)</li><li><strong>VNI nocturna</strong>: suple la restricción severa → calidad de vida ↑</li><li>Nebulización, Postural, FET: <strong>no indicados</strong> (sin broncoespasmo ni secreciones)</li></ul>',
+        params:{ CW:'Moviliz.→ +0.03', Pmax:'Diafr.→ +8', FRC:'VNI → +0.06' }
+      },
+    ]
+  },
+  {
+    id:'rest-neuro', title:'Restrictivo — Neuromuscular', icon:'⚡', color:'#f472b6',
+    desc:'Pmax reducida: Guillain-Barré, ELA, fatiga muscular.',
+    steps:[
+      { title:'Debilidad muscular respiratoria',
+        body:'En la enfermedad neuromuscular, el <strong>pulmón y la caja torácica son normales</strong>, pero la fuerza muscular (Pmax) está severamente reducida. Resultado: VT muy bajo → FR muy alta → patrón superficial taquipneico → hipercapnia.',
+        params:{ Pmax:'↓↓↓ (80→25)', CL:'Normal', CW:'Normal', FRC:'↓' }
+      },
+      { title:'Movimiento paradójico',
+        body:'Cuando Pmax es muy baja (<30 cmH₂O), el diafragma débil puede <strong>moverse paradójicamente</strong>: en inspiración sube (en vez de bajar). El abdomen se hunde en inspiración.<br><br>En el simulador observa: la excursión diafragmática es <strong>mínima</strong> y si Pmax < 28 verás el indicador "PARADÓJICO".',
+        params:{ Pmax:'< 28 → paradójico', diagAmpl:'mínima', VT:'0.15-0.20L' }
+      },
+      { title:'Intervención crítica: VNI',
+        body:'<ul><li><strong>VNI</strong>: es la intervención con mayor impacto → suple la Pmax perdida → Pmax efectiva ↑↑↑</li><li><strong>Drenaje postural asistido</strong>: no puede toser → acumulación de secreciones</li><li><strong>Nebulización</strong>: fluidifica secreciones para drenaje asistido</li><li>FET, ACBT activos: <strong>muy limitados</strong> si no hay fuerza</li></ul>',
+        params:{ Pmax:'VNI → +40', SpO2:'VNI → +6', FR:'VNI → -10' }
+      },
+    ]
+  },
+  {
+    id:'rest-parench', title:'Restrictivo — Parenquimatoso', icon:'🩹', color:'#4ade80',
+    desc:'CL reducida: FPI, neumonía, derrame pleural.',
+    steps:[
+      { title:'Restricción intrapulmonar',
+        body:'El patrón restrictivo parenquimatoso ocurre cuando el <strong>pulmón mismo es rígido o comprimido</strong>. La compliance pulmonar (CL) está reducida. Los pulmones son pequeños y duros. La caja torácica puede ser normal.',
+        params:{ CL:'↓↓ (FPI) / ↓ (Neumonía)', CW:'Normal', Raw:'Normal o ↑ levemente' }
+      },
+      { title:'Fibrosis vs Neumonía vs Derrame',
+        body:'<ul><li><strong>FPI</strong>: fibrosis intersticial difusa → CL↓↓, pulmones pequeños, patrón en panal. Sin secretiones.</li><li><strong>Neumonía</strong>: consolidación lobar → CL↓ localizada + secreciones en resolución. Ambas técnicas de expansión Y clearance.</li><li><strong>Derrame pleural</strong>: compresión externa → CL funcional↓ + shunt. Toracocentesis = tratamiento definitivo.</li></ul>',
+        params:{ CL:'FPI:0.10  Neumonia:0.15  Derrame:0.14', sec:'FPI:0  Neumonia:2' }
+      },
+      { title:'Técnicas y prioridades',
+        body:'<ul><li><strong>FPI</strong>: Espirometría incentivada (primera línea), PLB, VNI en avanzados. Sin clearance.</li><li><strong>Neumonía</strong>: Incentive + ACBT + FET (todas! hay expansión + clearance)</li><li><strong>Derrame</strong>: Postural/ACBT/FET CONTRAINDICADOS pre-drenaje. Post-drenaje: incentive es clave.</li></ul>',
+        params:{ CL:'Incentive → +0.025', sec:'ACBT → -1', 'CL (derrame)':'Drenaje → +0.03' }
+      },
+    ]
+  },
+];
+
+function renderLearnPaths() {
+  document.getElementById('learn-paths').innerHTML = LEARN_PATHS.map(p => `
+<div class="lpath-card" style="--lc:${p.color}" onclick="openLearnPath('${p.id}')">
+  <div class="lp-icon">${p.icon}</div>
+  <div class="lp-title">${p.title}</div>
+  <div class="lp-desc">${p.desc}</div>
+  <div class="lp-count">${p.steps.length} pasos</div>
+</div>`).join('');
+}
+
+function openLearnPath(pathId) {
+  const path = LEARN_PATHS.find(p => p.id === pathId);
+  if (!path) return;
+  document.getElementById('learn-paths').style.display = 'none';
+  const content = document.getElementById('learn-content');
+  content.classList.add('show');
+  document.getElementById('learn-steps').innerHTML = path.steps.map((step, i) => `
+<div class="lc-step">
+  <div class="lc-step-hd">Paso ${i+1} de ${path.steps.length}</div>
+  <div class="lc-step-title">${step.title}</div>
+  <div class="lc-step-body">${step.body}</div>
+  ${step.params ? `<div class="lc-diagram">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:.4rem">Cambios en parámetros</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+      ${Object.entries(step.params).map(([k,v]) => `<span style="font-family:var(--fm);font-size:11px;background:var(--bg2);padding:3px 8px;border-radius:5px;color:var(--text2)"><b style="color:var(--text)">${k}</b>: ${v}</span>`).join('')}
+    </div>
+  </div>` : ''}
+</div>`).join('');
+}
+
+function exitLearnPath() {
+  document.getElementById('learn-paths').style.display = '';
+  document.getElementById('learn-content').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// EVAL MODE
+// ════════════════════════════════════════════════════════════════════════════
+function renderEvalPills() {
+  document.getElementById('eval-pills').innerHTML = FISIO_EVAL_CASES.map(c =>
+    `<button class="eval-pill" id="epill-${c.id}" onclick="loadEvalCase('${c.id}')">${c.title}</button>`
+  ).join('');
+}
+
+function loadEvalCase(caseId) {
+  const ec = FISIO_EVAL_CASES.find(c => c.id === caseId);
+  if (!ec) return;
+  state.evalCase = ec;
+  state.evalAnswered = {};
+  state.evalScore = 0;
+  document.querySelectorAll('.eval-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById(`epill-${caseId}`)?.classList.add('active');
+
+  document.getElementById('eval-case-content').innerHTML = `
+<div class="eval-case">
+  <div class="eval-hd">${ec.title}</div>
+  <div class="eval-clinical">${ec.clinical}</div>
+  <div class="eval-vitals">
+    <span class="eval-v">SpO₂ ${ec.vitals.spo2}%</span>
+    <span class="eval-v">FC ${ec.vitals.hr} lpm</span>
+    <span class="eval-v">FR ${ec.vitals.rr} rpm</span>
+  </div>
+  ${ec.questions.map((q,qi) => `
+  <div class="eval-q" id="eq-${qi}">
+    <div class="eval-q-text">${qi+1}. ${q.q}</div>
+    <div class="eval-opts">
+      ${q.opts.map((opt,oi) => `
+      <button class="eval-opt" id="eopt-${qi}-${oi}" onclick="answerEval(${qi},${oi})">
+        <span class="eval-opt-key">${String.fromCharCode(65+oi)}.</span>
+        ${opt}
+      </button>`).join('')}
+    </div>
+    <div class="eval-exp" id="eexp-${qi}">${q.exp}</div>
+  </div>`).join('')}
+  <div class="eval-score" id="eval-score"></div>
+</div>`;
+}
+
+function answerEval(qi, oi) {
+  if (!state.evalCase || state.evalAnswered[qi] !== undefined) return;
+  const q = state.evalCase.questions[qi];
+  state.evalAnswered[qi] = oi;
+
+  // Mark options
+  q.opts.forEach((_, i) => {
+    const btn = document.getElementById(`eopt-${qi}-${i}`);
+    if (btn) {
+      btn.disabled = true;
+      if (i === q.correct) btn.classList.add('correct');
+      else if (i === oi)   btn.classList.add('wrong');
+    }
+  });
+
+  // Show explanation
+  const exp = document.getElementById(`eexp-${qi}`);
+  if (exp) exp.classList.add('show');
+
+  if (oi === q.correct) state.evalScore++;
+
+  // Check if all answered
+  if (Object.keys(state.evalAnswered).length === state.evalCase.questions.length) {
+    const total = state.evalCase.questions.length;
+    const pct   = Math.round(state.evalScore / total * 100);
+    const grade = pct >= 85 ? 'Excelente' : pct >= 70 ? 'Bueno' : pct >= 55 ? 'Aceptable' : 'Mejorar';
+    const sc = document.getElementById('eval-score');
+    if (sc) {
+      sc.classList.add('show');
+      sc.innerHTML = `<div class="eval-score-val">${state.evalScore}/${total}</div>
+<div class="eval-score-lbl">${grade} · ${pct}%</div>`;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ════════════════════════════════════════════════════════════════════════════
+function switchMode(mode) {
+  document.querySelectorAll('.mode-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['libre','learn','eval'][i] === mode);
+  });
+  document.getElementById('m-libre').hidden = mode !== 'libre';
+  document.getElementById('m-learn').hidden = mode !== 'learn';
+  document.getElementById('m-eval').hidden  = mode !== 'eval';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+try {
+  renderDiseaseSelector();
+  renderLearnPaths();
+  renderEvalPills();
+} catch(e) {
+  const el = document.getElementById('dis-groups');
+  if (el) el.innerHTML = `<div style="color:#f87171;padding:1rem;font-family:monospace;font-size:12px;white-space:pre-wrap;background:#1a0000;border-radius:6px"><b>ERROR JS:</b>\n${e.message}\n\n${e.stack}</div>`;
+  console.error('Init error:', e);
+}
+</script>
+</body>
+</html>

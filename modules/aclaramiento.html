@@ -332,6 +332,33 @@ const TECHNIQUES = [
     color:'#2dd4bf',
     mcid:'Presión Inspiratoria Máxima ↑ ≥ 10 cmH₂O + mejoría en test de marcha ≥ 25 m',
   },
+  {
+    id:'eltgol',
+    name:'ELTGOL',
+    icon:'🌬️',
+    cat:'Técnica de aclaramiento mucociliar',
+    evidence:'B',
+    mechanism:'Espiración Lenta Total con Glotis Abierta en Infraposición Lateral. Al colocar el pulmón afectado en posición declive e informar al paciente de mantener la glotis abierta durante una espiración lenta hasta el volumen residual, se incrementa la presión transpulmonar y se moviliza el moco desde vías aéreas periféricas hacia centrales, donde puede eliminarse con tos o huff.',
+    phases:[
+      'Decúbito lateral con el pulmón a tratar en posición infraposición (declive) — favorece el drenaje gravitacional',
+      'Inspiración nasal lenta y profunda hasta capacidad pulmonar total',
+      'Espiración oral lenta con glotis abierta (boca entreabierta, sin cierre laríngeo) hasta volumen residual — duración > 3 s',
+      'Pausa teleespiratoria breve (1–2 s); a continuación huff o tos controlada para evacuar el moco movilizado',
+    ],
+    indications:['EPOC con hipersecreción bronquial','Bronquiectasias','Fibrosis quística (estadios moderados)','Post-cirugía torácica o abdominal alta','Afectación unilateral o asimétrica (mejor rendimiento que técnicas simétricas)'],
+    contraindications:['Hemoptisis activa','Neumotórax no drenado','Inestabilidad hemodinámica','Cirugía reciente de columna o pelvis (contraindicación postural)'],
+    precautions:['Evitar en presión intracraneal elevada','Adaptar posición si hay reflujo gastroesofágico — elevar cabecera 30°','Monitorizar SpO₂ durante la técnica'],
+    params:[
+      ['Posición','Decúbito lateral — pulmón a tratar en declive'],
+      ['Duración de la espiración','> 3 s (lenta, hasta volumen residual)'],
+      ['Repeticiones','6–8 espiraciones lentas por serie'],
+      ['Series','2–3 series con descanso de 1–2 min entre ellas'],
+      ['Evacuación final','Huff × 2–3 o tos controlada al finalizar la serie'],
+    ],
+    animation:'eltgol',
+    color:'#c084fc',
+    mcid:'Reducción del volumen de esputo ≥ 10 mL/día o mejoría ≥ 2 puntos en escala de disnea (mMRC)',
+  },
 ];
 
 /* ====================================================
@@ -968,6 +995,86 @@ function getAnimation(id, color){
       <rect x="210" y="248" width="175" height="42" rx="6" fill="${c}" fill-opacity=".05" stroke="${c}" stroke-opacity=".15" stroke-width="1"/>
       <text x="297" y="265" fill="${c}" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Programa mínimo</text>
       <text x="297" y="279" fill="${c}" fill-opacity=".65" font-size="9" font-family="sans-serif" text-anchor="middle">8–12 semanas · 2 × /día</text>
+    </svg>`,
+
+    eltgol:`<svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lungGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${c}" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="${c}" stop-opacity=".04"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Cama / posición lateral -->
+      <rect x="30" y="220" width="500" height="12" rx="4" fill="${c}" fill-opacity=".15" stroke="${c}" stroke-opacity=".3" stroke-width="1"/>
+      <rect x="30" y="205" width="55" height="18" rx="3" fill="${c}" fill-opacity=".1" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="57" y="198" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" fill-opacity=".7">cabecera</text>
+
+      <!-- Silueta paciente en decúbito lateral -->
+      <!-- Cabeza -->
+      <ellipse cx="95" cy="195" rx="16" ry="14" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-opacity=".4" stroke-width="1.5"/>
+      <!-- Tronco -->
+      <ellipse cx="200" cy="207" rx="95" ry="13" fill="${c}" fill-opacity=".1" stroke="${c}" stroke-opacity=".3" stroke-width="1.5"/>
+      <!-- Piernas -->
+      <ellipse cx="360" cy="212" rx="80" ry="8" fill="${c}" fill-opacity=".08" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="200" y="240" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" fill-opacity=".6">Decúbito lateral — pulmón afectado en declive</text>
+
+      <!-- Pulmón izquierdo (inferior — en declive) resaltado -->
+      <path d="M 155,140 Q 145,105 165,85 Q 185,68 200,85 Q 200,120 195,140 Z"
+            fill="url(#lungGrad)" stroke="${c}" stroke-width="2" stroke-opacity=".7"/>
+      <text x="175" y="100" fill="${c}" font-size="8" font-family="sans-serif" text-anchor="middle" font-weight="700">↓ declive</text>
+
+      <!-- Pulmón derecho (superior) -->
+      <path d="M 215,140 Q 215,105 228,85 Q 248,68 265,85 Q 272,108 265,140 Z"
+            fill="${c}" fill-opacity=".06" stroke="${c}" stroke-width="1.2" stroke-opacity=".35"/>
+
+      <!-- Tráquea -->
+      <rect x="197" y="55" width="14" height="32" rx="4" fill="${c}" fill-opacity=".15" stroke="${c}" stroke-opacity=".4" stroke-width="1.2"/>
+      <text x="204" y="50" fill="${c}" font-size="8" font-family="sans-serif" text-anchor="middle">Tráquea</text>
+
+      <!-- Glotis — estado abierta -->
+      <ellipse cx="204" cy="54" rx="7" ry="4" fill="none" stroke="${c}" stroke-width="1.5" stroke-opacity=".7"/>
+      <text x="224" y="56" fill="${c}" font-size="8" font-family="sans-serif" fill-opacity=".7">glotis abierta</text>
+
+      <!-- Flecha espiración lenta hacia arriba por la tráquea -->
+      <line x1="204" y1="58" x2="204" y2="18" stroke="${c}" stroke-width="2" stroke-opacity=".6" stroke-dasharray="4,3"/>
+      <polygon points="204,10 199,20 209,20" fill="${c}" fill-opacity=".7"/>
+      <text x="224" y="20" fill="${c}" font-size="8" font-family="sans-serif" fill-opacity=".8">Espiración lenta</text>
+
+      <!-- Moco movilizándose — bola animada subiendo desde pulmón declive -->
+      <circle r="5" fill="${c}" fill-opacity=".9">
+        <animateMotion dur="3.2s" repeatCount="indefinite"
+          path="M 175,130 Q 190,100 204,80 L 204,20"/>
+        <animate attributeName="opacity" values="0;1;1;0.3" keyTimes="0;0.1;0.8;1" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="3.5" fill="${c}" fill-opacity=".7">
+        <animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite"
+          path="M 175,130 Q 190,100 204,80 L 204,20"/>
+        <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.15;0.8;1" dur="3.2s" begin="0.8s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Volumen pulmonar — barra de progreso -->
+      <rect x="310" y="70" width="18" height="130" rx="4" fill="${c}" fill-opacity=".08" stroke="${c}" stroke-opacity=".25" stroke-width="1"/>
+      <text x="319" y="65" fill="${c}" font-size="8" font-family="sans-serif" text-anchor="middle">Vol</text>
+      <rect x="312" y="72" width="14" rx="3" fill="${c}" fill-opacity=".55">
+        <animate attributeName="height" values="126;10;126" keyTimes="0;0.55;1" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="72;186;72" keyTimes="0;0.55;1" dur="4s" repeatCount="indefinite"/>
+      </rect>
+      <text x="319" y="215" fill="${c}" font-size="7.5" font-family="sans-serif" text-anchor="middle" fill-opacity=".6">VR</text>
+      <text x="319" y="82" fill="${c}" font-size="7.5" font-family="sans-serif" text-anchor="middle" fill-opacity=".6">CPT</text>
+
+      <!-- Fases etiquetas -->
+      <rect x="345" y="68" width="200" height="148" rx="6" fill="${c}" fill-opacity=".04" stroke="${c}" stroke-opacity=".12" stroke-width="1"/>
+      <text x="355" y="86" fill="${c}" font-size="9" font-family="sans-serif" font-weight="700">Fases ELTGOL</text>
+      <text x="355" y="104" fill="${c}" fill-opacity=".7" font-size="8.5" font-family="sans-serif">1 · Infraposición lateral (pulmón afectado declive)</text>
+      <text x="355" y="120" fill="${c}" fill-opacity=".7" font-size="8.5" font-family="sans-serif">2 · Inspiración nasal lenta → CPT</text>
+      <text x="355" y="136" fill="${c}" fill-opacity=".7" font-size="8.5" font-family="sans-serif">3 · Espiración oral lenta con glotis abierta → VR</text>
+      <text x="355" y="152" fill="${c}" fill-opacity=".7" font-size="8.5" font-family="sans-serif">   (duración &gt; 3 s, sin cierre laríngeo)</text>
+      <text x="355" y="168" fill="${c}" fill-opacity=".7" font-size="8.5" font-family="sans-serif">4 · Huff × 2–3 o tos controlada → evacuación</text>
+
+      <!-- Evidencia -->
+      <rect x="345" y="228" width="90" height="26" rx="5" fill="${c}" fill-opacity=".08" stroke="${c}" stroke-opacity=".2" stroke-width="1"/>
+      <text x="390" y="245" fill="${c}" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="700">Evidencia B</text>
     </svg>`,
   };
 

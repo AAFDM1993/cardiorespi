@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riesgo Cardiovascular · FisioResp</title>
+<link rel="stylesheet" href="../assets/css/fisioresp.css">
+<style>
+section .panel { display: block; }
+.nav-logo{font-family:var(--fh);font-size:1.15rem;color:var(--blue);letter-spacing:1px;display:flex;align-items:center;gap:.5rem}
+.nav-logo span{color:var(--teal)}
+.nav-pill{background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:600;color:#f472b6;letter-spacing:.4px;margin-left:auto}
+
+/* ── layout ── */
+.calc-wrap{display:flex;gap:2rem;align-items:flex-start;margin-top:1.25rem}
+.form-col{flex:1;min-width:0}
+.output-col{flex:0 0 220px;display:flex;flex-direction:column;align-items:center;gap:.75rem}
+
+/* ── form ── */
+.group-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin:1.75rem 0 .9rem;display:flex;align-items:center;gap:.5rem}
+.group-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.toggle-group{display:flex;gap:6px;margin-bottom:1.25rem}
+.tbtn{flex:1;padding:7px 0;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;font-family:var(--fb);cursor:pointer;transition:all .18s}
+.tbtn.on{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.35);color:var(--blue)}
+.tbtn.on-pink{background:rgba(244,114,182,.12);border-color:rgba(244,114,182,.35);color:#f472b6}
+
+.sl-row{margin-bottom:1rem}
+.sl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.35rem}
+.sl-label{font-size:12.5px;color:var(--text2);font-weight:500}
+.sl-val{font-size:13px;font-weight:700;color:var(--blue);font-family:var(--fm)}
+.sl-ref{font-size:10.5px;color:var(--text3)}
+input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2);border-radius:2px;outline:none;cursor:pointer;accent-color:var(--blue)}
+.sl-ticks{display:flex;justify-content:space-between;font-size:9.5px;color:var(--text3);margin-top:3px}
+
+.check-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;cursor:pointer;font-size:12.5px;color:var(--text2)}
+.check-row input{width:15px;height:15px;accent-color:var(--blue);cursor:pointer}
+
+/* ── gauge ── */
+#gauge-wrap{text-align:center}
+.gauge-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 12px;border-radius:100px;border:1px solid;margin-top:.25rem}
+.pts-box{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem .9rem;width:100%;box-sizing:border-box;font-size:12px}
+.pts-box h4{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:.5rem}
+.pts-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--border)}
+.pts-row:last-child{border:none;font-weight:700;color:var(--text);margin-top:3px}
+.pts-pos{color:var(--red);font-family:var(--fm)}
+.pts-neg{color:var(--green);font-family:var(--fm)}
+.pts-zero{color:var(--text3);font-family:var(--fm)}
+
+/* ── killip ── */
+.killip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.kcard{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:.9rem;cursor:pointer;transition:all .2s;text-align:center}
+.kcard:hover{transform:translateY(-2px)}
+.kcard.sel{border-width:2px}
+.kcard-k{font-family:var(--fh);font-size:1.5rem;font-weight:800;margin-bottom:.25rem}
+.kcard-title{font-size:11.5px;font-weight:700;margin-bottom:.4rem}
+.kcard-desc{font-size:10.5px;color:var(--text3);line-height:1.4}
+
+/* ── FITT ── */
+.fitt-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-top:.75rem}
+.fitt-title{font-family:var(--fh);font-size:1rem;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
+.fitt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:.9rem}
+.fitt-item{background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.65rem .8rem}
+.fitt-letter{font-family:var(--fh);font-size:1.3rem;font-weight:800;color:var(--blue)}
+.fitt-name{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:.35rem}
+.fitt-val{font-size:12px;color:var(--text);line-height:1.45}
+.fitt-warn{font-size:11.5px;color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:var(--rs);padding:.55rem .8rem;margin-bottom:.4rem}
+.fitt-warn.red{color:#ef4444;background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
+.fitt-note{font-size:11.5px;color:var(--text2);line-height:1.55}
+.fitt-note strong{color:var(--text)}
+
+@media(max-width:820px){.calc-wrap{flex-direction:column-reverse}.output-col{flex:none;width:100%;flex-direction:row;justify-content:center;align-items:flex-start}.killip-grid{grid-template-columns:repeat(2,1fr)}.fitt-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.killip-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🫁 Fisio<span>Resp</span></div>
+  <div class="nav-pill">C11–C12 · Riesgo Cardiovascular</div>
+</nav>
+
+<section>
+<div class="panel">
+
+  <div style="margin-bottom:1rem">
+    <h2 style="font-family:var(--fh);font-size:1.5rem;margin-bottom:.4rem">Riesgo Cardiovascular y Prescripción de Ejercicio</h2>
+    <p style="color:var(--text2);font-size:13px;max-width:720px;line-height:1.75">
+      Score de <strong>Framingham 2008</strong> (Wilson et al.) — estima el riesgo de evento CV (IAM, ACV, arteriopatía) a <strong>10 años</strong> en pacientes sin enfermedad cardiovascular previa. Combínalo con la clasificación <strong>Killip-Kimball</strong> para generar una prescripción FITT individualizada.
+    </p>
+  </div>
+
+  <!-- ── CALCULADORA FRAMINGHAM ── -->
+  <div class="group-label" style="margin-top:.5rem">Calculadora Framingham — Score de riesgo a 10 años</div>
+
+  <div class="calc-wrap">
+
+    <!-- form -->
+    <div class="form-col">
+
+      <div class="toggle-group">
+        <button class="tbtn on" id="btn-M" onclick="setSex('M')">♂ Hombre</button>
+        <button class="tbtn" id="btn-F" onclick="setSex('F')">♀ Mujer</button>
+      </div>
+
+      <div class="sl-row">
+        <div class="sl-header">
+          <span class="sl-label">Edad</span>
+          <span class="sl-val" id="v-age">52 años</span>
+        </div>
+        <input type="range" id="sl-age" min="20" max="79" value="52" oninput="upd('age',+this.value,'v-age',this.value+' años')">
+        <div class="sl-ticks"><span>20</span><span>40</span><span>60</span><span>79</span></div>
+      </div>
+
+      <div class="sl-row">
+        <div class="sl-header">
+          <span class="sl-label">Colesterol Total</span>
+          <span class="sl-val" id="v-tc">215 mg/dL</span>
+        </div>
+        <input type="range" id="sl-tc" min="100" max="320" value="215" oninput="upd('tc',+this.value,'v-tc',this.value+' mg/dL')">
+        <div class="sl-ticks"><span>100</span><span class="sl-ref">Óptimo &lt;200</span><span>240 ↑alto</span><span>320</span></div>
+      </div>
+
+      <div class="sl-row">
+        <div class="sl-header">
+          <span class="sl-label">HDL Colesterol</span>
+          <span class="sl-val" id="v-hdl">42 mg/dL</span>
+        </div>
+        <input type="range" id="sl-hdl" min="20" max="100" value="42" oninput="upd('hdl',+this.value,'v-hdl',this.value+' mg/dL')">
+        <div class="sl-ticks"><span>20</span><span class="sl-ref">Bajo &lt;40</span><span>60 óptimo</span><span>100</span></div>
+      </div>
+
+      <div class="sl-row">
+        <div class="sl-header">
+          <span class="sl-label">Presión Arterial Sistólica</span>
+          <span class="sl-val" id="v-sbp">145 mmHg</span>
+        </div>
+        <input type="range" id="sl-sbp" min="90" max="200" value="145" oninput="upd('sbp',+this.value,'v-sbp',this.value+' mmHg')">
+        <div class="sl-ticks"><span>90</span><span class="sl-ref">&lt;120 normal</span><span>140 ↑HTA</span><span>200</span></div>
+      </div>
+
+      <label class="check-row">
+        <input type="checkbox" id="ck-treated" onchange="state.bpTreated=this.checked;update()">
+        Hipertensión en tratamiento farmacológico
+      </label>
+      <label class="check-row">
+        <input type="checkbox" id="ck-smoke" onchange="state.smoking=this.checked;update()">
+        Fumador/a activo/a
+      </label>
+
+    </div><!-- /form-col -->
+
+    <!-- output -->
+    <div class="output-col">
+
+      <div id="gauge-wrap">
+        <svg id="gauge-svg" viewBox="0 0 200 120" width="200" style="display:block">
+          <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="14" stroke-linecap="round"/>
+          <path id="g-arc" d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+          <text id="g-pct" x="100" y="88" text-anchor="middle" font-size="30" font-weight="700" fill="#4ade80" font-family="Space Grotesk,sans-serif">--%</text>
+          <text x="100" y="110" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.55)" font-family="Space Grotesk,sans-serif">riesgo a 10 años</text>
+          <text x="20" y="115" text-anchor="start" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">BAJO</text>
+          <text x="180" y="115" text-anchor="end" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">MUY ALTO</text>
+        </svg>
+        <div id="g-cat" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010">—</div>
+      </div>
+
+      <div class="pts-box">
+        <h4>Desglose de puntos</h4>
+        <div class="pts-row"><span>Edad</span><span id="bd-age" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Col. Total</span><span id="bd-tc" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>HDL Col.</span><span id="bd-hdl" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Presión arterial</span><span id="bd-sbp" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Tabaquismo</span><span id="bd-smoke" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Total</span><span id="bd-total" class="pts-zero">—</span></div>
+      </div>
+
+    </div><!-- /output-col -->
+
+  </div><!-- /calc-wrap -->
+
+  <!-- ── KILLIP ── -->
+  <div class="group-label">Clasificación Killip-Kimball · Solo si el paciente es post-IAM</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:.9rem">Si el paciente NO tiene IAM previo, deja sin seleccionar. La prescripción se basa solo en el score Framingham.</div>
+  <div class="killip-grid" id="killip-grid"></div>
+
+  <!-- ── FITT ── -->
+  <div class="group-label">Prescripción de Ejercicio (FITT)</div>
+  <div id="fitt-output"></div>
+
+</div>
+</section>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────
+const state = { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false, killip:null };
+
+function setSex(s){
+  state.sex=s;
+  document.getElementById('btn-M').className='tbtn'+(s==='M'?' on':'');
+  document.getElementById('btn-F').className='tbtn'+(s==='F'?' on-pink':'');
+  update();
+}
+
+function upd(key, val, lblId, txt){
+  state[key]=val;
+  document.getElementById(lblId).textContent=txt;
+  update();
+}
+
+// ── Framingham 2008 ───────────────────────────────────────────────────
+function calcFram(){
+  const {sex,age,tc,hdl,sbp,bpTreated,smoking} = state;
+  let pts=0; const bd={};
+
+  // Age
+  const ageRowM=[[-9,34],[-4,39],[0,44],[3,49],[6,54],[8,59],[10,64],[11,69],[12,74],[13,99]];
+  const ageRowF=[[-7,34],[-3,39],[0,44],[3,49],[6,54],[8,59],[10,64],[12,69],[14,74],[16,99]];
+  bd.age=(sex==='M'?ageRowM:ageRowF).find(([,max])=>age<=max)[0];
+  pts+=bd.age;
+
+  // Total Cholesterol × age group
+  const ag=age<40?0:age<50?1:age<60?2:age<70?3:4;
+  const tb=tc<160?0:tc<200?1:tc<240?2:tc<280?3:4;
+  const tcM=[[0,4,7,9,11],[0,3,5,6,8],[0,2,3,4,5],[0,1,1,2,3],[0,0,0,1,1]];
+  const tcF=[[0,4,8,11,13],[0,3,6,8,10],[0,2,4,5,7],[0,1,2,3,4],[0,1,1,2,2]];
+  bd.tc=(sex==='M'?tcM:tcF)[ag][tb];
+  pts+=bd.tc;
+
+  // HDL
+  bd.hdl=hdl>=60?-1:hdl>=50?0:hdl>=40?1:2;
+  pts+=bd.hdl;
+
+  // SBP
+  const sb=sbp<120?0:sbp<130?1:sbp<140?2:sbp<160?3:4;
+  const sbpM=[[0,0,1,1,2],[0,1,2,2,3]];
+  const sbpF=[[0,1,2,3,4],[0,3,4,5,6]];
+  bd.sbp=(sex==='M'?sbpM:sbpF)[bpTreated?1:0][sb];
+  pts+=bd.sbp;
+
+  // Smoking
+  const smkArr=[9,7,4,2,1];
+  bd.smoke=smoking?smkArr[ag]:0;
+  pts+=bd.smoke;
+
+  // Risk %
+  let risk;
+  if(sex==='M'){
+    const tM=[0.5,1,1,1,1,2,2,3,4,5,6,8,10,12,16,20,25,30];
+    risk=tM[Math.max(0,Math.min(17,pts<=0?0:pts))];
+  } else {
+    if(pts<=9) risk=0.5;
+    else if(pts>=25) risk=30;
+    else { const tF=[1,1,1,2,2,3,4,5,6,8,11,14,17,22,27]; risk=tF[pts-10]; }
+  }
+
+  return {pts,bd,risk};
+}
+
+// ── Gauge ─────────────────────────────────────────────────────────────
+function updateGauge(risk){
+  const arc=document.getElementById('g-arc');
+  const txt=document.getElementById('g-pct');
+  const cat=document.getElementById('g-cat');
+
+  const prog=Math.min(risk/30,1);
+  arc.style.strokeDashoffset=251.3*(1-prog);
+
+  const {color,label,bg}=
+    risk<10  ?{color:'#4ade80',label:'Bajo riesgo',   bg:'#4ade8010'}:
+    risk<20  ?{color:'#fbbf24',label:'Riesgo moderado',bg:'#fbbf2410'}:
+    risk<30  ?{color:'#fb923c',label:'Riesgo alto',    bg:'#fb923c10'}:
+              {color:'#ef4444',label:'Riesgo muy alto', bg:'#ef444410'};
+
+  arc.style.stroke=color;
+  txt.style.fill=color;
+  txt.textContent=risk<1?'<1%':risk>=30?'≥30%':risk+'%';
+
+  cat.style.color=color;
+  cat.style.borderColor=color+'44';
+  cat.style.background=bg;
+  cat.textContent=label;
+}
+
+// ── Breakdown ─────────────────────────────────────────────────────────
+function fmtPts(n){
+  const cls=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
+  return `<span class="${cls}">${n>0?'+'+n:n}</span>`;
+}
+
+
+// ── FITT data ─────────────────────────────────────────────────────────
+const FITT = {
+  low:{
+    hdr:'Riesgo bajo — ejercicio independiente',
+    color:'#4ade80',
+    warn:null,
+    F:'5 días/semana (aeróbico)',
+    I:'Moderada · 40–60% VO₂máx · Borg 11–13',
+    T:'30–60 min/sesión continua o acumulada',
+    Tipo:'Marcha, ciclismo, natación, elíptico',
+    note:'Sin necesidad de supervisión especializada ni prueba de esfuerzo previa a ejercicio moderado.',
+  },
+  moderate:{
+    hdr:'Riesgo moderado — evaluación médica recomendada',
+    color:'#fbbf24',
+    warn:'Prueba de esfuerzo recomendada antes de iniciar ejercicio vigoroso.',
+    F:'3–5 días/semana',
+    I:'Moderada · 40–60% VO₂máx · Borg 11–13',
+    T:'20–40 min/sesión',
+    Tipo:'Marcha, ciclismo estático, natación',
+    note:'Iniciar con intensidad baja y progresar. Evaluación médica previa a cualquier programa vigoroso.',
+  },
+  high:{
+    hdr:'Riesgo alto — programa supervisado obligatorio',
+    color:'#fb923c',
+    warn:'Evaluación médica y prueba de esfuerzo obligatorias antes de iniciar.',
+    F:'3–4 días/semana (supervisado)',
+    I:'Baja-moderada · 40–50% VO₂máx · Borg ≤12',
+    T:'20–30 min/sesión',
+    Tipo:'Marcha plana, ciclismo estático suave',
+    note:'Inicio supervisado. Monitorización de FC y PA durante el ejercicio. Incremento muy gradual.',
+  },
+  k1:{
+    hdr:'Killip I · Rehabilitación cardíaca fases I–II',
+    color:'#38bdf8',
+    warn:'Monitorización ECG durante fase hospitalaria.',
+    F:'Hospitalario: 1–2×/día. Domicilio: 3–5×/sem',
+    I:'FC: reposo+20-30 lpm · Borg 11–13 · sin umbral anginoso',
+    T:'Inicio 5-10 min → progresar +5 min/semana hasta 30-40 min',
+    Tipo:'Deambulación sala (Fase I) → marcha + ciclismo estático (Fase II)',
+    note:'Protocolo AHA Fase I/II. Incremento del 5-10% semanal. Objetivo: ≥5 METS a las 6 semanas.',
+  },
+  k2:{
+    hdr:'Killip II · Ejercicio muy supervisado',
+    color:'#fbbf24',
+    warn:'Monitorización continua de FC, PA y saturación durante toda la sesión.',
+    F:'3–4 días/semana (solo supervisado)',
+    I:'FC: reposo+10-20 lpm · Borg ≤12 · muy conservador',
+    T:'5–15 min (incremento muy lento)',
+    Tipo:'Solo deambulación asistida. Sin ejercicio de resistencia.',
+    note:'Priorizar estabilidad hemodinámica. Suspender ante cualquier síntoma. Coordinación estrecha con cardiología.',
+  },
+  k3:{
+    hdr:'Killip III · Ejercicio contraindicado hasta estabilización',
+    color:'#ef4444',
+    warnRed:'CONTRAINDICACIÓN al ejercicio aeróbico activo.',
+    warn:null,
+    F:'—',
+    I:'Solo movilización pasiva',
+    T:'5–10 min de movilización articular pasiva',
+    Tipo:'Cambios posturales, movilización pasiva, evitar decúbito prolongado',
+    note:'Estabilizar hemodinámicamente antes de iniciar cualquier ejercicio activo. Reevaluar cuando mejore a Killip I-II.',
+  },
+  k4:{
+    hdr:'Killip IV · Contraindicación absoluta',
+    color:'#ef4444',
+    warnRed:'CONTRAINDICACIÓN ABSOLUTA. Soporte hemodinámico urgente.',
+    warn:null,
+    F:'—', I:'—', T:'—', Tipo:'Sin fisioterapia activa',
+    note:'Tratamiento médico urgente prioritario. No iniciar ningún tipo de rehabilitación hasta resolución del shock cardiogénico.',
+  },
+};
+
+function fittHTML(d, killipActive){
+  if(!d) return '';
+  const ctxNote = killipActive
+    ? `<div class="fitt-warn" style="color:var(--blue);background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2)">ℹ Prescripción basada en la clasificación Killip-Kimball — el score Framingham mostrado arriba no aplica en este contexto post-IAM agudo.</div>`
+    : '';
+  const warns=(d.warnRed?`<div class="fitt-warn red">⚠ ${d.warnRed}</div>`:'')
+             +(d.warn?`<div class="fitt-warn">⚡ ${d.warn}`+'</div>':'');
+  return `
+    <div class="fitt-card" style="border-color:${d.color}30">
+      <div class="fitt-title" style="color:${d.color}">
+        <span style="font-size:1.2rem">🏋️</span> ${d.hdr}
+      </div>
+      ${ctxNote}
+      ${warns}
+      <div class="fitt-grid">
+        <div class="fitt-item"><div class="fitt-letter" style="color:${d.color}">F</div><div class="fitt-name">Frecuencia</div><div class="fitt-val">${d.F}</div></div>
+        <div class="fitt-item"><div class="fitt-letter" style="color:${d.color}">I</div><div class="fitt-name">Intensidad</div><div class="fitt-val">${d.I}</div></div>
+        <div class="fitt-item"><div class="fitt-letter" style="color:${d.color}">T</div><div class="fitt-name">Tiempo</div><div class="fitt-val">${d.T}</div></div>
+        <div class="fitt-item"><div class="fitt-letter" style="color:${d.color}">T</div><div class="fitt-name">Tipo</div><div class="fitt-val">${d.Tipo}</div></div>
+      </div>
+      <div class="fitt-note"><strong>Nota clínica:</strong> ${d.note}</div>
+    </div>`;
+}
+
+function getFITT(risk, killip){
+  if(killip==='III') return FITT.k3;
+  if(killip==='IV')  return FITT.k4;
+  if(killip==='I')   return FITT.k1;
+  if(killip==='II')  return FITT.k2;
+  return risk<10?FITT.low:risk<20?FITT.moderate:FITT.high;
+}
+
+// ── Killip ────────────────────────────────────────────────────────────
+const KILLIP_DATA=[
+  {k:'I',  color:'#4ade80', title:'Sin signos de IC',
+   desc:'Sin S3, sin crepitantes, sin ↑PVY. Función cardíaca conservada.'},
+  {k:'II', color:'#fbbf24', title:'IC leve / moderada',
+   desc:'S3 audible, crepitantes &lt;50% del campo pulmonar o ↑PVY.'},
+  {k:'III',color:'#fb923c', title:'IC severa (EAP)',
+   desc:'Edema agudo de pulmón. Crepitantes &gt;50% del campo pulmonar.'},
+  {k:'IV', color:'#ef4444', title:'Shock cardiogénico',
+   desc:'PAS &lt;90 mmHg, signos de hipoperfusión (oliguria, cianosis, alteración mental).'},
+];
+
+function renderKillip(){
+  const g=document.getElementById('killip-grid');
+  KILLIP_DATA.forEach(d=>{
+    const c=document.createElement('div');
+    c.className='kcard'; c.id='kcard-'+d.k;
+    c.style.borderColor=d.color+'33';
+    c.innerHTML=`<div class="kcard-k" style="color:${d.color}">${d.k}</div>
+      <div class="kcard-title" style="color:${d.color}">Killip ${d.k}</div>
+      <div class="kcard-title" style="font-size:11px;color:var(--text);font-weight:600;margin-bottom:.3rem">${d.title}</div>
+      <div class="kcard-desc">${d.desc}</div>`;
+    c.onclick=()=>selectKillip(d.k);
+    g.appendChild(c);
+  });
+}
+
+function selectKillip(k){
+  state.killip = state.killip===k ? null : k;
+  KILLIP_DATA.forEach(d=>{
+    const c=document.getElementById('kcard-'+d.k);
+    const sel=state.killip===d.k;
+    c.style.borderColor=sel?d.color:(d.color+'33');
+    c.style.background=sel?d.color+'14':'var(--card)';
+  });
+  renderFITT();
+}
+
+// ── Update ────────────────────────────────────────────────────────────
+function renderFITT(){
+  const {risk}=calcFram();
+  document.getElementById('fitt-output').innerHTML=fittHTML(getFITT(risk,state.killip), !!state.killip);
+}
+
+function update(){
+  const {pts,bd,risk}=calcFram();
+  updateGauge(risk);
+  // breakdown
+  for(const k of['age','tc','hdl','sbp','smoke']){
+    const el=document.getElementById('bd-'+k);
+    if(!el) return;
+    const n=bd[k];
+    el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
+    el.textContent=n>0?'+'+n:n;
+  }
+  const tot=document.getElementById('bd-total');
+  if(tot){ tot.textContent=pts+' pts → '+(risk<1?'<1':risk>=30?'≥30':risk)+'%'; }
+  renderFITT();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+renderKillip();
+update();
+</script>
+</body>
+</html>
