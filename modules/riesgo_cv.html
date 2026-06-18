@@ -1084,8 +1084,19 @@ function selectKillip(k){
   renderFITT();
 }
 
+function getActiveRisk(){
+  if (state.activeScale === 'acsm') {
+    return state.lastNumericRisk ?? calcFram(state.fram).risk;
+  }
+  const calcMap = { fram: calcFram, score2: calcScore2, assign: calcAssign, qrisk: calcQrisk };
+  const calc = calcMap[state.activeScale];
+  const { risk } = calc(state[state.activeScale]);
+  state.lastNumericRisk = risk;
+  return risk;
+}
+
 function renderFITT(){
-  const {risk}=calcFram(state.fram);
+  const risk = getActiveRisk();
   document.getElementById('fitt-output').innerHTML=fittHTML(getFITT(risk,state.killip), !!state.killip);
 }
 
