@@ -6,7 +6,6 @@
 <title>Riesgo Cardiovascular · FisioResp</title>
 <link rel="stylesheet" href="../assets/css/fisioresp.css">
 <style>
-section .panel { display: block; }
 .nav-logo{font-family:var(--fh);font-size:1.15rem;color:var(--blue);letter-spacing:1px;display:flex;align-items:center;gap:.5rem}
 .nav-logo span{color:var(--teal)}
 .nav-pill{background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);border-radius:100px;padding:4px 14px;font-size:11px;font-weight:600;color:#f472b6;letter-spacing:.4px;margin-left:auto}
@@ -77,11 +76,16 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
 
 <nav>
   <div class="nav-logo">🫁 Fisio<span>Resp</span></div>
+  <div class="ntab active" onclick="showTab('fram',this)">Framingham</div>
+  <div class="ntab" onclick="showTab('score2',this)">SCORE2</div>
+  <div class="ntab" onclick="showTab('assign',this)">ASSIGN</div>
+  <div class="ntab" onclick="showTab('qrisk',this)">QRISK</div>
+  <div class="ntab" onclick="showTab('acsm',this)">ACSM</div>
   <div class="nav-pill">C11–C12 · Riesgo Cardiovascular</div>
 </nav>
 
 <section>
-<div class="wrap panel">
+<div class="wrap">
 
   <div style="margin-bottom:1rem">
     <h2 style="font-family:var(--fh);font-size:1.5rem;margin-bottom:.4rem">Riesgo Cardiovascular y Prescripción de Ejercicio</h2>
@@ -89,6 +93,8 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
       Score de <strong>Framingham 2008</strong> (Wilson et al.) — estima el riesgo de evento CV (IAM, ACV, arteriopatía) a <strong>10 años</strong> en pacientes sin enfermedad cardiovascular previa. Combínalo con la clasificación <strong>Killip-Kimball</strong> para generar una prescripción FITT individualizada.
     </p>
   </div>
+
+  <div class="panel active" id="tab-fram">
 
   <!-- ── CALCULADORA FRAMINGHAM ── -->
   <div class="group-label" style="margin-top:.5rem">Calculadora Framingham — Score de riesgo a 10 años</div>
@@ -99,52 +105,52 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
     <div class="form-col">
 
       <div class="toggle-group">
-        <button class="tbtn on" id="btn-M" onclick="setSex('M')">♂ Hombre</button>
-        <button class="tbtn" id="btn-F" onclick="setSex('F')">♀ Mujer</button>
+        <button class="tbtn on" id="fram-btn-M" onclick="setSexFram('M')">♂ Hombre</button>
+        <button class="tbtn" id="fram-btn-F" onclick="setSexFram('F')">♀ Mujer</button>
       </div>
 
       <div class="sl-row">
         <div class="sl-header">
           <span class="sl-label">Edad</span>
-          <span class="sl-val" id="v-age">52 años</span>
+          <span class="sl-val" id="fram-v-age">52 años</span>
         </div>
-        <input type="range" id="sl-age" min="20" max="79" value="52" oninput="upd('age',+this.value,'v-age',this.value+' años')">
+        <input type="range" id="fram-sl-age" min="20" max="79" value="52" oninput="updFram('age',+this.value,'fram-v-age',this.value+' años')">
         <div class="sl-ticks"><span>20</span><span>40</span><span>60</span><span>79</span></div>
       </div>
 
       <div class="sl-row">
         <div class="sl-header">
           <span class="sl-label">Colesterol Total</span>
-          <span class="sl-val" id="v-tc">215 mg/dL</span>
+          <span class="sl-val" id="fram-v-tc">215 mg/dL</span>
         </div>
-        <input type="range" id="sl-tc" min="100" max="320" value="215" oninput="upd('tc',+this.value,'v-tc',this.value+' mg/dL')">
+        <input type="range" id="fram-sl-tc" min="100" max="320" value="215" oninput="updFram('tc',+this.value,'fram-v-tc',this.value+' mg/dL')">
         <div class="sl-ticks"><span>100</span><span class="sl-ref">Óptimo &lt;200</span><span>240 ↑alto</span><span>320</span></div>
       </div>
 
       <div class="sl-row">
         <div class="sl-header">
           <span class="sl-label">HDL Colesterol</span>
-          <span class="sl-val" id="v-hdl">42 mg/dL</span>
+          <span class="sl-val" id="fram-v-hdl">42 mg/dL</span>
         </div>
-        <input type="range" id="sl-hdl" min="20" max="100" value="42" oninput="upd('hdl',+this.value,'v-hdl',this.value+' mg/dL')">
+        <input type="range" id="fram-sl-hdl" min="20" max="100" value="42" oninput="updFram('hdl',+this.value,'fram-v-hdl',this.value+' mg/dL')">
         <div class="sl-ticks"><span>20</span><span class="sl-ref">Bajo &lt;40</span><span>60 óptimo</span><span>100</span></div>
       </div>
 
       <div class="sl-row">
         <div class="sl-header">
           <span class="sl-label">Presión Arterial Sistólica</span>
-          <span class="sl-val" id="v-sbp">145 mmHg</span>
+          <span class="sl-val" id="fram-v-sbp">145 mmHg</span>
         </div>
-        <input type="range" id="sl-sbp" min="90" max="200" value="145" oninput="upd('sbp',+this.value,'v-sbp',this.value+' mmHg')">
+        <input type="range" id="fram-sl-sbp" min="90" max="200" value="145" oninput="updFram('sbp',+this.value,'fram-v-sbp',this.value+' mmHg')">
         <div class="sl-ticks"><span>90</span><span class="sl-ref">&lt;120 normal</span><span>140 ↑HTA</span><span>200</span></div>
       </div>
 
       <label class="check-row">
-        <input type="checkbox" id="ck-treated" onchange="state.bpTreated=this.checked;update()">
+        <input type="checkbox" id="fram-ck-treated" onchange="state.fram.bpTreated=this.checked;updateFram()">
         Hipertensión en tratamiento farmacológico
       </label>
       <label class="check-row">
-        <input type="checkbox" id="ck-smoke" onchange="state.smoking=this.checked;update()">
+        <input type="checkbox" id="fram-ck-smoke" onchange="state.fram.smoking=this.checked;updateFram()">
         Fumador/a activo/a
       </label>
 
@@ -153,31 +159,32 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
     <!-- output -->
     <div class="output-col">
 
-      <div id="gauge-wrap">
-        <svg id="gauge-svg" viewBox="0 0 200 120" width="200" style="display:block">
+      <div id="fram-gauge-wrap">
+        <svg id="fram-gauge-svg" viewBox="0 0 200 120" width="200" style="display:block">
           <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="14" stroke-linecap="round"/>
-          <path id="g-arc" d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
-          <text id="g-pct" x="100" y="88" text-anchor="middle" font-size="30" font-weight="700" fill="#4ade80" font-family="Space Grotesk,sans-serif">--%</text>
+          <path id="fram-g-arc" d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+          <text id="fram-g-pct" x="100" y="88" text-anchor="middle" font-size="30" font-weight="700" fill="#4ade80" font-family="Space Grotesk,sans-serif">--%</text>
           <text x="100" y="110" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.55)" font-family="Space Grotesk,sans-serif">riesgo a 10 años</text>
           <text x="20" y="115" text-anchor="start" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">BAJO</text>
           <text x="180" y="115" text-anchor="end" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">MUY ALTO</text>
         </svg>
-        <div id="g-cat" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010">—</div>
+        <div id="fram-g-cat" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010">—</div>
       </div>
 
       <div class="pts-box">
         <h4>Desglose de puntos</h4>
-        <div class="pts-row"><span>Edad</span><span id="bd-age" class="pts-zero">—</span></div>
-        <div class="pts-row"><span>Col. Total</span><span id="bd-tc" class="pts-zero">—</span></div>
-        <div class="pts-row"><span>HDL Col.</span><span id="bd-hdl" class="pts-zero">—</span></div>
-        <div class="pts-row"><span>Presión arterial</span><span id="bd-sbp" class="pts-zero">—</span></div>
-        <div class="pts-row"><span>Tabaquismo</span><span id="bd-smoke" class="pts-zero">—</span></div>
-        <div class="pts-row"><span>Total</span><span id="bd-total" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Edad</span><span id="fram-bd-age" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Col. Total</span><span id="fram-bd-tc" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>HDL Col.</span><span id="fram-bd-hdl" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Presión arterial</span><span id="fram-bd-sbp" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Tabaquismo</span><span id="fram-bd-smoke" class="pts-zero">—</span></div>
+        <div class="pts-row"><span>Total</span><span id="fram-bd-total" class="pts-zero">—</span></div>
       </div>
 
     </div><!-- /output-col -->
 
   </div><!-- /calc-wrap -->
+  </div><!-- /tab-fram -->
 
   <!-- ── KILLIP ── -->
   <div class="group-label">Clasificación Killip-Kimball · Solo si el paciente es post-IAM</div>
@@ -193,24 +200,38 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
 
 <script>
 // ── State ─────────────────────────────────────────────────────────────
-const state = { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false, killip:null };
+const state = {
+  activeScale: 'fram',
+  lastNumericRisk: null,
+  fram: { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false },
+  killip: null,
+};
 
-function setSex(s){
-  state.sex=s;
-  document.getElementById('btn-M').className='tbtn'+(s==='M'?' on':'');
-  document.getElementById('btn-F').className='tbtn'+(s==='F'?' on-pink':'');
-  update();
+function showTab(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  state.activeScale = id;
+  renderFITT();
 }
 
-function upd(key, val, lblId, txt){
-  state[key]=val;
+function setSexFram(s){
+  state.fram.sex=s;
+  document.getElementById('fram-btn-M').className='tbtn'+(s==='M'?' on':'');
+  document.getElementById('fram-btn-F').className='tbtn'+(s==='F'?' on-pink':'');
+  updateFram();
+}
+
+function updFram(key, val, lblId, txt){
+  state.fram[key]=val;
   document.getElementById(lblId).textContent=txt;
-  update();
+  updateFram();
 }
 
 // ── Framingham 2008 ───────────────────────────────────────────────────
-function calcFram(){
-  const {sex,age,tc,hdl,sbp,bpTreated,smoking} = state;
+function calcFram(s){
+  const {sex,age,tc,hdl,sbp,bpTreated,smoking} = s;
   let pts=0; const bd={};
 
   // Age
@@ -258,10 +279,10 @@ function calcFram(){
 }
 
 // ── Gauge ─────────────────────────────────────────────────────────────
-function updateGauge(risk){
-  const arc=document.getElementById('g-arc');
-  const txt=document.getElementById('g-pct');
-  const cat=document.getElementById('g-cat');
+function updateGaugeFram(risk){
+  const arc=document.getElementById('fram-g-arc');
+  const txt=document.getElementById('fram-g-pct');
+  const cat=document.getElementById('fram-g-cat');
 
   const prog=Math.min(risk/30,1);
   arc.style.strokeDashoffset=251.3*(1-prog);
@@ -432,31 +453,30 @@ function selectKillip(k){
   renderFITT();
 }
 
-// ── Update ────────────────────────────────────────────────────────────
 function renderFITT(){
-  const {risk}=calcFram();
+  const {risk}=calcFram(state.fram);
   document.getElementById('fitt-output').innerHTML=fittHTML(getFITT(risk,state.killip), !!state.killip);
 }
 
-function update(){
-  const {pts,bd,risk}=calcFram();
-  updateGauge(risk);
+function updateFram(){
+  const {pts,bd,risk}=calcFram(state.fram);
+  updateGaugeFram(risk);
   // breakdown
   for(const k of['age','tc','hdl','sbp','smoke']){
-    const el=document.getElementById('bd-'+k);
+    const el=document.getElementById('fram-bd-'+k);
     if(!el) return;
     const n=bd[k];
     el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
     el.textContent=n>0?'+'+n:n;
   }
-  const tot=document.getElementById('bd-total');
+  const tot=document.getElementById('fram-bd-total');
   if(tot){ tot.textContent=pts+' pts → '+(risk<1?'<1':risk>=30?'≥30':risk)+'%'; }
   renderFITT();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────
 renderKillip();
-update();
+updateFram();
 </script>
 </body>
 </html>
