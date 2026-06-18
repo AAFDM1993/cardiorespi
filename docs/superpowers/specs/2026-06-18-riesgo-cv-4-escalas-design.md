@@ -15,7 +15,8 @@
 
 | Acción | Archivo | Cambios |
 |--------|---------|---------|
-| Modificar | `modules/riesgo_cv.html` | Agregar selector de pestañas, 4 calculadoras nuevas, refactor de estado, integración FITT |
+| Modificar | `modules/riesgo_cv.html` | Agregar selector de pestañas, 4 calculadoras nuevas, refactor de estado, integración FITT, selector de casos clínicos |
+| Crear | `data/cases-riesgo-cv.js` | 10 perfiles clínicos preconfigurados (`RIESGO_CV_CASES`) |
 | Modificar | `modules/clase-11.html` | Actualizar `mod-desc` y footer de la tarjeta del módulo |
 
 `modules/clase-12.html` no se modifica.
@@ -42,6 +43,7 @@
   ```
 - Killip-Kimball y el bloque FITT permanecen **debajo de las pestañas, sin cambios visuales**, comunes a todas.
 - Se agrega un disclaimer breve y visible (no solo en el texto introductorio) bajo el selector de pestañas: *"SCORE2, ASSIGN y QRISK se calculan con aproximaciones educativas calibradas, no con el algoritmo clínico oficial. Framingham y ACSM siguen sus tablas/criterios reales publicados."*
+- Encima del selector de pestañas se agrega un selector global de **10 casos clínicos preconfigurados** (ver sección dedicada más abajo) que rellena las 5 pestañas a la vez.
 
 ---
 
@@ -243,6 +245,136 @@ function getActiveRisk() {
 
 ---
 
+## Casos clínicos preconfigurados
+
+**Objetivo:** permitir cargar uno de 10 pacientes predefinidos y ver cómo cada una de las 5 escalas lo clasifica, sin tener que reintroducir los datos en cada pestaña.
+
+### Ubicación en la UI
+
+Una fila de 10 chips (`Caso 1`…`Caso 10`, con nombre corto) sobre el selector de pestañas, más un chip `Entrada manual` que solo oculta la tarjeta de viñeta y desmarca el chip activo — **no resetea los valores ya cargados**, para que el usuario pueda seguir ajustando manualmente desde donde quedó el caso. Al seleccionar un caso:
+1. Se muestra una tarjeta de viñeta (nombre, edad, sexo, 1–2 líneas de contexto clínico) debajo de los chips.
+2. Se sincronizan los valores en los inputs DOM de **las 5 pestañas** (sliders/toggles/checkboxes), no solo la activa.
+3. Se recalculan y redibujan **las 5 pestañas de inmediato** (`updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm(); renderFITT();`) — así no quedan gauges desactualizados si el usuario cambia de pestaña después.
+4. La **región SCORE2** (Bajo/Moderado/Alto/Muy alto) NO se sobreescribe — es un atributo poblacional/geográfico, no del paciente, así que conserva lo que el usuario ya tenía seleccionado (por defecto "Bajo").
+
+### Estructura de datos — `data/cases-riesgo-cv.js`
+
+Perfil clínico **unificado** por caso (una sola fuente de verdad), con edades entre 42–68 años para que ninguna escala necesite clamping de rango:
+
+```js
+const RIESGO_CV_CASES = [
+  { id:1, name:'María Dolores Ruiz', age:45, sex:'F',
+    vignette:'45 años, físicamente activa, sin antecedentes. Perfil lipídico óptimo.',
+    sbp:112, tc:178, hdl:62, bpTreated:false,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:23, ethnicity:'white', diabetes:'none', famHist:false, afib:false, ckd:false,
+    ses:3, sedentary:false, dyslipidemiaTx:false },
+
+  { id:2, name:'Antonio Gómez', age:50, sex:'M',
+    vignette:'Hipertensión tratada y controlada. Exfumador desde hace 5 años.',
+    sbp:134, tc:205, hdl:45, bpTreated:true,
+    smoking:{status:'ex', cigsPerDay:0, quitMonthsAgo:60},
+    bmi:26, ethnicity:'white', diabetes:'none', famHist:false, afib:false, ckd:false,
+    ses:4, sedentary:false, dyslipidemiaTx:true },
+
+  { id:3, name:'Carmen Salas', age:55, sex:'F',
+    vignette:'Sedentaria, HDL bajo. Madre con IAM a los 58 años.',
+    sbp:128, tc:230, hdl:38, bpTreated:false,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:27, ethnicity:'white', diabetes:'none', famHist:true, afib:false, ckd:false,
+    ses:4, sedentary:true, dyslipidemiaTx:false },
+
+  { id:4, name:'Jorge Paredes', age:58, sex:'M',
+    vignette:'Fumador activo (20 cig/día), hipertensión sin tratamiento, sedentario.',
+    sbp:158, tc:215, hdl:41, bpTreated:false,
+    smoking:{status:'current', cigsPerDay:20, quitMonthsAgo:null},
+    bmi:28, ethnicity:'white', diabetes:'none', famHist:false, afib:false, ckd:false,
+    ses:5, sedentary:true, dyslipidemiaTx:false },
+
+  { id:5, name:'Manuel Torres', age:62, sex:'M',
+    vignette:'Diabetes tipo 2, obesidad (IMC 32), dislipidemia tratada, sedentario.',
+    sbp:148, tc:240, hdl:36, bpTreated:true,
+    smoking:{status:'ex', cigsPerDay:0, quitMonthsAgo:24},
+    bmi:32, ethnicity:'white', diabetes:'type2', famHist:false, afib:false, ckd:false,
+    ses:5, sedentary:true, dyslipidemiaTx:true },
+
+  { id:6, name:'Lucía Fernández', age:60, sex:'F',
+    vignette:'Fumadora intensa (25 cig/día). Padre con IAM a los 52 años.',
+    sbp:142, tc:225, hdl:44, bpTreated:false,
+    smoking:{status:'current', cigsPerDay:25, quitMonthsAgo:null},
+    bmi:25, ethnicity:'white', diabetes:'none', famHist:true, afib:false, ckd:false,
+    ses:4, sedentary:false, dyslipidemiaTx:false },
+
+  { id:7, name:'Ricardo Núñez', age:67, sex:'M',
+    vignette:'Fibrilación auricular conocida y enfermedad renal crónica estadio 4. Lípidos y PA bien controlados. — Caso de contraste: QRISK pondera FA/ERC, las demás escalas no.',
+    sbp:138, tc:198, hdl:48, bpTreated:true,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:27, ethnicity:'white', diabetes:'type2', famHist:false, afib:true, ckd:true,
+    ses:4, sedentary:true, dyslipidemiaTx:true },
+
+  { id:8, name:'Suresh Patel', age:48, sex:'M',
+    vignette:'Etnia surasiática. Hermano con IAM a los 50 años. Resto del perfil casi óptimo. — Caso de contraste: QRISK pondera etnia, Framingham/SCORE2 no.',
+    sbp:124, tc:190, hdl:50, bpTreated:false,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:24, ethnicity:'southAsian', diabetes:'none', famHist:true, afib:false, ckd:false,
+    ses:3, sedentary:false, dyslipidemiaTx:false },
+
+  { id:9, name:'Esperanza Molina', age:56, sex:'F',
+    vignette:'Nivel socioeconómico muy desfavorecido. Resto de factores moderados. — Caso de contraste: solo ASSIGN modela privación social.',
+    sbp:136, tc:210, hdl:46, bpTreated:false,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:26, ethnicity:'white', diabetes:'none', famHist:false, afib:false, ckd:false,
+    ses:7, sedentary:true, dyslipidemiaTx:false },
+
+  { id:10, name:'Felipe Castaño', age:50, sex:'M',
+    vignette:'No fumador, PA y lípidos casi normales, pero sedentario, obeso (IMC 31), prediabético y con antecedente familiar. — Caso de contraste: % bajo en escalas numéricas vs. ACSM por conteo de factores.',
+    sbp:126, tc:195, hdl:47, bpTreated:false,
+    smoking:{status:'never', cigsPerDay:0, quitMonthsAgo:null},
+    bmi:31, ethnicity:'white', diabetes:'none', famHist:true, afib:false, ckd:false,
+    ses:4, sedentary:true, dyslipidemiaTx:false, prediabetic:true },
+];
+```
+
+Campos `knownDisease`/`symptoms` de ACSM se omiten (quedan `false`) en los 10 casos: las 5 escalas asumen prevención primaria (sin ECV establecida), igual que ya aclara el texto introductorio del módulo.
+
+### Mapeo a las 5 pestañas
+
+```js
+function smokingCatFor(s) {
+  if (s.status === 'never') return 0;
+  if (s.status === 'ex') return 1;
+  return s.cigsPerDay < 10 ? 2 : s.cigsPerDay < 20 ? 3 : 4;
+}
+
+function applyCaseToScales(c) {
+  const isCurrent = c.smoking.status === 'current';
+  const acsmSmoking = isCurrent || (c.smoking.status === 'ex' && c.smoking.quitMonthsAgo != null && c.smoking.quitMonthsAgo < 6);
+
+  state.fram = { sex:c.sex, age:c.age, tc:c.tc, hdl:c.hdl, sbp:c.sbp, bpTreated:c.bpTreated, smoking:isCurrent };
+
+  state.score2 = { ...state.score2, sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent };
+  // region NO se sobreescribe — se mantiene la selección previa del usuario
+
+  state.assign = { sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent,
+    cigsPerDay:c.smoking.cigsPerDay||0, famHist:c.famHist, diabetes:c.diabetes!=='none', ses:c.ses };
+
+  state.qrisk = { sex:c.sex, age:c.age, ethnicity:c.ethnicity, bmi:c.bmi, sbp:c.sbp, tc:c.tc, hdl:c.hdl,
+    smokingCat:smokingCatFor(c.smoking), diabetes:c.diabetes, famHist:c.famHist, afib:c.afib, ckd:c.ckd };
+
+  state.acsm = { sex:c.sex, age:c.age, famHist:c.famHist, smoking:acsmSmoking, sedentary:c.sedentary,
+    obesity:c.bmi>=30, htn:c.sbp>=130||c.bpTreated, dyslipidemia:c.hdl<40||c.dyslipidemiaTx||c.tc>=200,
+    prediabetes:!!c.prediabetic, highHdl:c.hdl>=60, knownDisease:false, symptoms:false };
+
+  syncAllInputsFromState();  // posiciona sliders/checkboxes de las 5 pestañas según el state actualizado
+  updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm();
+  renderFITT();
+}
+```
+
+`syncAllInputsFromState()` es una función nueva (no existía) que, para cada pestaña, recorre sus inputs y aplica `.value`/`.checked` + actualiza los spans de texto (`v-age`, `v-tc`, etc.) a partir del `state` correspondiente — necesaria porque hoy los inputs solo se actualizan vía el evento `oninput`/`onchange` del usuario, nunca programáticamente.
+
+---
+
 ## Cambios en `modules/clase-11.html`
 
 ```diff
@@ -264,12 +396,14 @@ Proyecto sin framework de pruebas (vanilla JS, sin build). Verificación manual 
 4. Verificar que el bloque FITT cambia al cambiar de pestaña activa (con Killip sin seleccionar), y que seleccionar Killip sigue mandando sobre el FITT igual que hoy.
 5. Verificar la pestaña ACSM: marcar "enfermedad conocida" o "síntomas" debe forzar Alto independientemente del conteo; el fallback de FITT debe seguir mostrando el último % numérico calculado.
 6. Responsive: probar en viewport angosto (igual breakpoints `@media(max-width:820px)` ya existentes).
+7. Casos clínicos: cargar cada uno de los 10 casos y verificar que los sliders/checkboxes de las 5 pestañas se posicionan correctamente (no solo la pestaña activa). Confirmar especialmente los 4 casos de contraste (#7, #8, #9, #10): que QRISK suba notablemente más que Framingham/SCORE2/ASSIGN en #7 y #8, que ASSIGN suba más que las demás en #9, y que ACSM marque "Moderado" en #10 mientras las escalas numéricas muestran riesgo bajo.
+8. Verificar que cargar un caso no sobreescribe la región SCORE2 ya seleccionada, y que el chip "Entrada manual" limpia la viñeta sin alterar los valores ya cargados (permite seguir ajustando manualmente desde ahí).
 
 ---
 
 ## Commit esperado
 
 ```
-git add modules/riesgo_cv.html modules/clase-11.html
-git commit -m "feat: agregar escalas SCORE2, ASSIGN, QRISK y estratificacion ACSM a riesgo_cv"
+git add modules/riesgo_cv.html modules/clase-11.html data/cases-riesgo-cv.js
+git commit -m "feat: agregar escalas SCORE2, ASSIGN, QRISK, ACSM y 10 casos clinicos a riesgo_cv"
 ```
