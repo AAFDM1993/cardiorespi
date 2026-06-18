@@ -356,6 +356,126 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
     </div><!-- /calc-wrap -->
   </div><!-- /tab-assign -->
 
+  <div class="panel" id="tab-qrisk">
+
+    <p style="color:var(--text2);font-size:13px;max-width:720px;line-height:1.75;margin-bottom:1rem">
+      <strong>QRISK</strong> (versión educativa simplificada) — además de los factores clásicos, incorpora <strong>etnia</strong>, <strong>IMC</strong>, <strong>fibrilación auricular</strong> y <strong>enfermedad renal crónica</strong>, comorbilidades con fuerte impacto en el riesgo real que Framingham/SCORE2/ASSIGN no modelan.
+    </p>
+
+    <div class="calc-wrap">
+      <div class="form-col">
+
+        <div class="toggle-group">
+          <button class="tbtn on" id="qrisk-btn-M" onclick="setSexQrisk('M')">♂ Hombre</button>
+          <button class="tbtn" id="qrisk-btn-F" onclick="setSexQrisk('F')">♀ Mujer</button>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Edad</span><span class="sl-val" id="qrisk-v-age">55 años</span></div>
+          <input type="range" id="qrisk-sl-age" min="25" max="84" value="55" oninput="updQrisk('age',+this.value,'qrisk-v-age',this.value+' años')">
+          <div class="sl-ticks"><span>25</span><span>55</span><span>84</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Etnia</span></div>
+          <select id="qrisk-sel-ethnicity" onchange="state.qrisk.ethnicity=this.value;updateQrisk()" style="width:100%;padding:.5rem;border-radius:var(--rs);background:var(--card2);border:1px solid var(--border);color:var(--text)">
+            <option value="white">Blanca / no registrada</option>
+            <option value="southAsian">Asiática del sur</option>
+            <option value="black">Negra africana/caribeña</option>
+            <option value="eastAsian">Asiática del este</option>
+            <option value="mixed">Mixta/otra</option>
+          </select>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">IMC</span><span class="sl-val" id="qrisk-v-bmi">26 kg/m²</span></div>
+          <input type="range" id="qrisk-sl-bmi" min="15" max="45" value="26" oninput="updQrisk('bmi',+this.value,'qrisk-v-bmi',this.value+' kg/m²')">
+          <div class="sl-ticks"><span>15</span><span class="sl-ref">Normal &lt;25</span><span>45</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Presión Arterial Sistólica</span><span class="sl-val" id="qrisk-v-sbp">135 mmHg</span></div>
+          <input type="range" id="qrisk-sl-sbp" min="90" max="200" value="135" oninput="updQrisk('sbp',+this.value,'qrisk-v-sbp',this.value+' mmHg')">
+          <div class="sl-ticks"><span>90</span><span>200</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Colesterol Total</span><span class="sl-val" id="qrisk-v-tc">200 mg/dL</span></div>
+          <input type="range" id="qrisk-sl-tc" min="100" max="320" value="200" oninput="updQrisk('tc',+this.value,'qrisk-v-tc',this.value+' mg/dL')">
+          <div class="sl-ticks"><span>100</span><span>320</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">HDL Colesterol</span><span class="sl-val" id="qrisk-v-hdl">50 mg/dL</span></div>
+          <input type="range" id="qrisk-sl-hdl" min="20" max="100" value="50" oninput="updQrisk('hdl',+this.value,'qrisk-v-hdl',this.value+' mg/dL')">
+          <div class="sl-ticks"><span>20</span><span class="sl-ref">Ratio TC/HDL: <span id="qrisk-v-ratio">4.0</span></span><span>100</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Tabaquismo</span></div>
+          <select id="qrisk-sel-smoking" onchange="state.qrisk.smokingCat=+this.value;updateQrisk()" style="width:100%;padding:.5rem;border-radius:var(--rs);background:var(--card2);border:1px solid var(--border);color:var(--text)">
+            <option value="0">Nunca</option>
+            <option value="1">Ex-fumador</option>
+            <option value="2">Ligero (&lt;10/día)</option>
+            <option value="3">Moderado (10-19/día)</option>
+            <option value="4">Intenso (≥20/día)</option>
+          </select>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Diabetes</span></div>
+          <select id="qrisk-sel-diabetes" onchange="state.qrisk.diabetes=this.value;updateQrisk()" style="width:100%;padding:.5rem;border-radius:var(--rs);background:var(--card2);border:1px solid var(--border);color:var(--text)">
+            <option value="none">Ninguna</option>
+            <option value="type1">Tipo 1</option>
+            <option value="type2">Tipo 2</option>
+          </select>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="qrisk-ck-famhist" onchange="state.qrisk.famHist=this.checked;updateQrisk()">
+          Historia familiar de cardiopatía &lt;60 años
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="qrisk-ck-afib" onchange="state.qrisk.afib=this.checked;updateQrisk()">
+          Fibrilación auricular conocida
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="qrisk-ck-ckd" onchange="state.qrisk.ckd=this.checked;updateQrisk()">
+          Enfermedad renal crónica (estadio 4-5)
+        </label>
+
+      </div><!-- /form-col -->
+
+      <div class="output-col">
+        <div id="qrisk-gauge-wrap">
+          <svg id="qrisk-gauge-svg" viewBox="0 0 200 120" width="200" style="display:block">
+            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="14" stroke-linecap="round"/>
+            <path id="qrisk-g-arc" d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+            <text id="qrisk-g-pct" x="100" y="88" text-anchor="middle" font-size="30" font-weight="700" fill="#4ade80" font-family="Space Grotesk,sans-serif">--%</text>
+            <text x="100" y="110" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.55)" font-family="Space Grotesk,sans-serif">riesgo a 10 años</text>
+            <text x="20" y="115" text-anchor="start" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">BAJO</text>
+            <text x="180" y="115" text-anchor="end" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">ALTO</text>
+          </svg>
+          <div id="qrisk-g-cat" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010">—</div>
+        </div>
+
+        <div class="pts-box">
+          <h4>Desglose de contribución</h4>
+          <div class="pts-row"><span>Edad</span><span id="qrisk-bd-age" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Etnia</span><span id="qrisk-bd-ethnicity" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>IMC</span><span id="qrisk-bd-bmi" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>PA</span><span id="qrisk-bd-sbp" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Lípidos</span><span id="qrisk-bd-lipids" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Tabaquismo</span><span id="qrisk-bd-smoke" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Diabetes</span><span id="qrisk-bd-diabetes" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Hist. familiar</span><span id="qrisk-bd-famhist" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>FA</span><span id="qrisk-bd-afib" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>ERC</span><span id="qrisk-bd-ckd" class="pts-zero">—</span></div>
+        </div>
+      </div><!-- /output-col -->
+    </div><!-- /calc-wrap -->
+  </div><!-- /tab-qrisk -->
+
   <!-- ── KILLIP ── -->
   <div class="group-label">Clasificación Killip-Kimball · Solo si el paciente es post-IAM</div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:.9rem">Si el paciente NO tiene IAM previo, deja sin seleccionar. La prescripción se basa solo en el score Framingham.</div>
@@ -376,6 +496,7 @@ const state = {
   fram: { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false },
   score2: { sex:'M', age:55, sbp:140, tc:200, hdl:50, smoking:false, region:'low' },
   assign: { sex:'M', age:50, sbp:135, tc:210, hdl:48, smoking:false, cigsPerDay:10, famHist:false, diabetes:false, ses:4 },
+  qrisk: { sex:'M', age:55, ethnicity:'white', bmi:26, sbp:135, tc:200, hdl:50, smokingCat:0, diabetes:'none', famHist:false, afib:false, ckd:false },
   killip: null,
 };
 
@@ -584,6 +705,80 @@ function updateAssign(){
 
   for(const k of ['age','sbp','lipids','smoke','famhist','diabetes','ses']){
     const el=document.getElementById('assign-bd-'+k);
+    const n=bd[k];
+    el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
+    el.textContent=(n>0?'+':'')+n;
+  }
+  renderFITT();
+}
+
+// ── QRISK (version educativa simplificada) ─────────────────────────────
+function setSexQrisk(s){
+  state.qrisk.sex=s;
+  document.getElementById('qrisk-btn-M').className='tbtn'+(s==='M'?' on':'');
+  document.getElementById('qrisk-btn-F').className='tbtn'+(s==='F'?' on-pink':'');
+  updateQrisk();
+}
+
+function updQrisk(key, val, lblId, txt){
+  state.qrisk[key]=val;
+  document.getElementById(lblId).textContent=txt;
+  document.getElementById('qrisk-v-ratio').textContent = (state.qrisk.tc / state.qrisk.hdl).toFixed(1);
+  updateQrisk();
+}
+
+function calcQrisk(s){
+  const { sex, age, ethnicity, bmi, sbp, tc, hdl, smokingCat, diabetes, famHist, afib, ckd } = s;
+  const ratio = tc / hdl;
+  const ethMult = { white:1, southAsian:1.4, black:0.7, eastAsian:0.6, mixed:1.1 }[ethnicity];
+  const smokeMult = [0, 1.3, 1.8, 2.3, 3.0][smokingCat];
+  let x = (age - 50) * 0.085
+        + Math.max(0, sbp - 120) * 0.018
+        + Math.max(0, ratio - 4) * 0.22
+        + Math.max(0, bmi - 25) * 0.04
+        + Math.log(ethMult) + Math.log(smokeMult || 1)
+        + (diabetes === 'type2' ? 1.0 : diabetes === 'type1' ? 1.4 : 0)
+        + (famHist ? 0.45 : 0)
+        + (afib ? 1.1 : 0)
+        + (ckd ? 1.0 : 0);
+  if (sex === 'F') x *= 0.9;
+  let risk = 100 * (1 - Math.pow(0.98, Math.exp(x)));
+  risk = Math.max(0.5, Math.min(60, risk));
+  const bd = {
+    age:      Math.round((age - 50) * 0.085 * 10) / 10,
+    ethnicity: Math.round(Math.log(ethMult) * 10) / 10,
+    bmi:      Math.round(Math.max(0, bmi - 25) * 0.04 * 10) / 10,
+    sbp:      Math.round(Math.max(0, sbp - 120) * 0.018 * 10) / 10,
+    lipids:   Math.round(Math.max(0, ratio - 4) * 0.22 * 10) / 10,
+    smoke:    Math.round(Math.log(smokeMult || 1) * 10) / 10,
+    diabetes: diabetes === 'type2' ? 1.0 : diabetes === 'type1' ? 1.4 : 0,
+    famhist:  famHist ? 0.45 : 0,
+    afib:     afib ? 1.1 : 0,
+    ckd:      ckd ? 1.0 : 0,
+  };
+  return { risk, bd };
+}
+
+function updateQrisk(){
+  const { risk, bd } = calcQrisk(state.qrisk);
+  const arc=document.getElementById('qrisk-g-arc');
+  const txt=document.getElementById('qrisk-g-pct');
+  const cat=document.getElementById('qrisk-g-cat');
+  const prog=Math.min(risk/60,1);
+  arc.style.strokeDashoffset=251.3*(1-prog);
+
+  const {color,label,bg} =
+    risk<10 ? {color:'#4ade80',label:'Bajo riesgo',bg:'#4ade8010'} :
+    risk<20 ? {color:'#fbbf24',label:'Riesgo moderado',bg:'#fbbf2410'} :
+              {color:'#ef4444',label:'Riesgo alto',bg:'#ef444410'};
+
+  arc.style.stroke=color;
+  txt.style.fill=color;
+  txt.textContent=risk<1?'<1%':risk>=60?'≥60%':risk.toFixed(1)+'%';
+  cat.style.color=color; cat.style.borderColor=color+'44'; cat.style.background=bg; cat.textContent=label;
+
+  for(const k of ['age','ethnicity','bmi','sbp','lipids','smoke','diabetes','famhist','afib','ckd']){
+    const el=document.getElementById('qrisk-bd-'+k);
     const n=bd[k];
     el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
     el.textContent=(n>0?'+':'')+n;
