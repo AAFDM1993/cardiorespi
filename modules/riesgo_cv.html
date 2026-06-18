@@ -186,6 +186,83 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
   </div><!-- /calc-wrap -->
   </div><!-- /tab-fram -->
 
+  <div class="panel" id="tab-score2">
+
+    <p style="color:var(--text2);font-size:13px;max-width:720px;line-height:1.75;margin-bottom:1rem">
+      <strong>SCORE2</strong> (ESC 2021) — estima el riesgo combinado de evento CV fatal y no fatal a <strong>10 años</strong> en población europea de 40 a 69 años, calibrado por región de riesgo.
+    </p>
+
+    <div class="calc-wrap">
+      <div class="form-col">
+
+        <div class="toggle-group">
+          <button class="tbtn on" id="score2-btn-M" onclick="setSexScore2('M')">♂ Hombre</button>
+          <button class="tbtn" id="score2-btn-F" onclick="setSexScore2('F')">♀ Mujer</button>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Edad</span><span class="sl-val" id="score2-v-age">55 años</span></div>
+          <input type="range" id="score2-sl-age" min="40" max="69" value="55" oninput="updScore2('age',+this.value,'score2-v-age',this.value+' años')">
+          <div class="sl-ticks"><span>40</span><span>55</span><span>69</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Presión Arterial Sistólica</span><span class="sl-val" id="score2-v-sbp">140 mmHg</span></div>
+          <input type="range" id="score2-sl-sbp" min="90" max="200" value="140" oninput="updScore2('sbp',+this.value,'score2-v-sbp',this.value+' mmHg')">
+          <div class="sl-ticks"><span>90</span><span class="sl-ref">&lt;120 normal</span><span>200</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">Colesterol Total</span><span class="sl-val" id="score2-v-tc">200 mg/dL</span></div>
+          <input type="range" id="score2-sl-tc" min="100" max="320" value="200" oninput="updScore2('tc',+this.value,'score2-v-tc',this.value+' mg/dL')">
+          <div class="sl-ticks"><span>100</span><span class="sl-ref">Óptimo &lt;200</span><span>320</span></div>
+        </div>
+
+        <div class="sl-row">
+          <div class="sl-header"><span class="sl-label">HDL Colesterol</span><span class="sl-val" id="score2-v-hdl">50 mg/dL</span></div>
+          <input type="range" id="score2-sl-hdl" min="20" max="100" value="50" oninput="updScore2('hdl',+this.value,'score2-v-hdl',this.value+' mg/dL')">
+          <div class="sl-ticks"><span>20</span><span class="sl-ref">No-HDL: <span id="score2-v-nonhdl">150</span> mg/dL</span><span>100</span></div>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="score2-ck-smoke" onchange="state.score2.smoking=this.checked;updateScore2()">
+          Fumador/a activo/a
+        </label>
+
+        <div class="group-label" style="margin-top:1.25rem">Región de riesgo (calibración SCORE2)</div>
+        <div class="toggle-group" style="flex-wrap:wrap">
+          <button class="tbtn on" id="score2-region-low" onclick="setRegionScore2('low')">Bajo (España)</button>
+          <button class="tbtn" id="score2-region-moderate" onclick="setRegionScore2('moderate')">Moderado</button>
+          <button class="tbtn" id="score2-region-high" onclick="setRegionScore2('high')">Alto</button>
+          <button class="tbtn" id="score2-region-veryhigh" onclick="setRegionScore2('veryhigh')">Muy alto</button>
+        </div>
+
+      </div><!-- /form-col -->
+
+      <div class="output-col">
+        <div id="score2-gauge-wrap">
+          <svg id="score2-gauge-svg" viewBox="0 0 200 120" width="200" style="display:block">
+            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="14" stroke-linecap="round"/>
+            <path id="score2-g-arc" d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+            <text id="score2-g-pct" x="100" y="88" text-anchor="middle" font-size="30" font-weight="700" fill="#4ade80" font-family="Space Grotesk,sans-serif">--%</text>
+            <text x="100" y="110" text-anchor="middle" font-size="10" fill="rgba(148,163,184,.55)" font-family="Space Grotesk,sans-serif">riesgo a 10 años</text>
+            <text x="20" y="115" text-anchor="start" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">BAJO</text>
+            <text x="180" y="115" text-anchor="end" font-size="8.5" fill="rgba(148,163,184,.4)" font-family="Space Grotesk,sans-serif">ALTO</text>
+          </svg>
+          <div id="score2-g-cat" class="gauge-cat" style="color:#4ade80;border-color:#4ade8044;background:#4ade8010">—</div>
+        </div>
+
+        <div class="pts-box">
+          <h4>Desglose de contribución</h4>
+          <div class="pts-row"><span>Edad</span><span id="score2-bd-age" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>Tabaquismo</span><span id="score2-bd-smoke" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>PAS</span><span id="score2-bd-sbp" class="pts-zero">—</span></div>
+          <div class="pts-row"><span>No-HDL</span><span id="score2-bd-nonhdl" class="pts-zero">—</span></div>
+        </div>
+      </div><!-- /output-col -->
+    </div><!-- /calc-wrap -->
+  </div><!-- /tab-score2 -->
+
   <!-- ── KILLIP ── -->
   <div class="group-label">Clasificación Killip-Kimball · Solo si el paciente es post-IAM</div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:.9rem">Si el paciente NO tiene IAM previo, deja sin seleccionar. La prescripción se basa solo en el score Framingham.</div>
@@ -204,6 +281,7 @@ const state = {
   activeScale: 'fram',
   lastNumericRisk: null,
   fram: { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false },
+  score2: { sex:'M', age:55, sbp:140, tc:200, hdl:50, smoking:false, region:'low' },
   killip: null,
 };
 
@@ -276,6 +354,81 @@ function calcFram(s){
   }
 
   return {pts,bd,risk};
+}
+
+// ── SCORE2 (aproximación educativa) ─────────────────────────────────────
+function setSexScore2(s){
+  state.score2.sex=s;
+  document.getElementById('score2-btn-M').className='tbtn'+(s==='M'?' on':'');
+  document.getElementById('score2-btn-F').className='tbtn'+(s==='F'?' on-pink':'');
+  updateScore2();
+}
+
+function updScore2(key, val, lblId, txt){
+  state.score2[key]=val;
+  document.getElementById(lblId).textContent=txt;
+  document.getElementById('score2-v-nonhdl').textContent = state.score2.tc - state.score2.hdl;
+  updateScore2();
+}
+
+function setRegionScore2(r){
+  state.score2.region=r;
+  ['low','moderate','high','veryhigh'].forEach(k=>{
+    document.getElementById('score2-region-'+k).className='tbtn'+(k===r?' on':'');
+  });
+  updateScore2();
+}
+
+function calcScore2(s){
+  const { sex, age, sbp, tc, hdl, smoking, region } = s;
+  const noHdl = tc - hdl;
+  const cAge = (age - 60) / 5;
+  let x = 0.32*cAge
+        + (smoking ? 0.62 - 0.20*cAge : 0)
+        + 0.025*(sbp-120) - 0.003*cAge*(sbp-120)
+        + 0.018*(noHdl-130) - 0.002*cAge*(noHdl-130);
+  if (sex === 'F') x *= 0.85;
+  const baseline = { low: 0.018, moderate: 0.028, high: 0.042, veryhigh: 0.06 }[region];
+  let risk = 100 * (1 - Math.pow(1 - baseline, Math.exp(x)));
+  risk = Math.max(0.5, Math.min(50, risk));
+  const bd = {
+    age:    Math.round(0.32*cAge * 10) / 10,
+    smoke:  smoking ? Math.round((0.62 - 0.20*cAge) * 10) / 10 : 0,
+    sbp:    Math.round((0.025*(sbp-120) - 0.003*cAge*(sbp-120)) * 10) / 10,
+    nonHdl: Math.round((0.018*(noHdl-130) - 0.002*cAge*(noHdl-130)) * 10) / 10,
+  };
+  return { risk, bd };
+}
+
+function updateScore2(){
+  const { risk, bd } = calcScore2(state.score2);
+  const arc=document.getElementById('score2-g-arc');
+  const txt=document.getElementById('score2-g-pct');
+  const cat=document.getElementById('score2-g-cat');
+  const prog=Math.min(risk/50,1);
+  arc.style.strokeDashoffset=251.3*(1-prog);
+
+  const age = state.score2.age;
+  const lowMax = age < 50 ? 2.5 : 5;
+  const modMax = age < 50 ? 7.5 : 10;
+  const {color,label,bg} =
+    risk<lowMax ? {color:'#4ade80',label:'Bajo riesgo',bg:'#4ade8010'} :
+    risk<modMax ? {color:'#fbbf24',label:'Riesgo moderado',bg:'#fbbf2410'} :
+                  {color:'#ef4444',label:'Riesgo alto',bg:'#ef444410'};
+
+  arc.style.stroke=color;
+  txt.style.fill=color;
+  txt.textContent=risk<1?'<1%':risk>=50?'≥50%':risk.toFixed(1)+'%';
+  cat.style.color=color; cat.style.borderColor=color+'44'; cat.style.background=bg; cat.textContent=label;
+
+  for(const k of ['age','smoke','sbp','nonHdl']){
+    const elId = 'score2-bd-'+(k==='nonHdl'?'nonhdl':k);
+    const el=document.getElementById(elId);
+    const n=bd[k];
+    el.className=n>0?'pts-pos':n<0?'pts-neg':'pts-zero';
+    el.textContent=(n>0?'+':'')+n;
+  }
+  renderFITT();
 }
 
 // ── Gauge ─────────────────────────────────────────────────────────────
