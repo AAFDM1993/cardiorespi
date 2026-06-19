@@ -1241,26 +1241,30 @@ function smokingCatFor(s){
   return s.cigsPerDay < 10 ? 2 : s.cigsPerDay < 20 ? 3 : 4;
 }
 
-function applyCaseToScales(c){
+function deriveCaseFields(c){
   const isCurrent = c.smoking.status === 'current';
   const acsmSmoking = isCurrent || (c.smoking.status === 'ex' && c.smoking.quitMonthsAgo != null && c.smoking.quitMonthsAgo < 6);
+  return {
+    fram: { sex:c.sex, age:c.age, tc:c.tc, hdl:c.hdl, sbp:c.sbp, bpTreated:c.bpTreated, smoking:isCurrent },
+    score2: { sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent },
+    assign: { sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent,
+      cigsPerDay:c.smoking.cigsPerDay||0, famHist:c.famHist, diabetes:c.diabetes!=='none', ses:c.ses },
+    qrisk: { sex:c.sex, age:c.age, ethnicity:c.ethnicity, bmi:c.bmi, sbp:c.sbp, tc:c.tc, hdl:c.hdl,
+      smokingCat:smokingCatFor(c.smoking), diabetes:c.diabetes, famHist:c.famHist, afib:c.afib, ckd:c.ckd },
+    acsm: { sex:c.sex, age:c.age, famHist:c.famHist, smoking:acsmSmoking, sedentary:c.sedentary,
+      obesity:c.bmi>=30, htn:c.sbp>=130||c.bpTreated, dyslipidemia:c.hdl<40||c.dyslipidemiaTx||c.tc>=200,
+      prediabetes:!!c.prediabetic, highHdl:c.hdl>=60,
+      knownDisease:(c.diabetes!=='none')||c.ckd, symptoms:false },
+  };
+}
 
-  state.fram = { sex:c.sex, age:c.age, tc:c.tc, hdl:c.hdl, sbp:c.sbp, bpTreated:c.bpTreated, smoking:isCurrent };
-
-  state.score2 = { ...state.score2, sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent };
-  // region NO se sobreescribe — se mantiene la seleccion previa del usuario
-
-  state.assign = { sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent,
-    cigsPerDay:c.smoking.cigsPerDay||0, famHist:c.famHist, diabetes:c.diabetes!=='none', ses:c.ses };
-
-  state.qrisk = { sex:c.sex, age:c.age, ethnicity:c.ethnicity, bmi:c.bmi, sbp:c.sbp, tc:c.tc, hdl:c.hdl,
-    smokingCat:smokingCatFor(c.smoking), diabetes:c.diabetes, famHist:c.famHist, afib:c.afib, ckd:c.ckd };
-
-  state.acsm = { sex:c.sex, age:c.age, famHist:c.famHist, smoking:acsmSmoking, sedentary:c.sedentary,
-    obesity:c.bmi>=30, htn:c.sbp>=130||c.bpTreated, dyslipidemia:c.hdl<40||c.dyslipidemiaTx||c.tc>=200,
-    prediabetes:!!c.prediabetic, highHdl:c.hdl>=60,
-    knownDisease:(c.diabetes!=='none')||c.ckd, symptoms:false };
-
+function applyCaseToScales(c){
+  const fields = deriveCaseFields(c);
+  state.fram   = fields.fram;
+  state.score2 = { ...state.score2, ...fields.score2 };   // region NO se sobreescribe
+  state.assign = fields.assign;
+  state.qrisk  = fields.qrisk;
+  state.acsm   = fields.acsm;
   syncAllInputsFromState();
   updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm();
   renderFITT();
