@@ -582,14 +582,24 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
 
 <script>
 // ── State ─────────────────────────────────────────────────────────────
-const state = {
-  activeScale: 'fram',
-  lastNumericRisk: null,
+const DEFAULT_SCALE_STATE = {
   fram: { sex:'M', age:52, tc:215, hdl:42, sbp:145, bpTreated:false, smoking:false },
   score2: { sex:'M', age:55, sbp:140, tc:200, hdl:50, smoking:false, region:'low' },
   assign: { sex:'M', age:50, sbp:135, tc:210, hdl:48, smoking:false, cigsPerDay:10, famHist:false, diabetes:false, ses:4 },
   qrisk: { sex:'M', age:55, ethnicity:'white', bmi:26, sbp:135, tc:200, hdl:50, smokingCat:0, diabetes:'none', famHist:false, afib:false, ckd:false },
   acsm: { sex:'M', age:50, famHist:false, smoking:false, sedentary:false, obesity:false, htn:false, dyslipidemia:false, prediabetes:false, highHdl:false, knownDisease:false, symptoms:false },
+};
+
+const state = {
+  activeScale: 'fram',
+  lastNumericRisk: null,
+  caseMode: 'demo',
+  activeCaseId: null,
+  fram: { ...DEFAULT_SCALE_STATE.fram },
+  score2: { ...DEFAULT_SCALE_STATE.score2 },
+  assign: { ...DEFAULT_SCALE_STATE.assign },
+  qrisk: { ...DEFAULT_SCALE_STATE.qrisk },
+  acsm: { ...DEFAULT_SCALE_STATE.acsm },
   killip: null,
 };
 
