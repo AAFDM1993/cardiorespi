@@ -609,6 +609,8 @@ function showTab(id, el){
   document.getElementById('tab-'+id).classList.add('active');
   el.classList.add('active');
   state.activeScale = id;
+  const summary = document.getElementById('verify-summary');
+  if (summary) summary.textContent = '';
   renderFITT();
 }
 
@@ -719,6 +721,7 @@ function calcScore2(s){
 }
 
 function updateScore2(){
+  clearVerifyMarks();
   const { risk, bd } = calcScore2(state.score2);
   const arc=document.getElementById('score2-g-arc');
   const txt=document.getElementById('score2-g-pct');
@@ -789,6 +792,7 @@ function calcAssign(s){
 }
 
 function updateAssign(){
+  clearVerifyMarks();
   const { risk, bd } = calcAssign(state.assign);
   const arc=document.getElementById('assign-g-arc');
   const txt=document.getElementById('assign-g-pct');
@@ -863,6 +867,7 @@ function calcQrisk(s){
 }
 
 function updateQrisk(){
+  clearVerifyMarks();
   const { risk, bd } = calcQrisk(state.qrisk);
   const arc=document.getElementById('qrisk-g-arc');
   const txt=document.getElementById('qrisk-g-pct');
@@ -909,6 +914,7 @@ function calcAcsm(s){
 }
 
 function updateAcsm(){
+  clearVerifyMarks();
   const { category, activeLabels } = calcAcsm(state.acsm);
   const badge = document.getElementById('acsm-cat-badge');
   const {color,label,bg} =
@@ -1120,6 +1126,7 @@ function renderFITT(){
 }
 
 function updateFram(){
+  clearVerifyMarks();
   const {pts,bd,risk}=calcFram(state.fram);
   updateGaugeFram(risk);
   // breakdown
@@ -1232,6 +1239,86 @@ function syncAcsm(){
 
 function syncAllInputsFromState(){
   syncFram(); syncScore2(); syncAssign(); syncQrisk(); syncAcsm();
+}
+
+// ── Verificacion modo practica ───────────────────────────────────────────
+const VERIFY_FIELDS = {
+  fram:   ['sex','age','tc','hdl','sbp','bpTreated','smoking'],
+  score2: ['sex','age','sbp','tc','hdl','smoking'],
+  assign: ['sex','age','sbp','tc','hdl','smoking','cigsPerDay','famHist','diabetes','ses'],
+  qrisk:  ['sex','age','ethnicity','bmi','sbp','tc','hdl','smokingCat','diabetes','famHist','afib','ckd'],
+  acsm:   ['sex','age','famHist','smoking','sedentary','obesity','htn','dyslipidemia','prediabetes','highHdl','knownDisease','symptoms'],
+};
+
+const VERIFY_FIELD_ID = {
+  fram:   { age:'fram-v-age', tc:'fram-v-tc', hdl:'fram-v-hdl', sbp:'fram-v-sbp', bpTreated:'fram-ck-treated', smoking:'fram-ck-smoke' },
+  score2: { age:'score2-v-age', sbp:'score2-v-sbp', tc:'score2-v-tc', hdl:'score2-v-hdl', smoking:'score2-ck-smoke' },
+  assign: { age:'assign-v-age', sbp:'assign-v-sbp', tc:'assign-v-tc', hdl:'assign-v-hdl', smoking:'assign-ck-smoke',
+            cigsPerDay:'assign-v-cigs', famHist:'assign-ck-famhist', diabetes:'assign-ck-diabetes', ses:'assign-v-ses' },
+  qrisk:  { age:'qrisk-v-age', ethnicity:'qrisk-sel-ethnicity', bmi:'qrisk-v-bmi', sbp:'qrisk-v-sbp', tc:'qrisk-v-tc', hdl:'qrisk-v-hdl',
+            smokingCat:'qrisk-sel-smoking', diabetes:'qrisk-sel-diabetes', famHist:'qrisk-ck-famhist', afib:'qrisk-ck-afib', ckd:'qrisk-ck-ckd' },
+  acsm:   { age:'acsm-v-age', famHist:'acsm-ck-famhist', smoking:'acsm-ck-smoke', sedentary:'acsm-ck-sedentary', obesity:'acsm-ck-obesity', htn:'acsm-ck-htn',
+            dyslipidemia:'acsm-ck-dyslipidemia', prediabetes:'acsm-ck-prediabetes', highHdl:'acsm-ck-highhdl',
+            knownDisease:'acsm-ck-knowndisease', symptoms:'acsm-ck-symptoms' },
+};
+
+const VERIFY_BOOL_FIELDS = new Set(['bpTreated','smoking','famHist','afib','ckd','sedentary','obesity','htn','dyslipidemia','prediabetes','highHdl','knownDisease','symptoms']);
+const VERIFY_UNIT = { age:' años', tc:' mg/dL', hdl:' mg/dL', sbp:' mmHg', cigsPerDay:' cig/día' };
+const VERIFY_SELECT_ID = { ethnicity:'qrisk-sel-ethnicity', smokingCat:'qrisk-sel-smoking', diabetes:'qrisk-sel-diabetes' };
+
+function formatCorrectValue(scale, field, value){
+  if (field === 'sex') return value === 'M' ? 'Hombre' : 'Mujer';
+  if (scale === 'assign' && field === 'diabetes') return value ? 'sí' : 'no';
+  if (scale === 'qrisk' && VERIFY_SELECT_ID[field]){
+    const opt = document.querySelector('#'+VERIFY_SELECT_ID[field]+' option[value="'+value+'"]');
+    return opt ? opt.textContent : String(value);
+  }
+  if (VERIFY_BOOL_FIELDS.has(field)) return value ? 'sí' : 'no';
+  return value + (VERIFY_UNIT[field] || '');
+}
+
+function insertMark(afterId, ok, correctText){
+  const el = document.getElementById(afterId);
+  if (!el) return;
+  const mark = document.createElement('span');
+  mark.className = 'verify-mark';
+  mark.style.marginLeft = '4px';
+  mark.style.fontSize = '12px';
+  mark.style.color = ok ? '#4ade80' : '#f87171';
+  mark.textContent = ok ? '✅' : '❌ (correcto: '+correctText+')';
+  el.insertAdjacentElement('afterend', mark);
+}
+
+function markField(scale, field, ok, correctValue){
+  if (field === 'sex'){ insertMark(scale+'-btn-F', ok, formatCorrectValue(scale,'sex',correctValue)); return; }
+  insertMark(VERIFY_FIELD_ID[scale][field], ok, formatCorrectValue(scale, field, correctValue));
+}
+
+function clearVerifyMarks(){
+  document.querySelectorAll('.verify-mark').forEach(m => m.remove());
+}
+
+function compareCaseFields(scale, current, correct){
+  let fields = VERIFY_FIELDS[scale].slice();
+  if (scale === 'assign' && !correct.smoking) fields = fields.filter(f => f !== 'cigsPerDay');
+  const results = fields.map(f => ({ field:f, ok: current[f] === correct[f], correctValue: correct[f] }));
+  const okCount = results.filter(r => r.ok).length;
+  return { results, okCount, total: fields.length };
+}
+
+function verifyActiveTab(){
+  if (state.activeCaseId == null) return;
+  const c = RIESGO_CV_CASES.find(x => x.id === state.activeCaseId);
+  const scale = state.activeScale;
+  const correct = deriveCaseFields(c)[scale];
+  const current = state[scale];
+  clearVerifyMarks();
+
+  const { results, okCount, total } = compareCaseFields(scale, current, correct);
+  results.forEach(r => markField(scale, r.field, r.ok, r.correctValue));
+
+  const summary = document.getElementById('verify-summary');
+  if (summary) summary.textContent = okCount+'/'+total+' correctos en esta pestaña';
 }
 
 // ── Casos clinicos preconfigurados ──────────────────────────────────────
