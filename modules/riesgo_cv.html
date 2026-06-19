@@ -95,8 +95,14 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
     </p>
   </div>
 
-  <div class="group-label" style="margin-top:.5rem">Casos clínicos preconfigurados</div>
-  <div id="case-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem"></div>
+  <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
+    <div class="group-label" style="margin:0">Casos clínicos preconfigurados</div>
+    <div style="display:flex;gap:4px">
+      <button class="tbtn on" id="mode-btn-demo" onclick="setCaseMode('demo')">Demostración</button>
+      <button class="tbtn" id="mode-btn-practice" onclick="setCaseMode('practice')">Práctica</button>
+    </div>
+  </div>
+  <div id="case-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem;margin-top:.5rem"></div>
   <div id="case-vignette" style="display:none;font-size:12.5px;color:var(--text2);background:rgba(244,114,182,.06);border:1px solid rgba(244,114,182,.2);border-radius:var(--rs);padding:.6rem .9rem;margin-bottom:1.25rem;line-height:1.5"></div>
 
   <div id="scale-disclaimer" style="font-size:11.5px;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem .9rem;margin-bottom:1.25rem;line-height:1.5">
@@ -1360,17 +1366,73 @@ function applyCaseToScales(c){
 function loadCase(id){
   const c = RIESGO_CV_CASES.find(x => x.id === id);
   if (!c) return;
-  applyCaseToScales(c);
+  state.activeCaseId = id;
   document.querySelectorAll('.case-chip').forEach(ch => ch.classList.remove('on'));
   document.getElementById('case-chip-'+id).classList.add('on');
-  const v = document.getElementById('case-vignette');
-  v.style.display='block';
-  v.innerHTML = '<strong>'+c.name+'</strong> · '+c.age+' años · '+(c.sex==='M'?'Hombre':'Mujer')+'<br>'+c.vignette;
+
+  if (state.caseMode === 'demo') {
+    applyCaseToScales(c);
+  } else {
+    resetAllScalesToDefault();
+  }
+  renderCaseVignette(c);
 }
 
 function clearCase(){
+  state.activeCaseId = null;
   document.querySelectorAll('.case-chip').forEach(ch => ch.classList.remove('on'));
   document.getElementById('case-vignette').style.display='none';
+}
+
+function setCaseMode(mode){
+  if (state.caseMode === mode) return;
+  state.caseMode = mode;
+  document.getElementById('mode-btn-demo').className='tbtn'+(mode==='demo'?' on':'');
+  document.getElementById('mode-btn-practice').className='tbtn'+(mode==='practice'?' on':'');
+  clearCase();
+}
+
+function resetAllScalesToDefault(){
+  state.fram   = { ...DEFAULT_SCALE_STATE.fram };
+  state.score2 = { ...DEFAULT_SCALE_STATE.score2, region: state.score2.region };
+  state.assign = { ...DEFAULT_SCALE_STATE.assign };
+  state.qrisk  = { ...DEFAULT_SCALE_STATE.qrisk };
+  state.acsm   = { ...DEFAULT_SCALE_STATE.acsm };
+  syncAllInputsFromState();
+  updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm();
+  renderFITT();
+}
+
+function renderCaseVignette(c){
+  const v = document.getElementById('case-vignette');
+  v.style.display = 'block';
+  const header = '<strong>'+c.name+'</strong> · '+c.age+' años · '+(c.sex==='M'?'Hombre':'Mujer')+'<br>'+c.vignette;
+  if (state.caseMode === 'demo') {
+    v.innerHTML = header;
+  } else {
+    v.innerHTML = header + renderFichaClinica(c)
+      + '<div style="margin-top:.6rem">'
+      + '<button class="tbtn" onclick="verifyActiveTab()">Verificar</button> '
+      + '<span id="verify-summary" style="margin-left:.5rem;font-weight:600"></span>'
+      + '</div>';
+  }
+}
+
+function renderFichaClinica(c){
+  const smokeTxt = c.smoking.status==='never' ? 'no fumador'
+    : c.smoking.status==='ex' ? 'exfumador (hace '+c.smoking.quitMonthsAgo+' meses)'
+    : 'fumador activo, '+c.smoking.cigsPerDay+' cig/día';
+  const ethTxt  = {white:'blanca', southAsian:'surasiática', black:'negra', eastAsian:'asiática oriental', mixed:'mixta'}[c.ethnicity];
+  const diabTxt = {none:'no', type1:'tipo 1', type2:'tipo 2'}[c.diabetes];
+  return '<div style="margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--border)">'
+    + '<strong>Datos clínicos:</strong><br>'
+    + 'PAS: '+c.sbp+' mmHg · Colesterol total: '+c.tc+' mg/dL · HDL: '+c.hdl+' mg/dL<br>'
+    + 'Tabaquismo: '+smokeTxt+' · IMC: '+c.bmi+' kg/m²<br>'
+    + 'Etnia: '+ethTxt+' · Diabetes: '+diabTxt+' · HTA tratada: '+(c.bpTreated?'sí':'no')+'<br>'
+    + 'Antecedente familiar de ECV prematura: '+(c.famHist?'sí':'no')+' · FA: '+(c.afib?'sí':'no')+' · ERC: '+(c.ckd?'sí':'no')+'<br>'
+    + 'Nivel socioeconómico (1-7): '+c.ses+' · Sedentario: '+(c.sedentary?'sí':'no')+' · Tto. dislipidemia: '+(c.dyslipidemiaTx?'sí':'no')
+    + (c.prediabetic ? ' · Prediabético: sí' : '')
+    + '</div>';
 }
 
 function renderCaseChips(){
