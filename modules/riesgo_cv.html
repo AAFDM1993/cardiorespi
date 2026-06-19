@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Riesgo Cardiovascular · FisioResp</title>
 <link rel="stylesheet" href="../assets/css/fisioresp.css">
+<script src="../data/cases-riesgo-cv.js"></script>
 <style>
 .nav-logo{font-family:var(--fh);font-size:1.15rem;color:var(--blue);letter-spacing:1px;display:flex;align-items:center;gap:.5rem}
 .nav-logo span{color:var(--teal)}
@@ -93,6 +94,10 @@ input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2
       Score de <strong>Framingham 2008</strong> (Wilson et al.) — estima el riesgo de evento CV (IAM, ACV, arteriopatía) a <strong>10 años</strong> en pacientes sin enfermedad cardiovascular previa. Combínalo con la clasificación <strong>Killip-Kimball</strong> para generar una prescripción FITT individualizada.
     </p>
   </div>
+
+  <div class="group-label" style="margin-top:.5rem">Casos clínicos preconfigurados</div>
+  <div id="case-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem"></div>
+  <div id="case-vignette" style="display:none;font-size:12.5px;color:var(--text2);background:rgba(244,114,182,.06);border:1px solid rgba(244,114,182,.2);border-radius:var(--rs);padding:.6rem .9rem;margin-bottom:1.25rem;line-height:1.5"></div>
 
   <div id="scale-disclaimer" style="font-size:11.5px;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem .9rem;margin-bottom:1.25rem;line-height:1.5">
     ℹ SCORE2, ASSIGN y QRISK se calculan con <strong>aproximaciones educativas calibradas</strong>, no con el algoritmo clínico oficial. Framingham y ACSM siguen sus tablas/criterios reales publicados.
@@ -1120,8 +1125,175 @@ function updateFram(){
   renderFITT();
 }
 
+// ── Sincronizacion de inputs DOM a partir del state (para casos clinicos) ──
+function syncFram(){
+  document.getElementById('fram-btn-M').className='tbtn'+(state.fram.sex==='M'?' on':'');
+  document.getElementById('fram-btn-F').className='tbtn'+(state.fram.sex==='F'?' on-pink':'');
+  document.getElementById('fram-sl-age').value=state.fram.age;
+  document.getElementById('fram-v-age').textContent=state.fram.age+' años';
+  document.getElementById('fram-sl-tc').value=state.fram.tc;
+  document.getElementById('fram-v-tc').textContent=state.fram.tc+' mg/dL';
+  document.getElementById('fram-sl-hdl').value=state.fram.hdl;
+  document.getElementById('fram-v-hdl').textContent=state.fram.hdl+' mg/dL';
+  document.getElementById('fram-sl-sbp').value=state.fram.sbp;
+  document.getElementById('fram-v-sbp').textContent=state.fram.sbp+' mmHg';
+  document.getElementById('fram-ck-treated').checked=state.fram.bpTreated;
+  document.getElementById('fram-ck-smoke').checked=state.fram.smoking;
+}
+
+function syncScore2(){
+  document.getElementById('score2-btn-M').className='tbtn'+(state.score2.sex==='M'?' on':'');
+  document.getElementById('score2-btn-F').className='tbtn'+(state.score2.sex==='F'?' on-pink':'');
+  document.getElementById('score2-sl-age').value=state.score2.age;
+  document.getElementById('score2-v-age').textContent=state.score2.age+' años';
+  document.getElementById('score2-sl-sbp').value=state.score2.sbp;
+  document.getElementById('score2-v-sbp').textContent=state.score2.sbp+' mmHg';
+  document.getElementById('score2-sl-tc').value=state.score2.tc;
+  document.getElementById('score2-v-tc').textContent=state.score2.tc+' mg/dL';
+  document.getElementById('score2-sl-hdl').value=state.score2.hdl;
+  document.getElementById('score2-v-hdl').textContent=state.score2.hdl+' mg/dL';
+  document.getElementById('score2-v-nonhdl').textContent=state.score2.tc-state.score2.hdl;
+  document.getElementById('score2-ck-smoke').checked=state.score2.smoking;
+  ['low','moderate','high','veryhigh'].forEach(k=>{
+    document.getElementById('score2-region-'+k).className='tbtn'+(k===state.score2.region?' on':'');
+  });
+}
+
+function syncAssign(){
+  document.getElementById('assign-btn-M').className='tbtn'+(state.assign.sex==='M'?' on':'');
+  document.getElementById('assign-btn-F').className='tbtn'+(state.assign.sex==='F'?' on-pink':'');
+  document.getElementById('assign-sl-age').value=state.assign.age;
+  document.getElementById('assign-v-age').textContent=state.assign.age+' años';
+  document.getElementById('assign-sl-sbp').value=state.assign.sbp;
+  document.getElementById('assign-v-sbp').textContent=state.assign.sbp+' mmHg';
+  document.getElementById('assign-sl-tc').value=state.assign.tc;
+  document.getElementById('assign-v-tc').textContent=state.assign.tc+' mg/dL';
+  document.getElementById('assign-sl-hdl').value=state.assign.hdl;
+  document.getElementById('assign-v-hdl').textContent=state.assign.hdl+' mg/dL';
+  document.getElementById('assign-v-ratio').textContent=(state.assign.tc/state.assign.hdl).toFixed(1);
+  document.getElementById('assign-ck-smoke').checked=state.assign.smoking;
+  document.getElementById('assign-sl-cigs').disabled=!state.assign.smoking;
+  document.getElementById('assign-sl-cigs').value=state.assign.cigsPerDay;
+  document.getElementById('assign-v-cigs').textContent=state.assign.cigsPerDay;
+  document.getElementById('assign-ck-famhist').checked=state.assign.famHist;
+  document.getElementById('assign-ck-diabetes').checked=state.assign.diabetes;
+  document.getElementById('assign-sl-ses').value=state.assign.ses;
+  document.getElementById('assign-v-ses').textContent=state.assign.ses;
+}
+
+function syncQrisk(){
+  document.getElementById('qrisk-btn-M').className='tbtn'+(state.qrisk.sex==='M'?' on':'');
+  document.getElementById('qrisk-btn-F').className='tbtn'+(state.qrisk.sex==='F'?' on-pink':'');
+  document.getElementById('qrisk-sl-age').value=state.qrisk.age;
+  document.getElementById('qrisk-v-age').textContent=state.qrisk.age+' años';
+  document.getElementById('qrisk-sel-ethnicity').value=state.qrisk.ethnicity;
+  document.getElementById('qrisk-sl-bmi').value=state.qrisk.bmi;
+  document.getElementById('qrisk-v-bmi').textContent=state.qrisk.bmi+' kg/m²';
+  document.getElementById('qrisk-sl-sbp').value=state.qrisk.sbp;
+  document.getElementById('qrisk-v-sbp').textContent=state.qrisk.sbp+' mmHg';
+  document.getElementById('qrisk-sl-tc').value=state.qrisk.tc;
+  document.getElementById('qrisk-v-tc').textContent=state.qrisk.tc+' mg/dL';
+  document.getElementById('qrisk-sl-hdl').value=state.qrisk.hdl;
+  document.getElementById('qrisk-v-hdl').textContent=state.qrisk.hdl+' mg/dL';
+  document.getElementById('qrisk-v-ratio').textContent=(state.qrisk.tc/state.qrisk.hdl).toFixed(1);
+  document.getElementById('qrisk-sel-smoking').value=state.qrisk.smokingCat;
+  document.getElementById('qrisk-sel-diabetes').value=state.qrisk.diabetes;
+  document.getElementById('qrisk-ck-famhist').checked=state.qrisk.famHist;
+  document.getElementById('qrisk-ck-afib').checked=state.qrisk.afib;
+  document.getElementById('qrisk-ck-ckd').checked=state.qrisk.ckd;
+}
+
+function syncAcsm(){
+  document.getElementById('acsm-btn-M').className='tbtn'+(state.acsm.sex==='M'?' on':'');
+  document.getElementById('acsm-btn-F').className='tbtn'+(state.acsm.sex==='F'?' on-pink':'');
+  document.getElementById('acsm-sl-age').value=state.acsm.age;
+  document.getElementById('acsm-v-age').textContent=state.acsm.age+' años';
+  document.getElementById('acsm-ck-famhist').checked=state.acsm.famHist;
+  document.getElementById('acsm-ck-smoke').checked=state.acsm.smoking;
+  document.getElementById('acsm-ck-sedentary').checked=state.acsm.sedentary;
+  document.getElementById('acsm-ck-obesity').checked=state.acsm.obesity;
+  document.getElementById('acsm-ck-htn').checked=state.acsm.htn;
+  document.getElementById('acsm-ck-dyslipidemia').checked=state.acsm.dyslipidemia;
+  document.getElementById('acsm-ck-prediabetes').checked=state.acsm.prediabetes;
+  document.getElementById('acsm-ck-highhdl').checked=state.acsm.highHdl;
+  document.getElementById('acsm-ck-knowndisease').checked=state.acsm.knownDisease;
+  document.getElementById('acsm-ck-symptoms').checked=state.acsm.symptoms;
+}
+
+function syncAllInputsFromState(){
+  syncFram(); syncScore2(); syncAssign(); syncQrisk(); syncAcsm();
+}
+
+// ── Casos clinicos preconfigurados ──────────────────────────────────────
+function smokingCatFor(s){
+  if (s.status === 'never') return 0;
+  if (s.status === 'ex') return 1;
+  return s.cigsPerDay < 10 ? 2 : s.cigsPerDay < 20 ? 3 : 4;
+}
+
+function applyCaseToScales(c){
+  const isCurrent = c.smoking.status === 'current';
+  const acsmSmoking = isCurrent || (c.smoking.status === 'ex' && c.smoking.quitMonthsAgo != null && c.smoking.quitMonthsAgo < 6);
+
+  state.fram = { sex:c.sex, age:c.age, tc:c.tc, hdl:c.hdl, sbp:c.sbp, bpTreated:c.bpTreated, smoking:isCurrent };
+
+  state.score2 = { ...state.score2, sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent };
+  // region NO se sobreescribe — se mantiene la seleccion previa del usuario
+
+  state.assign = { sex:c.sex, age:c.age, sbp:c.sbp, tc:c.tc, hdl:c.hdl, smoking:isCurrent,
+    cigsPerDay:c.smoking.cigsPerDay||0, famHist:c.famHist, diabetes:c.diabetes!=='none', ses:c.ses };
+
+  state.qrisk = { sex:c.sex, age:c.age, ethnicity:c.ethnicity, bmi:c.bmi, sbp:c.sbp, tc:c.tc, hdl:c.hdl,
+    smokingCat:smokingCatFor(c.smoking), diabetes:c.diabetes, famHist:c.famHist, afib:c.afib, ckd:c.ckd };
+
+  state.acsm = { sex:c.sex, age:c.age, famHist:c.famHist, smoking:acsmSmoking, sedentary:c.sedentary,
+    obesity:c.bmi>=30, htn:c.sbp>=130||c.bpTreated, dyslipidemia:c.hdl<40||c.dyslipidemiaTx||c.tc>=200,
+    prediabetes:!!c.prediabetic, highHdl:c.hdl>=60,
+    knownDisease:(c.diabetes!=='none')||c.ckd, symptoms:false };
+
+  syncAllInputsFromState();
+  updateFram(); updateScore2(); updateAssign(); updateQrisk(); updateAcsm();
+  renderFITT();
+}
+
+function loadCase(id){
+  const c = RIESGO_CV_CASES.find(x => x.id === id);
+  if (!c) return;
+  applyCaseToScales(c);
+  document.querySelectorAll('.case-chip').forEach(ch => ch.classList.remove('on'));
+  document.getElementById('case-chip-'+id).classList.add('on');
+  const v = document.getElementById('case-vignette');
+  v.style.display='block';
+  v.innerHTML = '<strong>'+c.name+'</strong> · '+c.age+' años · '+(c.sex==='M'?'Hombre':'Mujer')+'<br>'+c.vignette;
+}
+
+function clearCase(){
+  document.querySelectorAll('.case-chip').forEach(ch => ch.classList.remove('on'));
+  document.getElementById('case-vignette').style.display='none';
+}
+
+function renderCaseChips(){
+  const wrap = document.getElementById('case-chips');
+  RIESGO_CV_CASES.forEach(c=>{
+    const btn = document.createElement('button');
+    btn.className='tbtn case-chip';
+    btn.id='case-chip-'+c.id;
+    btn.textContent='Caso '+c.id;
+    btn.style.flex='none';
+    btn.onclick=()=>loadCase(c.id);
+    wrap.appendChild(btn);
+  });
+  const manualBtn = document.createElement('button');
+  manualBtn.className='tbtn case-chip';
+  manualBtn.textContent='Entrada manual';
+  manualBtn.style.flex='none';
+  manualBtn.onclick=clearCase;
+  wrap.appendChild(manualBtn);
+}
+
 // ── Init ──────────────────────────────────────────────────────────────
 renderKillip();
+renderCaseChips();
 updateFram();
 </script>
 </body>
